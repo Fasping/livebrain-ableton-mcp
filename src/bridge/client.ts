@@ -25,12 +25,12 @@ export class BridgeError extends Error {
 
 export class AbletonBridgeClient {
   constructor(
-    private readonly host = process.env.LIVEBRAIN_BRIDGE_HOST ?? "127.0.0.1",
-    private readonly port = Number(process.env.LIVEBRAIN_BRIDGE_PORT ?? 9877),
+    private readonly host = process.env.LIVEBRAIN_HOST ?? "127.0.0.1",
+    private readonly port = Number(process.env.LIVEBRAIN_PORT ?? 9877),
     private readonly timeoutMs = 5000,
   ) {}
 
-  request<T>(method: string, params: Record<string, unknown> = {}): Promise<T> {
+  request<T>(method: string, params: object = {}): Promise<T> {
     const id = randomUUID();
 
     return new Promise<T>((resolve, reject) => {
