@@ -1,6 +1,8 @@
 # LiveBrain
 
-LiveBrain is an agent-agnostic music-production system for deep control of Ableton Live 12. It is built around the Model Context Protocol (MCP), so it is not tied to Claude Desktop or to one AI provider.
+**AI music production brain for Ableton Live.**
+
+LiveBrain is an agent-agnostic music-production system for deep control of Ableton Live 12. Unlike a generic remote-control MCP, it combines a normalized Ableton API with deterministic musical generation, mutation, project analysis and—later—a local Reference Brain and preference model.
 
 The same LiveBrain core is intended to work with Claude Desktop, Claude Code, ChatGPT, Codex, Cursor, VS Code and other MCP-compatible clients. Each client may require a different transport or deployment model.
 
@@ -53,7 +55,67 @@ npm run build
 npm run dev
 ```
 
+Use Node.js 20 or newer. Run without Ableton during development with:
+
+```bash
+LIVEBRAIN_ADAPTER=mock npm run dev
+```
+
 The initial MCP server uses stdio. The temporary Python bridge listens only on `127.0.0.1:9877`.
+
+## Ableton Remote Script
+
+1. Copy `bridge/LiveBrain` into a MIDI Remote Scripts location recognized by your Ableton Live 12 installation.
+2. Restart Live.
+3. In **Settings → Link, Tempo & MIDI**, select **LiveBrain** as a Control Surface.
+4. Keep port `9877` on localhost; never expose the bridge publicly.
+
+Live installations can use different Remote Script locations. See `docs/ABLETON_API.md`.
+
+## Claude Desktop
+
+After `npm run build`, add the server to Claude Desktop's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "livebrain": {
+      "command": "node",
+      "args": ["/absolute/path/to/livebrain-mcp/dist/index.js"],
+      "env": { "LIVEBRAIN_HOST": "127.0.0.1", "LIVEBRAIN_PORT": "9877" }
+    }
+  }
+}
+```
+
+## Development and testing
+
+```bash
+npm run typecheck
+npm test
+npm run build
+```
+
+Structured logs go only to stderr so MCP stdio is never corrupted.
+
+## Current MCP tools
+
+- `health`, `ableton_capabilities`
+- `livebrain_analyze_set` (`compact` or `detailed`)
+- `ableton_create_midi_track`, `ableton_create_midi_clip`
+- `ableton_get_clip_notes`, `ableton_replace_notes`
+- `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
+- `music_generate_drum_groove`, `music_mutate_clip`, `music_make_less_obvious`
+
+Write operations support `dryRun` where useful.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Ableton API](docs/ABLETON_API.md)
+- [Music Brain](docs/MUSIC_BRAIN.md)
+- [Reference Brain](docs/REFERENCE_BRAIN.md)
+- [Roadmap](docs/ROADMAP.md)
 
 ## Layout
 
