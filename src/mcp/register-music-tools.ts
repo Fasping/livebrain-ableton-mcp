@@ -4,20 +4,23 @@ import type { AbletonAdapter } from "../ableton/adapter.js";
 import { generateDrumGroove } from "../music-brain/drum-generator.js";
 import { makeLessObvious, mutateNotes } from "../music-brain/mutation-engine.js";
 import { afterhours2019 } from "../music-brain/style-profile.js";
+import type { ReferenceService } from "../reference/reference-service.js";
 import { clipTargetSchema, dryRunSchema } from "./schemas.js";
 import { textResult } from "./helpers.js";
 
-export function registerMusicTools(server: McpServer, ableton: AbletonAdapter) {
+export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, references: ReferenceService) {
   server.tool("music_generate_drum_groove", "Generate a deterministic sparse drum groove and optionally write it to a clip.", {
     bars: z.number().int().min(1).max(64).default(4), seed: z.number().int().default(1),
+    profileId: z.string().regex(/^[a-zA-Z0-9._-]+$/).optional(),
     apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(),
     dryRun: dryRunSchema,
-  }, async ({ bars, seed, apply, trackIndex, slotIndex, dryRun }) => {
-    const notes = generateDrumGroove(afterhours2019, { bars, seed });
-    if (!apply) return textResult({ profile: afterhours2019.id, seed, notes });
+  }, async ({ bars, seed, profileId, apply, trackIndex, slotIndex, dryRun }) => {
+    const profile = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const notes = generateDrumGroove(profile, { bars, seed });
+    if (!apply) return textResult({ profile: profile.id, seed, notes });
     if (trackIndex === undefined || slotIndex === undefined) throw new Error("trackIndex and slotIndex are required when apply=true");
     const change = await ableton.replaceClipNotes({ trackIndex, slotIndex }, notes, dryRun);
-    return textResult({ profile: afterhours2019.id, seed, generatedNotes: notes.length, change });
+    return textResult({ profile: profile.id, seed, generatedNotes: notes.length, change });
   });
 
   server.tool("music_mutate_clip", "Create a deterministic variation while preserving selected MIDI pitches.", {
