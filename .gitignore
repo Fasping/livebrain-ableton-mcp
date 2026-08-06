@@ -5,6 +5,14 @@ dist/
 *.log
 __pycache__/
 *.pyc
-data/references/*
+data/references/.local-index.json
+data/references/**/*.wav
+data/references/**/*.wave
+data/references/**/*.aif
+data/references/**/*.aiff
+data/references/**/*.mp3
+data/references/**/*.flac
+data/references/**/*.m4a
+data/references/**/*.ogg
 !data/references/.gitkeep
 data/feedback/*.local.json
