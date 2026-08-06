@@ -19,7 +19,11 @@ Arrangement, automation, racks/macros, nested chains, sends/returns, routing and
 
 ## Phase 4 — Reference Brain
 
-Local catalog, `AudioAnalyzer`, measured features and profile aggregation.
+- [x] Local catalog and gitignored path index
+- [x] `AudioAnalyzer` abstraction with WAV and optional ffmpeg decoders
+- [x] Rhythm-focused measurements and human ratings
+- [x] Distribution aggregation into generator-ready profiles
+- [ ] Section-boundary and tonal/spectral expansion
 
 ## Phase 5 — Feedback and personal profile
 

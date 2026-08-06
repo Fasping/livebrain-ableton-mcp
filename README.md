@@ -106,8 +106,24 @@ Structured logs go only to stderr so MCP stdio is never corrupted.
 - `ableton_get_clip_notes`, `ableton_replace_notes`
 - `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
 - `music_generate_drum_groove`, `music_mutate_clip`, `music_make_less_obvious`
+- `music_compare_to_profile`
+- `reference_add`, `reference_analyze`, `reference_tag`, `reference_rate`
+- `reference_get`, `reference_list`, `reference_build_profile`
 
 Write operations support `dryRun` where useful.
+
+## Reference workflow
+
+Reference audio remains at its original local path and is never copied into Git. LiveBrain stores shareable measurements separately from a gitignored local path index.
+
+```bash
+livebrain reference-add --audio "/local/music/reference.wav" --title "Reference 01" --groups afterhours_2019
+livebrain reference-analyze --id UUID
+livebrain reference-rate --id UUID --ratings '{"groove":0.9,"space":0.8,"cheese":0.05}'
+livebrain reference-build-profile --group afterhours_2019
+```
+
+PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install it and optionally set `LIVEBRAIN_FFMPEG_PATH`.
 
 ## Documentation
 

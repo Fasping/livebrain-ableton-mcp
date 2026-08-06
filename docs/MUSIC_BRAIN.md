@@ -25,3 +25,7 @@ The same profile, seed and parameters produce identical notes. This enables test
 - Rich groove extraction and profile blending.
 - Bass and short-sequence generators.
 - Variation sets and 16/32/64-bar section evolution.
+
+## Reference-derived profiles
+
+Generated profiles directly influence rhythm density, syncopation, microtiming, repetition, silence, mutation rate, hat/ghost density and selected bass/timbre/arrangement parameters. Artist and label metadata never selects cloning logic.
