@@ -68,6 +68,7 @@ bridge/LiveBrain/
 ## Roadmap
 
 - **v0.1:** MCP, minimal bridge and first Music Brain.
+- **v0.1.1:** thread-safe Live execution, versioned bridge protocol and replaceable Ableton adapter.
 - **v0.2:** devices, automation, arrangement, browser, racks, routing and section operations.
 - **v0.3:** Reference Brain and evolving producer profiles.
 - **Future:** remote MCP transport and migration from the Python compatibility bridge to Ableton Extensions SDK.
