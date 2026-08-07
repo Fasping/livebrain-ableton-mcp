@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { generateDrumGroove } from "../music-brain/drum-generator.js";
@@ -21,25 +21,44 @@ test("reference library stores local paths separately and builds a consumable pr
   const analyzed = await service.analyze(added.id);
   assert.ok(analyzed.measured);
   assert.ok(analyzed.measured.rhythm.onsetCount > 8);
-  await service.rate(added.id, { groove: 0.9, space: 0.7, electro: 0.8 });
+  await service.rate(added.id, { groove: 9, space: 7, electro: 8 });
+  await service.setInfluence(added.id, { groove: 1, space: 1, electro: 1, drums: .8 });
   const profile = await service.buildProfile("machine_funk");
   assert.equal(profile.styleProfile.id, "machine_funk");
   assert.ok(profile.styleProfile.rhythm.density >= 0 && profile.styleProfile.rhythm.density <= 1);
 });
 
 test("different reference profiles produce measurably different patterns", () => {
-  const sparse = buildReferenceProfile("sparse", [reference("sparse", features(0.8, 0.72, 0.9), { space: 0.9 })]);
-  const dense = buildReferenceProfile("dense", [reference("dense", features(6.2, 0.35, 0.15), { space: 0.2 })]);
+  const sparse = buildReferenceProfile("sparse", [reference("sparse", features(0.8, 0.72, 0.9), { space: 9 })]);
+  const dense = buildReferenceProfile("dense", [reference("dense", features(6.2, 0.35, 0.15), { space: 2 })]);
   const sparseNotes = generateDrumGroove(sparse.styleProfile, { bars: 16, seed: 404 });
   const denseNotes = generateDrumGroove(dense.styleProfile, { bars: 16, seed: 404 });
   assert.notDeepEqual(sparseNotes, denseNotes);
   assert.ok(denseNotes.length > sparseNotes.length * 1.25, `${denseNotes.length} should be denser than ${sparseNotes.length}`);
 });
 
+test("reference audio extensions and local path index are gitignored", async () => {
+  const gitignore = await readFile(new URL("../../.gitignore", import.meta.url), "utf8");
+  assert.match(gitignore, /data\/references\/\.local-index\.json/);
+  for (const extension of ["wav", "aiff", "mp3", "flac"]) assert.match(gitignore, new RegExp(`\\*\\*/\\*\\.${extension}`));
+});
+
+test("curated priors remain human-only and can build an influence-weighted profile", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "livebrain-priors-"));
+  const service = new ReferenceService(new ReferenceStore(join(directory, "data")), new AnalyzerRegistry([new WavAudioAnalyzer()]));
+  const priors = await service.seedCuratedPriors();
+  assert.ok(priors.length >= 20);
+  assert.ok(priors.every((reference) => reference.measured === undefined));
+  const profile = await service.buildProfile("afterhours_2019");
+  assert.ok((profile.contributions.groove?.length ?? 0) > 5);
+  assert.ok(profile.styleProfile.rhythm.density >= 0 && profile.styleProfile.rhythm.density <= 1);
+});
+
 function reference(group: string, measured: MeasuredAudioFeatures, ratings: ReferenceTrack["human"]["ratings"]): ReferenceTrack {
   return {
-    id: `${group}-id`, version: 1, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
-    metadata: { title: group, groups: [group], tags: [], sourceFileName: `${group}.wav` }, measured, human: { ratings },
+    id: `${group}-id`, version: 2, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z",
+    metadata: { title: group, groups: [group], tags: [], sourceFileName: `${group}.wav` }, measured,
+    human: { ratings, notes: [] }, influence: { groove: 1, drums: 1, space: 1 },
   };
 }
 
@@ -48,9 +67,9 @@ function features(onsetDensity: number, repetition: number, silenceRatio: number
     analyzer: "test", analyzerVersion: "1", analyzedAt: "2026-01-01T00:00:00.000Z", durationSeconds: 60, sampleRate: 22050, channels: 1,
     dynamics: { rms: 0.2, peak: 0.8, crestFactor: 4 },
     rhythm: {
-      onsetCount: Math.round(onsetDensity * 60), onsetDensity, estimatedBpm: 130,
+      onsetCount: Math.round(onsetDensity * 60), onsetDensity, estimatedBpm: 130, bpmConfidence: .8,
       beatRelativeOnsetHistogram: Array.from({ length: 16 }, (_, i) => i % 4 === 0 ? 0.15 : 0.025),
-      syncopationProxy: onsetDensity > 3 ? 0.75 : 0.35, repetition,
+      syncopationProxy: onsetDensity > 3 ? 0.75 : 0.35, repetition, onsetRegularity: .7, predictabilityProxy: .5,
       microtimingMeanMs: 7, microtimingStdMs: onsetDensity > 3 ? 18 : 6, silenceRatio,
       accentPattern: Array.from({ length: 16 }, (_, i) => i % 4 === 0 ? 1 : 0.3), longCycleVariation: onsetDensity > 3 ? 0.45 : 0.12,
     },

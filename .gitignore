@@ -16,3 +16,4 @@ data/references/**/*.m4a
 data/references/**/*.ogg
 !data/references/.gitkeep
 data/feedback/*.local.json
+data/feedback/generations.json

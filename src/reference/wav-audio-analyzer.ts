@@ -81,7 +81,8 @@ function analyzeRhythm(samples: Float32Array, sampleRate: number): RhythmFeature
   }
   const frameSeconds = hop / sampleRate;
   const duration = samples.length / sampleRate;
-  const bpm = estimateBpm(onsets, frameSeconds, duration);
+  const tempo = estimateBpm(onsets, frameSeconds, duration);
+  const bpm = tempo.bpm;
   const histogram = phaseHistogram(onsets, frameSeconds, bpm, 16);
   const accented = histogram.map((value, index) => value * ([0, 4, 8, 12].includes(index) ? 0 : 1)).reduce((a, b) => a + b, 0);
   const total = histogram.reduce((a, b) => a + b, 0);
@@ -89,13 +90,20 @@ function analyzeRhythm(samples: Float32Array, sampleRate: number): RhythmFeature
   const silenceThreshold = Math.max(0.0005, median(energies) * 0.18);
   const barFrames = bpm ? Math.max(1, Math.round((60 / bpm * 4) / frameSeconds)) : 400;
   const barVectors = chunkVectors(energies, barFrames, 16);
+  const onsetIntervals = onsets.slice(1).map((frame, index) => (frame - onsets[index]!) * frameSeconds);
+  const regularity = onsetIntervals.length ? 1 - Math.min(1, coefficientOfVariation(onsetIntervals)) : 0;
+  const repetition = consecutiveCosineSimilarity(barVectors);
+  const syncopation = total ? accented / total : 0;
   return {
     onsetCount: onsets.length,
     onsetDensity: onsets.length / Math.max(duration, 0.001),
     estimatedBpm: bpm,
+    bpmConfidence: tempo.confidence,
     beatRelativeOnsetHistogram: histogram,
-    syncopationProxy: total ? accented / total : 0,
-    repetition: consecutiveCosineSimilarity(barVectors),
+    syncopationProxy: syncopation,
+    repetition,
+    onsetRegularity: regularity,
+    predictabilityProxy: Math.max(0, Math.min(1, repetition * .6 + regularity * .3 + (1 - syncopation) * .1)),
     microtimingMeanMs: microtiming.length ? mean(microtiming.map(Math.abs)) : null,
     microtimingStdMs: microtiming.length ? standardDeviation(microtiming) : null,
     silenceRatio: energies.filter((value) => value < silenceThreshold).length / Math.max(1, energies.length),
@@ -104,21 +112,23 @@ function analyzeRhythm(samples: Float32Array, sampleRate: number): RhythmFeature
   };
 }
 
-function estimateBpm(onsets: number[], frameSeconds: number, duration: number): number | null {
-  if (onsets.length < 8 || duration < 8) return null;
+function estimateBpm(onsets: number[], frameSeconds: number, duration: number): { bpm: number | null; confidence: number } {
+  if (onsets.length < 8 || duration < 8) return { bpm: null, confidence: 0 };
   const envelopeLength = Math.ceil(duration / frameSeconds);
   const envelope = new Float32Array(envelopeLength);
   for (const onset of onsets) envelope[onset] = 1;
-  let bestBpm = 0, bestScore = -1;
+  let bestBpm = 0, bestScore = -1, secondScore = -1;
   for (let bpm = 70; bpm <= 180; bpm += 0.25) {
     const lag = Math.round((60 / bpm) / frameSeconds);
     let score = 0;
     for (let i = lag; i < envelope.length; i += 1) score += envelope[i]! * envelope[i - lag]!;
-    if (score > bestScore) { bestScore = score; bestBpm = bpm; }
+    if (score > bestScore) { secondScore = bestScore; bestScore = score; bestBpm = bpm; }
+    else if (score > secondScore) secondScore = score;
   }
   while (bestBpm < 105) bestBpm *= 2;
   while (bestBpm > 155) bestBpm /= 2;
-  return Math.round(bestBpm * 100) / 100;
+  const confidence = bestScore > 0 ? Math.max(0, Math.min(1, (bestScore - Math.max(0, secondScore)) / bestScore + bestScore / onsets.length * .5)) : 0;
+  return { bpm: Math.round(bestBpm * 100) / 100, confidence };
 }
 
 function phaseHistogram(onsets: number[], frameSeconds: number, bpm: number | null, bins: number) {

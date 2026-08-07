@@ -1,18 +1,27 @@
 import type { StyleProfile } from "../music-brain/style-profile.js";
 
 export const ratingKeys = [
-  "groove", "drums", "bass", "arrangement", "weirdness", "hypnosis",
-  "darkness", "electro", "progressive", "space", "cheese", "overallReferenceValue",
+  "groove", "drums", "bass", "synth", "arrangement", "weirdness", "hypnosis",
+  "darkness", "electro", "progressive", "space", "rawness", "subtlety",
+  "predictability", "cheese", "overallReferenceValue",
 ] as const;
 
 export type RatingKey = (typeof ratingKeys)[number];
 export type HumanRatings = Partial<Record<RatingKey, number>>;
+
+export const influenceKeys = [
+  "groove", "drums", "bass", "synth", "sequence", "arrangement", "timbre",
+  "harmony", "space", "rawness", "weirdness", "hypnosis", "electro", "progressive",
+] as const;
+export type InfluenceKey = (typeof influenceKeys)[number];
+export type ReferenceInfluence = Partial<Record<InfluenceKey, number>>;
 
 export interface ReferenceMetadata {
   title: string;
   artist?: string;
   release?: string;
   label?: string;
+  catalog?: string;
   year?: number;
   groups: string[];
   tags: string[];
@@ -23,9 +32,12 @@ export interface RhythmFeatures {
   onsetCount: number;
   onsetDensity: number;
   estimatedBpm: number | null;
+  bpmConfidence: number;
   beatRelativeOnsetHistogram: number[];
   syncopationProxy: number;
   repetition: number;
+  onsetRegularity: number;
+  predictabilityProxy: number;
   microtimingMeanMs: number | null;
   microtimingStdMs: number | null;
   silenceRatio: number;
@@ -46,12 +58,16 @@ export interface MeasuredAudioFeatures {
 
 export interface ReferenceTrack {
   id: string;
-  version: 1;
+  version: 2;
   createdAt: string;
   updatedAt: string;
   metadata: ReferenceMetadata;
   measured?: MeasuredAudioFeatures;
-  human: { ratings: HumanRatings; notes?: string };
+  human: { ratings: HumanRatings; notes: string[] };
+  influence: ReferenceInfluence;
+  sourceConfidence?: "low" | "medium" | "medium-high" | "high";
+  needsHumanReview?: boolean;
+  needsAudioAnalysis?: boolean;
 }
 
 export interface Distribution {
@@ -61,6 +77,9 @@ export interface Distribution {
   median: number;
   mean: number;
   standardDeviation: number;
+  p25: number;
+  p75: number;
+  weightedMean?: number;
 }
 
 export interface ReferenceProfile {
@@ -80,6 +99,7 @@ export interface ReferenceProfile {
     accentPattern: number[];
   };
   human: Partial<Record<RatingKey, Distribution>>;
+  contributions: Partial<Record<InfluenceKey, Array<{ referenceId: string; title: string; weight: number; percentage: number }>>>;
   styleProfile: StyleProfile;
 }
 

@@ -2,6 +2,8 @@ import type { AbletonAdapter } from "../ableton/adapter.js";
 import type { HumanRatings, ProfileComparison, ReferenceMetadata, ReferenceProfile, ReferenceTrack } from "./models.js";
 import { AnalyzerRegistry } from "./audio-analyzer.js";
 import { buildReferenceProfile } from "./profile-builder.js";
+import { explainProfile } from "./profile-builder.js";
+import { curatedSeedPriors } from "./seed-priors.js";
 import { ReferenceStore } from "./store.js";
 
 export class ReferenceService {
@@ -11,7 +13,12 @@ export class ReferenceService {
   list(group?: string) { return this.store.list(group); }
   tag(id: string, tags: string[], groups: string[]) { return this.store.tag(id, tags, groups); }
   rate(id: string, ratings: HumanRatings, notes?: string) { return this.store.rate(id, ratings, notes); }
+  setInfluence(id: string, influence: import("./models.js").ReferenceInfluence) { return this.store.setInfluence(id, influence); }
   getProfile(id: string) { return this.store.getProfile(id); }
+
+  async seedCuratedPriors() {
+    return Promise.all(curatedSeedPriors.map((reference) => this.store.upsertSeed(reference)));
+  }
 
   async analyze(id: string): Promise<ReferenceTrack> {
     const path = await this.store.audioPath(id);
@@ -24,6 +31,8 @@ export class ReferenceService {
     await this.store.saveProfile(profile);
     return profile;
   }
+
+  async explainProfile(id: string) { return explainProfile(await this.getProfile(id)); }
 
   async compareLiveSet(profileId: string, ableton: AbletonAdapter): Promise<ProfileComparison> {
     const [profile, snapshot] = await Promise.all([this.getProfile(profileId), ableton.snapshot("compact")]);
