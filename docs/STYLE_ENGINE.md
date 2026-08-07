@@ -20,6 +20,10 @@ stored profile + generation overrides + future preference weights
 
 Overrides change real density, syncopation, digital/electro weighting, chromaticism, predictability, rests and subtraction parameters.
 
+## Profile blending
+
+`reference_blend_profiles` normalizes component weights and blends actual StyleProfile parameters and measured distributions. It does not concatenate names or prompt text. Cycle-bar constraints and negative traits are merged explicitly.
+
 ## Seed priors
 
 Bundled curated priors are human metadata only. They have no `measured` audio features and are marked `needsAudioAnalysis`. Artist and label names are curation metadata, never generator switches.

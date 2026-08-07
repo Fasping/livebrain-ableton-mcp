@@ -103,13 +103,15 @@ Structured logs go only to stderr so MCP stdio is never corrupted.
 - `health`, `ableton_capabilities`
 - `livebrain_analyze_set` (`compact` or `detailed`)
 - `ableton_create_midi_track`, `ableton_create_midi_clip`
-- `ableton_get_clip_notes`, `ableton_replace_notes`
+- `ableton_get_clip_notes`, `ableton_replace_notes`, `ableton_duplicate_clip`, `ableton_set_clip_loop`
 - `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
-- `music_generate_drum_groove`, `music_generate_bass`, `music_mutate_clip`, `music_make_less_obvious`
+- `music_generate_drum_groove`, `music_generate_bass`, `music_generate_sequence`
+- `music_mutate_clip`, `music_make_less_obvious`, `music_make_bass_less_obvious`, `music_evolve_section`
 - `music_compare_to_profile`
 - `reference_add`, `reference_analyze`, `reference_tag`, `reference_rate`
-- `reference_set_influence`, `reference_get`, `reference_list`, `reference_build_profile`, `reference_explain_profile`
+- `reference_set_influence`, `reference_get`, `reference_list`, `reference_build_profile`, `reference_explain_profile`, `reference_blend_profiles`
 - `feedback_generation`, `feedback_get_preferences`
+- `generation_set_locks`, `generation_get_locks`
 
 Write operations support `dryRun` where useful.
 
@@ -135,6 +137,7 @@ PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install
 - [Reference Brain](docs/REFERENCE_BRAIN.md)
 - [Style Engine](docs/STYLE_ENGINE.md)
 - [Feedback Engine](docs/FEEDBACK_ENGINE.md)
+- [Selective Generation & Evolution](docs/SELECTIVE_EVOLUTION.md)
 - [Roadmap](docs/ROADMAP.md)
 
 ## Layout
@@ -153,4 +156,5 @@ bridge/LiveBrain/
 - **v0.1.1:** thread-safe Live execution, versioned bridge protocol and replaceable Ableton adapter.
 - **v0.2:** devices, automation, arrangement, browser, racks, routing and section operations.
 - **v0.3:** Reference Brain and evolving producer profiles.
+- **v0.4:** selective generation, persistent dimension locks and section evolution.
 - **Future:** remote MCP transport and migration from the Python compatibility bridge to Ableton Extensions SDK.

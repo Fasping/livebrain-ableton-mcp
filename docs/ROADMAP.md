@@ -6,7 +6,7 @@
 - [x] Replaceable and mock adapters
 - [x] Compact/detailed snapshots
 - [x] Core Session MIDI and device parameters
-- [ ] Mixer, track mutation, clip duplication and Live integration fixture
+- [ ] Mixer, track mutation and Live integration fixture
 
 ## Phase 2 — Advanced Ableton control
 
@@ -15,7 +15,10 @@ Arrangement, automation, racks/macros, nested chains, sends/returns, routing and
 ## Phase 3 — Music generators
 
 - [x] Deterministic drums, MIDI mutation and less-obvious transformation
-- [ ] Bass, short sequences, variation sets and section evolution
+- [x] Rhythm-first bass and alien sequence generators
+- [x] Persistent dimension locks and bass-selective mutation
+- [x] Deterministic 16→64-bar MIDI evolution with duplicate-before-transform
+- [ ] Multi-clip variation sets and verified filter/send automation
 
 ## Phase 4 — Reference Brain
 

@@ -16,6 +16,7 @@ The same profile, seed and parameters produce identical notes. This enables test
 
 - Multi-role drum groove generation.
 - Rhythm-first bass generation with motifs, rests, phrase cycles and controlled chromatic mutation.
+- Short alien/digital/FM-oriented sequences, bleeps, stabs, one-shots and chord fragments with non-obvious cycles.
 - Timing, velocity and density mutation while preserving selected pitches.
 - “Less obvious” transformation through selective removal, delayed recurrence and restrained accent changes.
 
@@ -26,6 +27,7 @@ The same profile, seed and parameters produce identical notes. This enables test
 - Rich groove extraction and profile blending.
 - Bass and short-sequence generators.
 - Variation sets and 16/32/64-bar section evolution.
+- Device/filter/send automation remains pending until verified against Live's API.
 
 ## Reference-derived profiles
 

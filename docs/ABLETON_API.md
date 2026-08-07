@@ -9,6 +9,8 @@
 | Create MIDI track | `track.create_midi` |
 | Create Session MIDI clip | `clip.create_midi` |
 | Read/replace/add notes | `clip.get_notes`, `clip.replace_notes`, `clip.add_notes` |
+| Duplicate Session clip | `clip.duplicate` |
+| Set MIDI clip loop | `clip.set_loop` |
 | Devices and parameters | `device.list`, `device.parameters`, `device.set_parameter` |
 
 Parameters use normalized values from 0 to 1. Writes validate targets and support dry-run where exposed.
@@ -21,6 +23,18 @@ Parameters use normalized values from 0 to 1. Writes validate targets and suppor
 - Nested racks, Drum Rack pads, routing, sends and returns are pending.
 - Persistent Live object IDs are not exposed yet; resolve validated indices from a fresh snapshot.
 - Modern note writing uses `add_new_notes`; older Live APIs only have a read fallback.
+- High-level duplicate-transform workflows currently perform several individually undoable bridge calls. A future compound transaction should make the whole workflow one atomic undo step.
+- `duplicate_clip_to` and extended loop growth are implemented but must still be verified in the installed Live 12 Remote Script.
+
+## Smoke test
+
+With Ableton running and LiveBrain selected as a Control Surface:
+
+```bash
+npm run smoke:ableton
+```
+
+This verifies TypeScript adapter → socket → Python bridge → Live Object Model for capabilities and compact snapshot. It does not claim Arrangement or Automation support.
 
 ## Remote Script
 
