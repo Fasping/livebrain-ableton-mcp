@@ -1,33 +1,46 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import { AbletonBridgeClient } from "./bridge/client.js";
-import { MusicBrain } from "./music-brain/index.js";
+import { MockAbletonAdapter } from "./ableton/mock-adapter.js";
+import { PythonRemoteScriptAdapter } from "./ableton/python-remote-script-adapter.js";
+import { loadConfig } from "./config.js";
+import { log } from "./logger.js";
+import { registerAbletonTools } from "./mcp/register-ableton-tools.js";
+import { registerMusicTools } from "./mcp/register-music-tools.js";
+import { registerReferenceTools } from "./mcp/register-reference-tools.js";
+import { registerFeedbackTools } from "./mcp/register-feedback-tools.js";
+import { registerLockTools } from "./mcp/register-lock-tools.js";
+import { textResult } from "./mcp/helpers.js";
+import { createReferenceService } from "./reference/create-reference-service.js";
+import { FeedbackStore } from "./feedback/feedback-store.js";
+import { LockStore } from "./locks/lock-store.js";
 
-const server = new McpServer({ name: "livebrain-mcp", version: "0.1.0" });
-const bridge = new AbletonBridgeClient();
-const brain = new MusicBrain();
+const config = loadConfig();
+const server = new McpServer({ name: "livebrain-mcp", version: "0.2.0" });
+const ableton = config.adapter === "mock" ? new MockAbletonAdapter() : new PythonRemoteScriptAdapter();
+const references = createReferenceService(config.dataDir);
+const feedback = new FeedbackStore(config.dataDir);
+const locks = new LockStore(config.dataDir);
 
-server.tool("health", "Check LiveBrain MCP health.", {}, async () => ({
-  content: [{ type: "text", text: JSON.stringify({ ok: true, version: "0.1.0" }) }],
+server.tool("health", "Check LiveBrain MCP and configured adapter.", {}, async () => textResult({
+  ok: true, version: "0.2.0", adapter: config.adapter,
 }));
+server.tool("ableton_capabilities", "Read bridge version and explicitly supported operations.", {},
+  async () => textResult(await ableton.capabilities()));
 
-server.tool("live_set_snapshot", "Read the current Ableton Live Set.", {}, async () => ({
-  content: [{ type: "text", text: JSON.stringify(await bridge.request("live_set.snapshot"), null, 2) }],
-}));
+registerAbletonTools(server, ableton);
+registerMusicTools(server, ableton, references, feedback, locks);
+registerReferenceTools(server, references, ableton);
+registerFeedbackTools(server, feedback);
+registerLockTools(server, locks);
 
-server.tool(
-  "generate_bassline",
-  "Generate a deterministic style-aware bassline.",
-  {
-    bars: z.number().int().min(1).max(256).default(4),
-    seed: z.number().int().default(1),
-    rootMidi: z.number().int().min(0).max(127).default(36),
-  },
-  async (input) => ({
-    content: [{ type: "text", text: JSON.stringify({ notes: brain.generateBassline(input) }, null, 2) }],
-  }),
-);
+const shutdown = async () => {
+  log("info", "LiveBrain shutting down");
+  await ableton.close();
+  await server.close();
+};
+process.once("SIGINT", () => void shutdown().finally(() => process.exit(0)));
+process.once("SIGTERM", () => void shutdown().finally(() => process.exit(0)));
 
+log("info", "LiveBrain starting", { adapter: config.adapter, host: config.host, port: config.port });
 await server.connect(new StdioServerTransport());
