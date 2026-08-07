@@ -35,6 +35,9 @@ export function createEffectiveStyleProfile(base: StyleProfile, request: Effecti
     profile.timbre.weirdness = clamp01(traits.weirdness);
     profile.bass.chromaticism = clamp01(profile.bass.chromaticism * .45 + traits.weirdness * .55);
     profile.rhythm.predictability = clamp01(profile.rhythm.predictability * (1 - traits.weirdness * .45));
+    profile.sequence.chromaticism = clamp01(profile.sequence.chromaticism * .4 + traits.weirdness * .6);
+    profile.sequence.rareEventProbability = clamp01(.02 + traits.weirdness * .14);
+    profile.sequence.cycleSteps = traits.weirdness > .75 ? 11 : traits.weirdness > .45 ? 7 : 8;
   }
   if (traits.space !== undefined) {
     const value = clamp01(traits.space);
@@ -44,6 +47,7 @@ export function createEffectiveStyleProfile(base: StyleProfile, request: Effecti
     profile.mix.space = value;
     profile.rhythm.density = clamp01(profile.rhythm.density * (1 - value * .38));
     profile.bass.density = clamp01(profile.bass.density * (1 - value * .42));
+    profile.sequence.density = clamp01(profile.sequence.density * (1 - value * .45));
   }
   profile.version = `${base.version}+effective`;
   return profile;

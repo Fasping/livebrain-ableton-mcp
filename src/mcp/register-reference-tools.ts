@@ -59,6 +59,11 @@ export function registerReferenceTools(server: McpServer, references: ReferenceS
     profileId: idSchema,
   }, async ({ profileId }) => textResult(await references.explainProfile(profileId)));
 
+  server.tool("reference_blend_profiles", "Blend stored profile parameters and measured distributions using normalized weights.", {
+    id: idSchema,
+    components: z.array(z.object({ profileId: idSchema, weight: z.number().positive() })).min(2).max(8),
+  }, async ({ id, components }) => textResult(await references.blendProfiles(id, components)));
+
   server.tool("reference_seed_curated_priors", "Import bundled human-curation priors without pretending they are audio measurements.", {},
     async () => textResult({ references: await references.seedCuratedPriors() }));
 

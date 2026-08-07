@@ -4,6 +4,7 @@ import { AnalyzerRegistry } from "./audio-analyzer.js";
 import { buildReferenceProfile } from "./profile-builder.js";
 import { explainProfile } from "./profile-builder.js";
 import { curatedSeedPriors } from "./seed-priors.js";
+import { blendReferenceProfiles } from "../style/profile-blender.js";
 import { ReferenceStore } from "./store.js";
 
 export class ReferenceService {
@@ -33,6 +34,13 @@ export class ReferenceService {
   }
 
   async explainProfile(id: string) { return explainProfile(await this.getProfile(id)); }
+
+  async blendProfiles(id: string, components: Array<{ profileId: string; weight: number }>) {
+    const loaded = await Promise.all(components.map(async (component) => ({ profile: await this.getProfile(component.profileId), weight: component.weight })));
+    const blended = blendReferenceProfiles(id, loaded);
+    await this.store.saveProfile(blended);
+    return blended;
+  }
 
   async compareLiveSet(profileId: string, ableton: AbletonAdapter): Promise<ProfileComparison> {
     const [profile, snapshot] = await Promise.all([this.getProfile(profileId), ableton.snapshot("compact")]);

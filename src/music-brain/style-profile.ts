@@ -15,6 +15,7 @@ export interface StyleProfile {
   };
   drums: { kickWeight: number; hatDensity: number; ghostDensity: number; electroInfluence: number };
   bass: { density: number; chromaticism: number; tonalStability: number; rests: number; register: [number, number] };
+  sequence: { density: number; cycleSteps: number; chromaticism: number; chordProbability: number; rareEventProbability: number; register: [number, number] };
   timbre: { weirdness: number; brightness: number; rawness: number; digital: number };
   arrangement: { evolutionRate: number; subtraction: number; cycleBars: number[] };
   mix: { loudness: number; lowEnd: number; brightness: number; space: number };
@@ -33,6 +34,7 @@ export const afterhours2019: StyleProfile = {
   },
   drums: { kickWeight: 0.42, hatDensity: 0.33, ghostDensity: 0.18, electroInfluence: 0.35 },
   bass: { density: 0.31, chromaticism: 0.42, tonalStability: 0.38, rests: 0.55, register: [28, 48] },
+  sequence: { density: 0.24, cycleSteps: 7, chromaticism: 0.58, chordProbability: 0.12, rareEventProbability: 0.08, register: [48, 78] },
   timbre: { weirdness: 0.85, brightness: 0.38, rawness: 0.62, digital: 0.58 },
   arrangement: { evolutionRate: 0.2, subtraction: 0.72, cycleBars: [2, 4, 8, 16, 32, 64] },
   mix: { loudness: 0.48, lowEnd: 0.62, brightness: 0.35, space: 0.72 },
