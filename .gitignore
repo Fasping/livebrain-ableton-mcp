@@ -17,3 +17,4 @@ data/references/**/*.ogg
 !data/references/.gitkeep
 data/feedback/*.local.json
 data/feedback/generations.json
+data/locks/locks.json

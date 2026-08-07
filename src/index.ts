@@ -9,15 +9,18 @@ import { registerAbletonTools } from "./mcp/register-ableton-tools.js";
 import { registerMusicTools } from "./mcp/register-music-tools.js";
 import { registerReferenceTools } from "./mcp/register-reference-tools.js";
 import { registerFeedbackTools } from "./mcp/register-feedback-tools.js";
+import { registerLockTools } from "./mcp/register-lock-tools.js";
 import { textResult } from "./mcp/helpers.js";
 import { createReferenceService } from "./reference/create-reference-service.js";
 import { FeedbackStore } from "./feedback/feedback-store.js";
+import { LockStore } from "./locks/lock-store.js";
 
 const config = loadConfig();
 const server = new McpServer({ name: "livebrain-mcp", version: "0.2.0" });
 const ableton = config.adapter === "mock" ? new MockAbletonAdapter() : new PythonRemoteScriptAdapter();
 const references = createReferenceService(config.dataDir);
 const feedback = new FeedbackStore(config.dataDir);
+const locks = new LockStore(config.dataDir);
 
 server.tool("health", "Check LiveBrain MCP and configured adapter.", {}, async () => textResult({
   ok: true, version: "0.2.0", adapter: config.adapter,
@@ -26,9 +29,10 @@ server.tool("ableton_capabilities", "Read bridge version and explicitly supporte
   async () => textResult(await ableton.capabilities()));
 
 registerAbletonTools(server, ableton);
-registerMusicTools(server, ableton, references, feedback);
+registerMusicTools(server, ableton, references, feedback, locks);
 registerReferenceTools(server, references, ableton);
 registerFeedbackTools(server, feedback);
+registerLockTools(server, locks);
 
 const shutdown = async () => {
   log("info", "LiveBrain shutting down");
