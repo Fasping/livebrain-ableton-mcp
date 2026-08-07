@@ -27,7 +27,9 @@ Arrangement, automation, racks/macros, nested chains, sends/returns, routing and
 
 ## Phase 5 — Feedback and personal profile
 
-Structured feedback, statistical preference weighting and versioned personal profiles.
+- [x] Generation IDs and structured local feedback
+- [x] Statistical preference summaries
+- [ ] Parameter-prior adaptation and versioned `natural-goofy` profiles
 
 ## Phase 6 — Comparison
 

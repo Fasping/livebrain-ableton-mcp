@@ -42,13 +42,15 @@ The built-in PCM WAV analyzer measures:
 
 These are signal-processing estimates, not artistic truth. Compressed formats and AIFF are decoded to mono PCM through optional `ffmpeg`. Subjective properties remain human ratings.
 
-## Human ratings
+## Human ratings and influence
 
-All ratings use `0..1`: groove, drums, bass, arrangement, weirdness, hypnosis, darkness, electro, progressive, space, cheese and overall reference value.
+Human ratings use `0..10`: groove, drums, bass, synth, arrangement, weirdness, hypnosis, darkness, electro, progressive, space, rawness, subtlety, predictability, cheese and overall reference value.
+
+Influence is independent and uses `0..1` per DNA dimension. A bass rating of `10` with bass influence `0` means “excellent bass, but do not learn its bass behavior.” Groove, Drum, Bass, Synth, Sequence, Timbre, Harmony and Arrangement DNA are aggregated independently.
 
 ## Profile integration
 
-`reference_build_profile` aggregates distributions and maps supported measurements/ratings into real generator parameters. `music_generate_drum_groove` accepts `profileId`; it does not concatenate tags into a prompt. Tests verify that sparse and dense reference profiles generate measurably different MIDI patterns with the same seed.
+`reference_build_profile` calculates min/max, median, p25/p75, variance, weighted mean and normalized per-dimension contributions. `reference_explain_profile` exposes exactly which references contributed to each DNA dimension. Generator tools accept `profileId`; they do not concatenate tags into prompts.
 
 `music_compare_to_profile` returns three separate layers:
 

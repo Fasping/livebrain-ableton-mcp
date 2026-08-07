@@ -105,10 +105,11 @@ Structured logs go only to stderr so MCP stdio is never corrupted.
 - `ableton_create_midi_track`, `ableton_create_midi_clip`
 - `ableton_get_clip_notes`, `ableton_replace_notes`
 - `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
-- `music_generate_drum_groove`, `music_mutate_clip`, `music_make_less_obvious`
+- `music_generate_drum_groove`, `music_generate_bass`, `music_mutate_clip`, `music_make_less_obvious`
 - `music_compare_to_profile`
 - `reference_add`, `reference_analyze`, `reference_tag`, `reference_rate`
-- `reference_get`, `reference_list`, `reference_build_profile`
+- `reference_set_influence`, `reference_get`, `reference_list`, `reference_build_profile`, `reference_explain_profile`
+- `feedback_generation`, `feedback_get_preferences`
 
 Write operations support `dryRun` where useful.
 
@@ -119,7 +120,8 @@ Reference audio remains at its original local path and is never copied into Git.
 ```bash
 livebrain reference-add --audio "/local/music/reference.wav" --title "Reference 01" --groups afterhours_2019
 livebrain reference-analyze --id UUID
-livebrain reference-rate --id UUID --ratings '{"groove":0.9,"space":0.8,"cheese":0.05}'
+livebrain reference-rate --id UUID --ratings '{"groove":9,"space":8,"cheese":0.5}'
+livebrain reference-set-influence --id UUID --influence '{"groove":1,"bass":0,"arrangement":0.8}'
 livebrain reference-build-profile --group afterhours_2019
 ```
 
@@ -131,6 +133,8 @@ PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install
 - [Ableton API](docs/ABLETON_API.md)
 - [Music Brain](docs/MUSIC_BRAIN.md)
 - [Reference Brain](docs/REFERENCE_BRAIN.md)
+- [Style Engine](docs/STYLE_ENGINE.md)
+- [Feedback Engine](docs/FEEDBACK_ENGINE.md)
 - [Roadmap](docs/ROADMAP.md)
 
 ## Layout
