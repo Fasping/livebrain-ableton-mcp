@@ -46,6 +46,14 @@ export class PythonRemoteScriptAdapter implements AbletonAdapter {
     return this.bridge.request("clip.add_notes", { ...target, notes, dryRun });
   }
 
+  duplicateClip(source: ClipTarget, destination: ClipTarget, dryRun = false): Promise<ChangeSummary> {
+    return this.bridge.request("clip.duplicate", { source, destination, dryRun });
+  }
+
+  setClipLoop(target: ClipTarget, loopStart: number, loopEnd: number, dryRun = false): Promise<ChangeSummary> {
+    return this.bridge.request("clip.set_loop", { ...target, loopStart, loopEnd, dryRun });
+  }
+
   getDevices(trackIndex: number): Promise<LiveDeviceSnapshot[]> {
     return this.bridge.request("device.list", { trackIndex });
   }

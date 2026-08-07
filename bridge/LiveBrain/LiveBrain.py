@@ -132,6 +132,8 @@ class LiveBrain(ControlSurface):
             "clip.get_notes": self._get_clip_notes,
             "clip.replace_notes": self._replace_clip_notes,
             "clip.add_notes": self._add_notes,
+            "clip.duplicate": self._duplicate_clip,
+            "clip.set_loop": self._set_clip_loop,
             "device.list": self._list_devices,
             "device.parameters": self._device_parameters,
             "device.set_parameter": self._set_device_parameter,
@@ -148,7 +150,7 @@ class LiveBrain(ControlSurface):
             "methods": [
                 "system.capabilities", "live_set.snapshot", "track.create_midi",
                 "clip.create_midi", "clip.get_notes", "clip.replace_notes",
-                "clip.add_notes", "device.list", "device.parameters",
+                "clip.add_notes", "clip.duplicate", "clip.set_loop", "device.list", "device.parameters",
                 "device.set_parameter",
             ],
             "unsupported": [
@@ -287,6 +289,39 @@ class LiveBrain(ControlSurface):
         if not dry_run:
             self._undo(lambda: clip.add_new_notes(tuple(notes)))
         return self._change("clip.add_notes", not dry_run, dry_run, self._clip_target(params), {"noteCount": len(notes)})
+
+    def _duplicate_clip(self, params):
+        source_params = params.get("source") or {}
+        destination_params = params.get("destination") or {}
+        source_track = self._track(self._int(source_params, "trackIndex"))
+        destination_track = self._track(self._int(destination_params, "trackIndex"))
+        source_slot = self._slot(source_track, self._int(source_params, "slotIndex"))
+        destination_slot = self._slot(destination_track, self._int(destination_params, "slotIndex"))
+        if not source_slot.has_clip:
+            raise ValueError("source clip slot is empty")
+        if destination_slot.has_clip:
+            raise ValueError("destination clip slot is occupied")
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            self._undo(lambda: source_slot.duplicate_clip_to(destination_slot))
+        return self._change("clip.duplicate", not dry_run, dry_run, {
+            "trackIndex": self._int(destination_params, "trackIndex"), "slotIndex": self._int(destination_params, "slotIndex"),
+        }, {"sourceTrackIndex": self._int(source_params, "trackIndex"), "sourceSlotIndex": self._int(source_params, "slotIndex")})
+
+    def _set_clip_loop(self, params):
+        clip = self._midi_clip(params)
+        loop_start = float(params.get("loopStart", 0))
+        loop_end = float(params.get("loopEnd", 0))
+        if loop_start < 0 or loop_end <= loop_start:
+            raise ValueError("invalid loop range")
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            def operation():
+                clip.looping = True
+                clip.loop_start = loop_start
+                clip.loop_end = loop_end
+            self._undo(operation)
+        return self._change("clip.set_loop", not dry_run, dry_run, self._clip_target(params), {"loopStart": loop_start, "loopEnd": loop_end})
 
     def _list_devices(self, params):
         track = self._track(self._int(params, "trackIndex"))

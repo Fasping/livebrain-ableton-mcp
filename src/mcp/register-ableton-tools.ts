@@ -24,6 +24,18 @@ export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter)
     ...clipTargetSchema, notes: z.array(midiNoteSchema).max(20000), dryRun: dryRunSchema,
   }, async ({ notes, dryRun, ...target }) => textResult(await ableton.replaceClipNotes(target, notes, dryRun)));
 
+  server.tool("ableton_duplicate_clip", "Duplicate a Session clip into an explicitly empty destination before transforming it.", {
+    sourceTrackIndex: z.number().int().min(0), sourceSlotIndex: z.number().int().min(0),
+    destinationTrackIndex: z.number().int().min(0), destinationSlotIndex: z.number().int().min(0), dryRun: dryRunSchema,
+  }, async ({ sourceTrackIndex, sourceSlotIndex, destinationTrackIndex, destinationSlotIndex, dryRun }) => textResult(await ableton.duplicateClip(
+    { trackIndex: sourceTrackIndex, slotIndex: sourceSlotIndex },
+    { trackIndex: destinationTrackIndex, slotIndex: destinationSlotIndex }, dryRun,
+  )));
+
+  server.tool("ableton_set_clip_loop", "Set a validated MIDI clip loop range.", {
+    ...clipTargetSchema, loopStart: z.number().min(0), loopEnd: z.number().positive(), dryRun: dryRunSchema,
+  }, async ({ loopStart, loopEnd, dryRun, ...target }) => textResult(await ableton.setClipLoop(target, loopStart, loopEnd, dryRun)));
+
   server.tool("ableton_get_devices", "List devices on a track.", { trackIndex: z.number().int().min(0) },
     async ({ trackIndex }) => textResult({ devices: await ableton.getDevices(trackIndex) }));
 

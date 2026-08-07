@@ -75,6 +75,21 @@ export class MockAbletonAdapter implements AbletonAdapter {
     return this.summary("clip.add_notes", !dryRun, dryRun, { trackIndex: target.trackIndex, slotIndex: target.slotIndex }, { noteCount: notes.length });
   }
 
+  async duplicateClip(source: ClipTarget, destination: ClipTarget, dryRun = false): Promise<ChangeSummary> {
+    const sourceClip = this.clip(source);
+    const track = this.track(destination.trackIndex);
+    if (track.clips.some((clip) => clip.slotIndex === destination.slotIndex)) throw new Error("Destination clip slot is occupied");
+    if (!dryRun) track.clips.push({ ...structuredClone(sourceClip), slotIndex: destination.slotIndex, name: `${sourceClip.name} Copy` });
+    return this.summary("clip.duplicate", !dryRun, dryRun, { trackIndex: destination.trackIndex, slotIndex: destination.slotIndex }, { sourceTrackIndex: source.trackIndex, sourceSlotIndex: source.slotIndex });
+  }
+
+  async setClipLoop(target: ClipTarget, loopStart: number, loopEnd: number, dryRun = false): Promise<ChangeSummary> {
+    if (loopStart < 0 || loopEnd <= loopStart) throw new Error("Invalid loop range");
+    const clip = this.clip(target);
+    if (!dryRun) { clip.loopStart = loopStart; clip.loopEnd = loopEnd; clip.length = loopEnd - loopStart; }
+    return this.summary("clip.set_loop", !dryRun, dryRun, { trackIndex: target.trackIndex, slotIndex: target.slotIndex }, { loopStart, loopEnd });
+  }
+
   async getDevices(trackIndex: number): Promise<LiveDeviceSnapshot[]> {
     return structuredClone(this.track(trackIndex).devices);
   }

@@ -11,7 +11,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test dist/tests/*.test.js"
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "smoke:ableton": "npm run build && node dist/smoke/ableton-smoke.js"
   },
   "engines": { "node": ">=20" },
   "dependencies": {

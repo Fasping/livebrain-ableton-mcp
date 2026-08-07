@@ -22,6 +22,8 @@ export interface AbletonAdapter {
   getClipNotes(target: ClipTarget): Promise<MidiNote[]>;
   replaceClipNotes(target: ClipTarget, notes: MidiNote[], dryRun?: boolean): Promise<ChangeSummary>;
   addNotes(target: ClipTarget, notes: MidiNote[], dryRun?: boolean): Promise<ChangeSummary>;
+  duplicateClip(source: ClipTarget, destination: ClipTarget, dryRun?: boolean): Promise<ChangeSummary>;
+  setClipLoop(target: ClipTarget, loopStart: number, loopEnd: number, dryRun?: boolean): Promise<ChangeSummary>;
   getDevices(trackIndex: number): Promise<LiveDeviceSnapshot[]>;
   getDeviceParameters(target: DeviceTarget): Promise<DeviceParameterSnapshot[]>;
   setDeviceParameter(target: ParameterTarget, normalizedValue: number, dryRun?: boolean): Promise<ChangeSummary>;
