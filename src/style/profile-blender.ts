@@ -28,11 +28,14 @@ export function blendReferenceProfiles(id: string, components: Array<WeightedPro
   const normalized = normalize(components);
   const styleProfile = blendStyleProfiles(id, normalized.map((item) => ({ profile: item.profile.styleProfile, weight: item.weight })));
   const distributionKeys = ["bpm", "onsetDensity", "syncopation", "repetition", "microtimingStdMs", "silenceRatio", "longCycleVariation"] as const;
-  const measured = Object.fromEntries(distributionKeys.flatMap((key) => {
+  const distributions = Object.fromEntries(distributionKeys.flatMap((key) => {
     const values = normalized.flatMap((item) => item.profile.measured[key] ? [{ profile: item.profile.measured[key]!, weight: item.weight }] : []);
     return values.length ? [[key, blendDistribution(values)]] : [];
-  })) as ReferenceProfile["measured"];
-  measured.accentPattern = blendVectors(normalized.map((item) => ({ vector: item.profile.measured.accentPattern, weight: item.weight })));
+  })) as Partial<Omit<ReferenceProfile["measured"], "accentPattern">>;
+  const measured: ReferenceProfile["measured"] = {
+    ...distributions,
+    accentPattern: blendVectors(normalized.map((item) => ({ vector: item.profile.measured.accentPattern, weight: item.weight }))),
+  };
   return {
     id, version: "blend-0.1", builtAt: new Date().toISOString(), group: id,
     referenceIds: [...new Set(normalized.flatMap((item) => item.profile.referenceIds))], measured,
