@@ -2,25 +2,51 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { AbletonAdapter } from "../ableton/adapter.js";
 import { generateDrumGroove } from "../music-brain/drum-generator.js";
+import { generateBass } from "../music-brain/bass-generator.js";
 import { makeLessObvious, mutateNotes } from "../music-brain/mutation-engine.js";
 import { afterhours2019 } from "../music-brain/style-profile.js";
 import type { ReferenceService } from "../reference/reference-service.js";
 import { clipTargetSchema, dryRunSchema } from "./schemas.js";
 import { textResult } from "./helpers.js";
+import { createEffectiveStyleProfile } from "../style/effective-profile.js";
+import type { FeedbackStore } from "../feedback/feedback-store.js";
 
-export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, references: ReferenceService) {
+const traitsSchema = z.object({
+  groove: z.number().min(0).max(1).optional(), electro: z.number().min(0).max(1).optional(),
+  progressive: z.number().min(0).max(1).optional(), weirdness: z.number().min(0).max(1).optional(), space: z.number().min(0).max(1).optional(),
+}).default({});
+
+export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, references: ReferenceService, feedback: FeedbackStore) {
   server.tool("music_generate_drum_groove", "Generate a deterministic sparse drum groove and optionally write it to a clip.", {
     bars: z.number().int().min(1).max(64).default(4), seed: z.number().int().default(1),
     profileId: z.string().regex(/^[a-zA-Z0-9._-]+$/).optional(),
+    bpm: z.number().min(40).max(300).optional(), traits: traitsSchema,
     apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(),
     dryRun: dryRunSchema,
-  }, async ({ bars, seed, profileId, apply, trackIndex, slotIndex, dryRun }) => {
-    const profile = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+  }, async ({ bars, seed, profileId, bpm, traits, apply, trackIndex, slotIndex, dryRun }) => {
+    const base = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const profile = createEffectiveStyleProfile(base, { bpm, traits });
     const notes = generateDrumGroove(profile, { bars, seed });
-    if (!apply) return textResult({ profile: profile.id, seed, notes });
+    const generation = await feedback.record({ profileId: base.id, profileVersion: base.version, seed, parameters: { bars, bpm, traits, instrument: "drums" }, generatedFeatures: { noteCount: notes.length, bars } });
+    if (!apply) return textResult({ profile: profile.id, effectiveProfileVersion: profile.version, seed, generationId: generation.generationId, notes });
     if (trackIndex === undefined || slotIndex === undefined) throw new Error("trackIndex and slotIndex are required when apply=true");
     const change = await ableton.replaceClipNotes({ trackIndex, slotIndex }, notes, dryRun);
-    return textResult({ profile: profile.id, seed, generatedNotes: notes.length, change });
+    return textResult({ profile: profile.id, seed, generationId: generation.generationId, generatedNotes: notes.length, change });
+  });
+
+  server.tool("music_generate_bass", "Generate an original deterministic rhythm-first bass motif using a stored or built-in profile.", {
+    bars: z.number().int().min(1).max(64).default(4), seed: z.number().int(), rootMidi: z.number().int().min(0).max(127).optional(),
+    profileId: z.string().regex(/^[a-zA-Z0-9._-]+$/).optional(), bpm: z.number().min(40).max(300).optional(), traits: traitsSchema,
+    apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(), dryRun: dryRunSchema,
+  }, async ({ bars, seed, rootMidi, profileId, bpm, traits, apply, trackIndex, slotIndex, dryRun }) => {
+    const base = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const profile = createEffectiveStyleProfile(base, { bpm, traits });
+    const notes = generateBass(profile, { bars, seed, rootMidi });
+    const generation = await feedback.record({ profileId: base.id, profileVersion: base.version, seed, parameters: { bars, bpm, traits, instrument: "bass" }, generatedFeatures: { noteCount: notes.length, bars } });
+    if (!apply) return textResult({ profile: profile.id, seed, generationId: generation.generationId, notes });
+    if (trackIndex === undefined || slotIndex === undefined) throw new Error("trackIndex and slotIndex are required when apply=true");
+    const change = await ableton.replaceClipNotes({ trackIndex, slotIndex }, notes, dryRun);
+    return textResult({ profile: profile.id, seed, generationId: generation.generationId, generatedNotes: notes.length, change });
   });
 
   server.tool("music_mutate_clip", "Create a deterministic variation while preserving selected MIDI pitches.", {
