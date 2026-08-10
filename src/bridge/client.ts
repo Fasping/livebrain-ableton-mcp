@@ -27,7 +27,7 @@ export class AbletonBridgeClient {
   constructor(
     private readonly host = process.env.LIVEBRAIN_HOST ?? "127.0.0.1",
     private readonly port = Number(process.env.LIVEBRAIN_PORT ?? 9877),
-    private readonly timeoutMs = 5000,
+    private readonly timeoutMs = Number(process.env.LIVEBRAIN_TIMEOUT_MS ?? 15000),
   ) {}
 
   request<T>(method: string, params: object = {}): Promise<T> {

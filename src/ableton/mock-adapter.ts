@@ -1,6 +1,10 @@
 import type { AbletonAdapter } from "./adapter.js";
 import type {
+  ArrangementClipSnapshot,
+  ArrangementPlacementInput,
   BridgeCapabilities,
+  BrowserItemSnapshot,
+  BrowserSearchInput,
   ChangeSummary,
   ClipSnapshot,
   ClipTarget,
@@ -13,7 +17,10 @@ import type {
   LiveTrackSnapshot,
   MidiNote,
   ParameterTarget,
+  SongSettingsInput,
   SnapshotMode,
+  TrackMixerInput,
+  TransportAction,
 } from "./types.js";
 
 interface MockClip extends ClipSnapshot { notes: MidiNote[] }
@@ -21,6 +28,19 @@ interface MockTrack extends Omit<LiveTrackSnapshot, "clips"> { clips: MockClip[]
 
 export class MockAbletonAdapter implements AbletonAdapter {
   private readonly tracks: MockTrack[] = [];
+  private readonly arrangement = new Map<number, ArrangementClipSnapshot[]>();
+  private tempo = 130;
+  private timeSignature = { numerator: 4, denominator: 4 };
+  private isPlaying = false;
+  private readonly browser: BrowserItemSnapshot[] = [
+    { name: "Drum Rack", uri: "mock:drums/drum-rack", category: "drums", path: "Drums/Drum Rack", isLoadable: true, isFolder: false },
+    { name: "Drift", uri: "mock:instruments/drift", category: "instruments", path: "Instruments/Drift", isLoadable: true, isFolder: false },
+    { name: "Simpler", uri: "mock:instruments/simpler", category: "instruments", path: "Instruments/Simpler", isLoadable: true, isFolder: false },
+    { name: "EQ Eight", uri: "mock:audio-effects/eq-eight", category: "audio_effects", path: "Audio Effects/EQ Eight", isLoadable: true, isFolder: false },
+    { name: "Compressor", uri: "mock:audio-effects/compressor", category: "audio_effects", path: "Audio Effects/Compressor", isLoadable: true, isFolder: false },
+    { name: "Hybrid Reverb", uri: "mock:audio-effects/hybrid-reverb", category: "audio_effects", path: "Audio Effects/Hybrid Reverb", isLoadable: true, isFolder: false },
+    { name: "Reverb", uri: "mock:audio-effects/reverb", category: "audio_effects", path: "Audio Effects/Reverb", isLoadable: true, isFolder: false },
+  ];
 
   async capabilities(): Promise<BridgeCapabilities> {
     return { protocolVersion: "1.0", bridgeVersion: "mock", methods: ["mock"], unsupported: [] };
@@ -29,9 +49,9 @@ export class MockAbletonAdapter implements AbletonAdapter {
   async snapshot(mode: SnapshotMode = "compact"): Promise<LiveSetSnapshot> {
     return {
       mode,
-      tempo: 130,
-      timeSignature: { numerator: 4, denominator: 4 },
-      isPlaying: false,
+      tempo: this.tempo,
+      timeSignature: structuredClone(this.timeSignature),
+      isPlaying: this.isPlaying,
       currentSongTime: 0,
       trackCount: this.tracks.length,
       returnCount: 0,
@@ -48,8 +68,27 @@ export class MockAbletonAdapter implements AbletonAdapter {
 
   async createMidiTrack(input: CreateTrackInput & { dryRun?: boolean }): Promise<ChangeSummary> {
     const index = input.index ?? this.tracks.length;
-    if (!input.dryRun) this.tracks.splice(index, 0, this.newTrack(input.name ?? `MIDI ${index + 1}`));
+    if (!input.dryRun) {
+      this.tracks.splice(index, 0, this.newTrack(input.name ?? `MIDI ${index + 1}`));
+      this.tracks.forEach((track, trackIndex) => { track.index = trackIndex; });
+    }
     return this.summary("track.create_midi", !input.dryRun, Boolean(input.dryRun), { trackIndex: index });
+  }
+
+  async deleteTrack(trackIndex: number, dryRun = false): Promise<ChangeSummary> {
+    this.track(trackIndex);
+    if (!dryRun) {
+      this.tracks.splice(trackIndex, 1);
+      this.tracks.forEach((track, index) => { track.index = index; });
+      const nextArrangement = new Map<number, ArrangementClipSnapshot[]>();
+      for (const [index, clips] of this.arrangement) {
+        if (index === trackIndex) continue;
+        nextArrangement.set(index > trackIndex ? index - 1 : index, clips);
+      }
+      this.arrangement.clear();
+      for (const [index, clips] of nextArrangement) this.arrangement.set(index, clips);
+    }
+    return this.summary("track.delete", !dryRun, dryRun, { trackIndex });
   }
 
   async createMidiClip(input: CreateMidiClipInput & { dryRun?: boolean }): Promise<ChangeSummary> {
@@ -110,6 +149,78 @@ export class MockAbletonAdapter implements AbletonAdapter {
     }, { normalizedValue });
   }
 
+  async setSongSettings(input: SongSettingsInput, dryRun = false): Promise<ChangeSummary> {
+    if (!dryRun) {
+      if (input.tempo !== undefined) this.tempo = input.tempo;
+      if (input.timeSignature) this.timeSignature = structuredClone(input.timeSignature);
+    }
+    return this.summary("song.settings", !dryRun, dryRun, { song: "live_set" }, structuredClone(input) as Record<string, unknown>);
+  }
+
+  async setTrackMixer(trackIndex: number, input: TrackMixerInput, dryRun = false): Promise<ChangeSummary> {
+    const track = this.track(trackIndex);
+    if (!dryRun) {
+      if (input.volume !== undefined) track.mixer.volume = input.volume;
+      if (input.pan !== undefined) track.mixer.pan = input.pan;
+      if (input.mute !== undefined) track.mixer.mute = input.mute;
+      if (input.solo !== undefined) track.mixer.solo = input.solo;
+      if (input.arm !== undefined) track.mixer.arm = input.arm;
+      for (const send of input.sends ?? []) track.mixer.sends[send.sendIndex] = send.value;
+    }
+    return this.summary("track.mixer", !dryRun, dryRun, { trackIndex }, structuredClone(input) as Record<string, unknown>);
+  }
+
+  async setTransport(action: TransportAction, dryRun = false): Promise<ChangeSummary> {
+    if (!dryRun) this.isPlaying = action === "start";
+    return this.summary("transport.set", !dryRun, dryRun, { action }, { isPlaying: action === "start" });
+  }
+
+  async searchBrowser(input: BrowserSearchInput): Promise<BrowserItemSnapshot[]> {
+    const query = input.query.toLowerCase();
+    const categories = new Set<string>(input.categories ?? ["instruments", "sounds", "drums", "audio_effects", "midi_effects"]);
+    return structuredClone(this.browser.filter((item) => categories.has(item.category) && item.name.toLowerCase().includes(query)).slice(0, input.maxResults ?? 12));
+  }
+
+  async loadBrowserItem(trackIndex: number, uri: string, dryRun = false): Promise<ChangeSummary> {
+    const item = this.browser.find((candidate) => candidate.uri === uri);
+    if (!item) throw new Error("Browser item not found");
+    const track = this.track(trackIndex);
+    if (!dryRun) track.devices.push({ index: track.devices.length, name: item.name, className: item.category, parameters: this.mockParameters(item.name) });
+    return this.summary("browser.load", !dryRun, dryRun, { trackIndex, uri }, { name: item.name });
+  }
+
+  async duplicateToArrangement(target: ClipTarget, destinationTime: number, dryRun = false): Promise<ChangeSummary> {
+    const clip = this.clip(target);
+    if (!dryRun) {
+      const clips = this.arrangement.get(target.trackIndex) ?? [];
+      clips.push({ index: clips.length, name: clip.name, startTime: destinationTime, endTime: destinationTime + clip.length, length: clip.length, isMidi: clip.isMidi, isAudio: !clip.isMidi });
+      this.arrangement.set(target.trackIndex, clips);
+    }
+    return this.summary("arrangement.duplicate", !dryRun, dryRun, { trackIndex: target.trackIndex, slotIndex: target.slotIndex }, { destinationTime });
+  }
+
+  async duplicateManyToArrangement(placements: ArrangementPlacementInput[], dryRun = false): Promise<ChangeSummary> {
+    for (const placement of placements) this.clip(placement);
+    if (!dryRun) {
+      for (const placement of placements) {
+        const clip = this.clip(placement);
+        const clips = this.arrangement.get(placement.trackIndex) ?? [];
+        clips.push({ index: clips.length, name: clip.name, startTime: placement.destinationTime, endTime: placement.destinationTime + clip.length, length: clip.length, isMidi: clip.isMidi, isAudio: !clip.isMidi });
+        this.arrangement.set(placement.trackIndex, clips);
+      }
+    }
+    return this.summary("arrangement.duplicate_many", !dryRun, dryRun, { arrangement: "live_set" }, { placementCount: placements.length });
+  }
+
+  async getArrangementClips(trackIndex: number): Promise<ArrangementClipSnapshot[]> {
+    this.track(trackIndex);
+    return structuredClone(this.arrangement.get(trackIndex) ?? []);
+  }
+
+  async showArrangement(dryRun = false): Promise<ChangeSummary> {
+    return this.summary("view.arrangement", !dryRun, dryRun, { view: "arrangement" });
+  }
+
   async close(): Promise<void> {}
 
   private newTrack(name: string): MockTrack {
@@ -120,6 +231,17 @@ export class MockAbletonAdapter implements AbletonAdapter {
   private track(index: number) { const value = this.tracks[index]; if (!value) throw new Error("Track not found"); return value; }
   private clip(target: ClipTarget) { const value = this.track(target.trackIndex).clips.find((c) => c.slotIndex === target.slotIndex); if (!value) throw new Error("Clip not found"); return value; }
   private device(target: DeviceTarget) { const value = this.track(target.trackIndex).devices[target.deviceIndex]; if (!value) throw new Error("Device not found"); return value; }
+  private mockParameters(name: string): DeviceParameterSnapshot[] {
+    const parameter = (index: number, parameterName: string, normalizedValue = .5, valueItems?: string[]): DeviceParameterSnapshot => ({
+      index, name: parameterName, value: normalizedValue, normalizedValue, min: 0, max: 1,
+      isQuantized: Boolean(valueItems), enabled: true, valueItems,
+    });
+    if (name === "Compressor") return [parameter(0, "Threshold"), parameter(1, "Ratio"), parameter(2, "Attack"), parameter(3, "Release"), parameter(4, "Dry/Wet", 1)];
+    if (name === "EQ Eight") return [
+      parameter(0, "1 Filter On A", 0), parameter(1, "1 Filter Type A", 0, ["Low Cut 48", "Low Cut 12", "Bell", "High Shelf"]), parameter(2, "1 Frequency A"),
+    ];
+    return [];
+  }
   private summary(operation: string, changed: boolean, dryRun: boolean, target: Record<string, number | string>, details?: Record<string, unknown>): ChangeSummary {
     return { operation, changed, dryRun, target, details };
   }

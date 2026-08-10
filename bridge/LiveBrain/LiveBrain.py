@@ -8,9 +8,9 @@ from ableton.v2.control_surface import ControlSurface
 
 
 PROTOCOL_VERSION = "1.0"
-BRIDGE_VERSION = "0.1.3"
+BRIDGE_VERSION = "0.2.1"
 MAX_REQUEST_BYTES = 1024 * 1024
-REQUEST_TIMEOUT_SECONDS = 5.0
+REQUEST_TIMEOUT_SECONDS = 15.0
 
 
 class LiveBrain(ControlSurface):
@@ -21,6 +21,7 @@ class LiveBrain(ControlSurface):
         self._running = True
         self._server = None
         self._jobs = queue.Queue()
+        self._browser_uri_cache = {}
         self._thread = threading.Thread(target=self._serve, name="LiveBrainBridge")
         self._thread.daemon = True
         self._thread.start()
@@ -129,6 +130,7 @@ class LiveBrain(ControlSurface):
             "system.capabilities": self._capabilities,
             "live_set.snapshot": self._snapshot,
             "track.create_midi": self._create_midi_track,
+            "track.delete": self._delete_track,
             "clip.create_midi": self._create_midi_clip,
             "clip.get_notes": self._get_clip_notes,
             "clip.replace_notes": self._replace_clip_notes,
@@ -138,6 +140,15 @@ class LiveBrain(ControlSurface):
             "device.list": self._list_devices,
             "device.parameters": self._device_parameters,
             "device.set_parameter": self._set_device_parameter,
+            "song.settings": self._set_song_settings,
+            "track.mixer": self._set_track_mixer,
+            "transport.set": self._set_transport,
+            "browser.search": self._search_browser,
+            "browser.load": self._load_browser_item,
+            "arrangement.duplicate": self._duplicate_to_arrangement,
+            "arrangement.duplicate_many": self._duplicate_many_to_arrangement,
+            "arrangement.clips": self._arrangement_clips,
+            "view.arrangement": self._show_arrangement,
         }
         handler = handlers.get(method)
         if handler is None:
@@ -149,13 +160,16 @@ class LiveBrain(ControlSurface):
             "protocolVersion": PROTOCOL_VERSION,
             "bridgeVersion": BRIDGE_VERSION,
             "methods": [
-                "system.capabilities", "live_set.snapshot", "track.create_midi",
+                "system.capabilities", "live_set.snapshot", "track.create_midi", "track.delete",
                 "clip.create_midi", "clip.get_notes", "clip.replace_notes",
                 "clip.add_notes", "clip.duplicate", "clip.set_loop", "device.list", "device.parameters",
-                "device.set_parameter",
+                "device.set_parameter", "song.settings", "track.mixer", "transport.set",
+                "browser.search", "browser.load", "arrangement.duplicate", "arrangement.duplicate_many", "arrangement.clips",
+                "view.arrangement",
             ],
             "unsupported": [
-                "browser.load (Live Object Model support varies)",
+                "sidechain input routing (not exposed consistently by the Live Object Model)",
+                "adaptive spectral mixing without an analyzer device",
                 "arrangement automation curves (pending API verification)",
             ],
         }
@@ -229,7 +243,7 @@ class LiveBrain(ControlSurface):
         maximum = float(parameter.max)
         value = float(parameter.value)
         span = maximum - minimum
-        return {
+        result = {
             "index": index,
             "name": parameter.name,
             "value": value,
@@ -239,6 +253,9 @@ class LiveBrain(ControlSurface):
             "isQuantized": bool(parameter.is_quantized),
             "enabled": bool(parameter.is_enabled),
         }
+        if bool(parameter.is_quantized) and hasattr(parameter, "value_items"):
+            result["valueItems"] = [str(item) for item in parameter.value_items]
+        return result
 
     def _create_midi_track(self, params):
         index = int(params.get("index", len(self.song.tracks)))
@@ -250,6 +267,14 @@ class LiveBrain(ControlSurface):
             if params.get("name"):
                 self.song.tracks[index].name = str(params["name"])
         return self._change("track.create_midi", not dry_run, dry_run, {"trackIndex": index})
+
+    def _delete_track(self, params):
+        track_index = self._int(params, "trackIndex")
+        self._track(track_index)
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            self._undo(lambda: self.song.delete_track(track_index))
+        return self._change("track.delete", not dry_run, dry_run, {"trackIndex": track_index})
 
     def _create_midi_clip(self, params):
         track_index = self._int(params, "trackIndex")
@@ -352,6 +377,244 @@ class LiveBrain(ControlSurface):
         return self._change("device.set_parameter", not dry_run, dry_run, {
             "trackIndex": self._int(params, "trackIndex"), "deviceIndex": self._int(params, "deviceIndex"), "parameterIndex": parameter_index,
         }, {"normalizedValue": normalized, "value": value})
+
+    def _set_song_settings(self, params):
+        dry_run = bool(params.get("dryRun", False))
+        tempo = params.get("tempo")
+        signature = params.get("timeSignature")
+        scale = params.get("scale")
+        loop = params.get("loop")
+        if tempo is not None and (float(tempo) < 20 or float(tempo) > 999):
+            raise ValueError("tempo is out of range")
+        if signature is not None:
+            numerator = int(signature.get("numerator", 0))
+            denominator = int(signature.get("denominator", 0))
+            if numerator < 1 or numerator > 16 or denominator not in (1, 2, 4, 8, 16):
+                raise ValueError("invalid time signature")
+        if scale is not None:
+            root_note = int(scale.get("rootNote", -1))
+            if root_note < 0 or root_note > 11 or not str(scale.get("name", "")):
+                raise ValueError("invalid song scale")
+            if not hasattr(self.song, "root_note") or not hasattr(self.song, "scale_name"):
+                raise ValueError("song scale is unavailable in this Live version")
+        if loop is not None and (float(loop.get("start", -1)) < 0 or float(loop.get("length", 0)) <= 0):
+            raise ValueError("invalid arrangement loop")
+        if not dry_run:
+            def operation():
+                if tempo is not None:
+                    self.song.tempo = float(tempo)
+                if signature is not None:
+                    self.song.signature_numerator = int(signature["numerator"])
+                    self.song.signature_denominator = int(signature["denominator"])
+                if scale is not None:
+                    self.song.root_note = int(scale["rootNote"])
+                    self.song.scale_name = str(scale["name"])
+                if loop is not None:
+                    self.song.loop_start = float(loop["start"])
+                    self.song.loop_length = float(loop["length"])
+                    self.song.loop = bool(loop.get("enabled", True))
+            self._undo(operation)
+        return self._change("song.settings", not dry_run, dry_run, {"song": "live_set"}, {
+            "tempo": tempo, "timeSignature": signature, "scale": scale, "loop": loop,
+        })
+
+    def _set_track_mixer(self, params):
+        track_index = self._int(params, "trackIndex")
+        track = self._track(track_index)
+        dry_run = bool(params.get("dryRun", False))
+        volume = params.get("volume")
+        pan = params.get("pan")
+        sends = params.get("sends") or []
+        if pan is not None and (float(pan) < -1 or float(pan) > 1):
+            raise ValueError("pan must be between -1 and 1")
+        if volume is not None and (float(volume) < 0 or float(volume) > 1):
+            raise ValueError("volume must be between 0 and 1")
+        for send in sends:
+            send_index = int(send.get("sendIndex", -1))
+            value = float(send.get("value", -1))
+            if send_index < 0 or send_index >= len(track.mixer_device.sends) or value < 0 or value > 1:
+                raise ValueError("invalid send")
+        if params.get("arm") is not None and not getattr(track, "can_be_armed", False):
+            raise ValueError("track cannot be armed")
+        if not dry_run:
+            def operation():
+                if volume is not None:
+                    parameter = track.mixer_device.volume
+                    parameter.value = float(parameter.min) + float(volume) * (float(parameter.max) - float(parameter.min))
+                if pan is not None:
+                    track.mixer_device.panning.value = float(pan)
+                if params.get("mute") is not None:
+                    track.mute = bool(params["mute"])
+                if params.get("solo") is not None:
+                    track.solo = bool(params["solo"])
+                if params.get("arm") is not None:
+                    track.arm = bool(params["arm"])
+                for send in sends:
+                    parameter = track.mixer_device.sends[int(send["sendIndex"])]
+                    parameter.value = float(parameter.min) + float(send["value"]) * (float(parameter.max) - float(parameter.min))
+            self._undo(operation)
+        return self._change("track.mixer", not dry_run, dry_run, {"trackIndex": track_index}, {
+            "volume": volume, "pan": pan, "mute": params.get("mute"), "solo": params.get("solo"),
+            "arm": params.get("arm"), "sends": sends,
+        })
+
+    def _set_transport(self, params):
+        action = str(params.get("action", ""))
+        if action not in ("start", "stop"):
+            raise ValueError("action must be start or stop")
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            if action == "start":
+                self.song.start_playing()
+            else:
+                self.song.stop_playing()
+        return self._change("transport.set", not dry_run, dry_run, {"action": action}, {"isPlaying": action == "start"})
+
+    def _search_browser(self, params):
+        query = str(params.get("query", "")).strip().lower()
+        if not query:
+            raise ValueError("browser query is required")
+        categories = params.get("categories") or ["instruments", "sounds", "drums", "audio_effects", "midi_effects"]
+        max_results = max(1, min(50, int(params.get("maxResults", 12))))
+        browser = self.application.browser
+        results = []
+        scanned = [0]
+        query_tokens = [token for token in query.replace("-", " ").split() if token]
+
+        def visit(item, category, path, depth):
+            if item is None or depth > 10 or scanned[0] >= 8000:
+                return
+            scanned[0] += 1
+            name = str(getattr(item, "name", ""))
+            lowered = name.lower()
+            uri = str(getattr(item, "uri", ""))
+            if uri:
+                self._browser_uri_cache[uri] = item
+            loadable = bool(getattr(item, "is_loadable", False))
+            children = getattr(item, "children", ()) or ()
+            score = 0
+            if lowered == query:
+                score = 100
+            elif lowered.startswith(query):
+                score = 80
+            elif query in lowered:
+                score = 65
+            elif query_tokens and all(token in lowered for token in query_tokens):
+                score = 50
+            if score and loadable and uri:
+                results.append({
+                    "name": name, "uri": uri, "category": category,
+                    "path": "/".join(path + [name]), "isLoadable": True,
+                    "isFolder": bool(children), "score": score,
+                })
+            for child in children:
+                visit(child, category, path + ([name] if name else []), depth + 1)
+
+        for category in categories:
+            if not hasattr(browser, category):
+                continue
+            visit(getattr(browser, category), category, [], 0)
+        results.sort(key=lambda item: (-item["score"], len(item["path"]), item["name"].lower()))
+        return results[:max_results]
+
+    def _load_browser_item(self, params):
+        track_index = self._int(params, "trackIndex")
+        uri = str(params.get("uri", ""))
+        if not uri:
+            raise ValueError("browser item URI is required")
+        dry_run = bool(params.get("dryRun", False))
+        track = self._track(track_index)
+        item = self._browser_uri_cache.get(uri)
+        if item is None:
+            item = self._find_browser_item_by_uri(self.application.browser, uri)
+        if item is None:
+            raise ValueError("browser item not found: %s" % uri)
+        if not bool(getattr(item, "is_loadable", False)):
+            raise ValueError("browser item is not loadable")
+        before = [device.name for device in track.devices]
+        if not dry_run:
+            self.song.view.selected_track = track
+            self.application.browser.load_item(item)
+        after = [device.name for device in track.devices]
+        return self._change("browser.load", not dry_run, dry_run, {"trackIndex": track_index, "uri": uri}, {
+            "name": str(getattr(item, "name", "")), "devicesBefore": before, "devicesAfter": after,
+        })
+
+    def _find_browser_item_by_uri(self, root, uri, depth=0):
+        if root is None or depth > 10:
+            return None
+        if str(getattr(root, "uri", "")) == uri:
+            return root
+        if hasattr(root, "instruments"):
+            for category in ("instruments", "sounds", "drums", "audio_effects", "midi_effects"):
+                if hasattr(root, category):
+                    found = self._find_browser_item_by_uri(getattr(root, category), uri, depth + 1)
+                    if found is not None:
+                        return found
+            return None
+        for child in (getattr(root, "children", ()) or ()):
+            found = self._find_browser_item_by_uri(child, uri, depth + 1)
+            if found is not None:
+                return found
+        return None
+
+    def _duplicate_to_arrangement(self, params):
+        track_index = self._int(params, "trackIndex")
+        slot_index = self._int(params, "slotIndex")
+        destination_time = float(params.get("destinationTime", -1))
+        if destination_time < 0:
+            raise ValueError("destinationTime must be non-negative")
+        track = self._track(track_index)
+        slot = self._slot(track, slot_index)
+        if not slot.has_clip:
+            raise ValueError("source clip slot is empty")
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            self._undo(lambda: track.duplicate_clip_to_arrangement(slot.clip, destination_time))
+        return self._change("arrangement.duplicate", not dry_run, dry_run, {
+            "trackIndex": track_index, "slotIndex": slot_index,
+        }, {"destinationTime": destination_time, "clipName": slot.clip.name})
+
+    def _duplicate_many_to_arrangement(self, params):
+        raw_placements = params.get("placements")
+        if not isinstance(raw_placements, list) or not raw_placements:
+            raise ValueError("placements must be a non-empty list")
+        placements = []
+        for raw in raw_placements:
+            track_index = self._int(raw, "trackIndex")
+            slot_index = self._int(raw, "slotIndex")
+            destination_time = float(raw.get("destinationTime", -1))
+            if destination_time < 0:
+                raise ValueError("destinationTime must be non-negative")
+            track = self._track(track_index)
+            slot = self._slot(track, slot_index)
+            if not slot.has_clip:
+                raise ValueError("source clip slot is empty")
+            placements.append((track, slot.clip, destination_time))
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            def operation():
+                for track, clip, destination_time in placements:
+                    track.duplicate_clip_to_arrangement(clip, destination_time)
+            self._undo(operation)
+        return self._change("arrangement.duplicate_many", not dry_run, dry_run, {"arrangement": "live_set"}, {
+            "placementCount": len(placements),
+        })
+
+    def _arrangement_clips(self, params):
+        track_index = self._int(params, "trackIndex")
+        track = self._track(track_index)
+        return [{
+            "index": index, "name": clip.name, "startTime": float(clip.start_time),
+            "endTime": float(clip.end_time), "length": float(clip.length),
+            "isMidi": bool(clip.is_midi_clip), "isAudio": bool(clip.is_audio_clip),
+        } for index, clip in enumerate(track.arrangement_clips)]
+
+    def _show_arrangement(self, params):
+        dry_run = bool(params.get("dryRun", False))
+        if not dry_run:
+            self.application.view.show_view("Arranger")
+        return self._change("view.arrangement", not dry_run, dry_run, {"view": "arrangement"})
 
     def _read_notes(self, clip):
         if hasattr(clip, "get_notes_extended"):

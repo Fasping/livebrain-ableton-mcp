@@ -2,7 +2,7 @@
 
 **AI music production brain for Ableton Live.**
 
-LiveBrain is an agent-agnostic music-production system for deep control of Ableton Live 12. Unlike a generic remote-control MCP, it combines a normalized Ableton API with deterministic musical generation, mutation, project analysis and—later—a local Reference Brain and preference model.
+LiveBrain is an agent-agnostic music-production system for deep control of Ableton Live 12. Unlike a generic remote-control MCP, it combines a normalized Ableton API with deterministic musical generation, mutation, project analysis, a local Reference Brain and a preference model.
 
 The same LiveBrain core is intended to work with Claude Desktop, Claude Code, ChatGPT, Codex, Cursor, VS Code and other MCP-compatible clients. Each client may require a different transport or deployment model.
 
@@ -11,7 +11,8 @@ The same LiveBrain core is intended to work with Claude Desktop, Claude Code, Ch
 - **MCP Server (TypeScript)** — stable tools exposed to any compatible AI client.
 - **Music Brain (TypeScript)** — grooves, basslines, percussion and style-aware decisions.
 - **Ableton Bridge (temporary Python Remote Script)** — deliberately small JSON-lines adapter to Live's current Python API.
-- **Reference Brain (planned)** — musical analysis and reusable style profiles.
+- **Reference Brain** — local audio analysis, reusable style profiles, ratings and per-dimension influence.
+- **Production Engine (beta)** — natural-language vibe compilation, eight-role composition, device discovery, Arrangement construction and role-aware mix setup.
 - **Ableton Extensions SDK adapter (planned)** — preferred native bridge once the required Ableton APIs are available and stable; it will replace the temporary Python layer.
 - **React dashboard (optional)** — observability and manual control later.
 
@@ -88,6 +89,8 @@ After `npm run build`, add the server to Claude Desktop's MCP configuration:
 }
 ```
 
+Bridge requests use a 15-second timeout by default to allow Live's Browser to traverse large libraries. Override it with `LIVEBRAIN_TIMEOUT_MS` only if necessary.
+
 ## Development and testing
 
 ```bash
@@ -102,10 +105,14 @@ Structured logs go only to stderr so MCP stdio is never corrupted.
 
 - `health`, `ableton_capabilities`
 - `livebrain_analyze_set` (`compact` or `detailed`)
-- `ableton_create_midi_track`, `ableton_create_midi_clip`
+- `ableton_create_midi_track`, `ableton_delete_track`, `ableton_create_midi_clip`
 - `ableton_get_clip_notes`, `ableton_replace_notes`, `ableton_duplicate_clip`, `ableton_set_clip_loop`
 - `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
+- `ableton_set_song`, `ableton_set_track_mixer`, `ableton_transport`
+- `ableton_search_browser`, `ableton_load_browser_item`
+- `ableton_duplicate_to_arrangement`, `ableton_duplicate_many_to_arrangement`, `ableton_get_arrangement_clips`, `ableton_show_arrangement`
 - `music_generate_drum_groove`, `music_generate_bass`, `music_generate_sequence`
+- `music_plan_production`, `music_create_production`
 - `music_mutate_clip`, `music_make_less_obvious`, `music_make_bass_less_obvious`, `music_evolve_section`
 - `music_compare_to_profile`
 - `reference_add`, `reference_analyze`, `reference_tag`, `reference_rate`
@@ -114,6 +121,28 @@ Structured logs go only to stderr so MCP stdio is never corrupted.
 - `generation_set_locks`, `generation_get_locks`
 
 Write operations support `dryRun` where useful.
+
+## Full production workflow (beta)
+
+LiveBrain can translate a natural-language brief into a deterministic production plan and then build it in Ableton:
+
+```text
+Plan a dark, hypnotic, spacious minimal track with a quirky 2019 afterhours feel.
+Use 128 bars and seed 19. Show me the plan before changing Ableton.
+```
+
+Call `music_plan_production` first. Then call `music_create_production` with the same prompt and `dryRun: true`; after review, repeat with `dryRun: false`.
+
+The current beta creates independent kick, hats, percussion, bass, chords, lead, texture and FX tracks; writes 16-bar source clips; searches the local Ableton browser for suitable instruments/effects; applies conservative mixer, EQ and compressor starting points; and places active layers across a structured Arrangement.
+
+Production runs are resumable by the canonical `LB Kick`…`LB FX` track names. Repeating the same prompt and seed reuses those tracks, replaces their source MIDI deterministically, skips existing Arrangement positions and completes missing devices instead of duplicating the production. Arrangement placement is sent to Live in one batch, and the song loop is set only after clips establish the Arrangement length.
+
+Important boundaries:
+
+- Device selection depends on what is installed in the local Ableton library and uses fallbacks.
+- EQ and compression are role-aware starting points, not measured mastering decisions.
+- True adaptive frequency cleanup requires an audio/spectrum analyzer feedback path.
+- Compressor sidechain input routing is not consistently exposed by the Python Live Object Model; LiveBrain reports this instead of claiming it was applied.
 
 ## Reference workflow
 
@@ -138,6 +167,7 @@ PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install
 - [Style Engine](docs/STYLE_ENGINE.md)
 - [Feedback Engine](docs/FEEDBACK_ENGINE.md)
 - [Selective Generation & Evolution](docs/SELECTIVE_EVOLUTION.md)
+- [Production Engine](docs/PRODUCTION_ENGINE.md)
 - [Roadmap](docs/ROADMAP.md)
 
 ## Layout
@@ -154,7 +184,8 @@ bridge/LiveBrain/
 
 - **v0.1:** MCP, minimal bridge and first Music Brain.
 - **v0.1.1:** thread-safe Live execution, versioned bridge protocol and replaceable Ableton adapter.
-- **v0.2:** devices, automation, arrangement, browser, racks, routing and section operations.
-- **v0.3:** Reference Brain and evolving producer profiles.
-- **v0.4:** selective generation, persistent dimension locks and section evolution.
+- **v0.2:** Reference Brain, selective generation, persistent locks and the first full-production beta.
+- **v0.2.1:** Live 12 Browser/Arrangement compatibility fix, batched placement and idempotent production resume.
+- **v0.3:** verified Live browser/device/Arrangement parity, richer sound design and resilient resumable production runs.
+- **v0.4:** analyzer-backed EQ decisions, verified sidechain workflows and adaptive producer profiles.
 - **Future:** remote MCP transport and migration from the Python compatibility bridge to Ableton Extensions SDK.

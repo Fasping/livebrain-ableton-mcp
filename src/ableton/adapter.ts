@@ -1,5 +1,9 @@
 import type {
+  ArrangementClipSnapshot,
+  ArrangementPlacementInput,
   BridgeCapabilities,
+  BrowserItemSnapshot,
+  BrowserSearchInput,
   ChangeSummary,
   ClipTarget,
   CreateMidiClipInput,
@@ -10,7 +14,10 @@ import type {
   LiveSetSnapshot,
   MidiNote,
   ParameterTarget,
+  SongSettingsInput,
   SnapshotMode,
+  TrackMixerInput,
+  TransportAction,
 } from "./types.js";
 
 /** Stable boundary between LiveBrain and the replaceable Ableton integration. */
@@ -18,6 +25,7 @@ export interface AbletonAdapter {
   capabilities(): Promise<BridgeCapabilities>;
   snapshot(mode?: SnapshotMode): Promise<LiveSetSnapshot>;
   createMidiTrack(input: CreateTrackInput & { dryRun?: boolean }): Promise<ChangeSummary>;
+  deleteTrack(trackIndex: number, dryRun?: boolean): Promise<ChangeSummary>;
   createMidiClip(input: CreateMidiClipInput & { dryRun?: boolean }): Promise<ChangeSummary>;
   getClipNotes(target: ClipTarget): Promise<MidiNote[]>;
   replaceClipNotes(target: ClipTarget, notes: MidiNote[], dryRun?: boolean): Promise<ChangeSummary>;
@@ -27,5 +35,14 @@ export interface AbletonAdapter {
   getDevices(trackIndex: number): Promise<LiveDeviceSnapshot[]>;
   getDeviceParameters(target: DeviceTarget): Promise<DeviceParameterSnapshot[]>;
   setDeviceParameter(target: ParameterTarget, normalizedValue: number, dryRun?: boolean): Promise<ChangeSummary>;
+  setSongSettings(input: SongSettingsInput, dryRun?: boolean): Promise<ChangeSummary>;
+  setTrackMixer(trackIndex: number, input: TrackMixerInput, dryRun?: boolean): Promise<ChangeSummary>;
+  setTransport(action: TransportAction, dryRun?: boolean): Promise<ChangeSummary>;
+  searchBrowser(input: BrowserSearchInput): Promise<BrowserItemSnapshot[]>;
+  loadBrowserItem(trackIndex: number, uri: string, dryRun?: boolean): Promise<ChangeSummary>;
+  duplicateToArrangement(target: ClipTarget, destinationTime: number, dryRun?: boolean): Promise<ChangeSummary>;
+  duplicateManyToArrangement(placements: ArrangementPlacementInput[], dryRun?: boolean): Promise<ChangeSummary>;
+  getArrangementClips(trackIndex: number): Promise<ArrangementClipSnapshot[]>;
+  showArrangement(dryRun?: boolean): Promise<ChangeSummary>;
   close(): Promise<void>;
 }

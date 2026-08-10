@@ -6,20 +6,24 @@
 |---|---|
 | Capabilities | `system.capabilities` |
 | Set snapshot | `live_set.snapshot` |
-| Create MIDI track | `track.create_midi` |
+| Create/delete MIDI track | `track.create_midi`, `track.delete` |
 | Create Session MIDI clip | `clip.create_midi` |
 | Read/replace/add notes | `clip.get_notes`, `clip.replace_notes`, `clip.add_notes` |
 | Duplicate Session clip | `clip.duplicate` |
 | Set MIDI clip loop | `clip.set_loop` |
 | Devices and parameters | `device.list`, `device.parameters`, `device.set_parameter` |
+| Song settings and transport | `song.settings`, `transport.set` |
+| Mixer | `track.mixer` |
+| Browser search and loading | `browser.search`, `browser.load` |
+| Arrangement | `arrangement.duplicate`, `arrangement.duplicate_many`, `arrangement.clips`, `view.arrangement` |
 
 Parameters use normalized values from 0 to 1. Writes validate targets and support dry-run where exposed.
 
 ## Explicit limitations
 
-- Arrangement editing is pending.
+- Arrangement clip placement is implemented; direct Arrangement clip creation/editing is still pending.
 - Automation curves require Live 12 API verification.
-- Browser loading varies across the Live Object Model and is not claimed yet.
+- Browser search/loading is implemented with bounded traversal and must be verified against each installed Live library.
 - Nested racks, Drum Rack pads, routing, sends and returns are pending.
 - Persistent Live object IDs are not exposed yet; resolve validated indices from a fresh snapshot.
 - Modern note writing uses `add_new_notes`; older Live APIs only have a read fallback.
@@ -38,6 +42,6 @@ This verifies TypeScript adapter → socket → Python bridge → Live Object Mo
 
 ## Remote Script
 
-Copy the `LiveBrain` folder into a MIDI Remote Scripts location recognized by your Live installation, restart Live, and select LiveBrain as a Control Surface. Locations differ by edition and installation.
+Run `./scripts/install-remote-script.sh`, restart Live, and select `LiveBrainDev` as the Control Surface. The installer uses `~/Music/Ableton/User Library/Remote Scripts` by default so Live upgrades do not overwrite it. Set `ABLETON_USER_LIBRARY` if your User Library lives elsewhere.
 
 The bridge binds to `127.0.0.1`, rejects unknown commands and oversized messages, and never evaluates code or executes shell commands.
