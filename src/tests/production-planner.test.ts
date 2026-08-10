@@ -13,6 +13,7 @@ test("Binh/Cabaret language compiles into a complete deterministic minimal produ
   assert.equal(first.brief.genre, "minimal");
   assert.equal(first.brief.style.id, "afterhours_2019");
   assert.equal(first.brief.style.source, "curated");
+  assert.equal(first.brief.style.components[0]?.id, "afterhours_2019");
   assert.equal(first.brief.bpm, 130);
   assert.equal(first.brief.mode, "Dorian");
   assert.equal(first.tracks.length, 8);
@@ -33,6 +34,14 @@ test("requested scene profiles shape the plan and sections receive independent c
   const timelessLead = timeless.tracks.find((track) => track.role === "lead");
   assert.ok(timelessLead && timelessLead.clips.length >= 3);
   assert.ok(new Set(timelessLead.clips.map((clip) => JSON.stringify(clip.notes))).size > 1);
+});
+
+test("a multi-label prompt blends profiles automatically without an explicit profileId", () => {
+  const plan = planProduction("algo entre Timeless, Phonotheque y Perlon", { bars: 64, seed: 12 });
+  assert.match(plan.brief.style.id, /^mix_/);
+  assert.equal(plan.brief.style.components.length, 3);
+  assert.equal(plan.styleProfile.id, plan.brief.style.id);
+  assert.ok(Math.abs(plan.brief.style.components.reduce((sum, component) => sum + component.weight, 0) - 1) < 1e-9);
 });
 
 test("production execution dry-runs safely and builds independent tracks with mock Ableton", async () => {

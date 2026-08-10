@@ -35,7 +35,8 @@
 - [ ] Device racks and macro-based sound design
 - [ ] Audio stem/reference render and comparison loop
 - [x] Recursive local reference-folder import, duplicate detection and one-step profile build
-- [ ] A/B preference comparisons that update dimension weights without opaque “AI training” claims
+- [x] A/B preference comparisons and directional tags that transparently personalize future profiles
+- [x] Automatic multi-label/scene resolution with explainable normalized weights
 
 ## Mixing and routing
 

@@ -5,19 +5,26 @@ import { generateHarmony } from "../music-brain/harmony-generator.js";
 import { generateMelody } from "../music-brain/melody-generator.js";
 import { mutateNotes } from "../music-brain/mutation-engine.js";
 import { generateSequence } from "../music-brain/sequence-generator.js";
-import { afterhours2019, type StyleProfile } from "../music-brain/style-profile.js";
-import { resolveCuratedStyleContext } from "../style/curated-scenes.js";
+import type { StyleProfile } from "../music-brain/style-profile.js";
+import { defaultStyleResolution, resolveCuratedStyleMix } from "../style/style-resolver.js";
 import { compileVibe, type CompileVibeOptions } from "./vibe-compiler.js";
 import type { ProductionClipPlan, ProductionPlan, ProductionTrackPlan, TrackRole } from "./types.js";
 
 export function planProduction(prompt: string, options: CompileVibeOptions = {}): ProductionPlan {
-  const curated = options.styleProfile ? undefined : resolveCuratedStyleContext(prompt);
-  const styleProfile = options.styleProfile ?? curated?.profile ?? afterhours2019;
+  const automatic = options.styleProfile ? undefined : resolveCuratedStyleMix(prompt);
+  const resolution = automatic ?? defaultStyleResolution();
+  const styleProfile = options.styleProfile ?? resolution.profile;
+  const components = options.styleComponents ?? (options.styleProfile ? [{
+    id: styleProfile.id, name: styleProfile.name, source: options.styleSource ?? "reference-profile" as const,
+    weight: 1, matchedAliases: [], needsAudioAnalysis: options.styleNeedsAudioAnalysis ?? false, weightReason: "explicit profile",
+  }] : resolution.components);
   const brief = compileVibe(prompt, {
     ...options,
     styleProfile,
-    styleSource: options.styleSource ?? (curated ? "curated" : options.styleProfile ? "reference-profile" : "default"),
-    styleNeedsAudioAnalysis: options.styleNeedsAudioAnalysis ?? Boolean(curated),
+    styleSource: options.styleSource ?? (automatic?.source ?? resolution.source),
+    styleNeedsAudioAnalysis: options.styleNeedsAudioAnalysis ?? (automatic?.needsAudioAnalysis ?? resolution.needsAudioAnalysis),
+    styleComponents: components,
+    styleExplanation: options.styleExplanation ?? (automatic?.explanation ?? resolution.explanation),
   });
   const clipBars = brief.clipBars;
   const drums = generateDrumGroove(styleProfile, { bars: clipBars, seed: brief.seed });
@@ -34,7 +41,7 @@ export function planProduction(prompt: string, options: CompileVibeOptions = {})
   };
   const tracks = (Object.keys(notesByRole) as TrackRole[]).map((role, index) => trackPlan(role, notesByRole[role], brief, styleProfile, index));
   return {
-    brief,
+    brief, styleProfile: structuredClone(styleProfile),
     tracks,
     limitations: [
       "EQ and compression chains are loaded as a role-aware starting point; adaptive frequency cleanup requires measured audio.",

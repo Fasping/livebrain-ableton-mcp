@@ -1,5 +1,6 @@
 import type { ProductionBrief, ProductionGenre, ProductionSection, TrackRole } from "./types.js";
 import type { StyleProfile } from "../music-brain/style-profile.js";
+import type { ResolvedStyleComponent } from "../style/style-resolver.js";
 
 const roots = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 const allRoles: TrackRole[] = ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"];
@@ -12,6 +13,9 @@ export interface CompileVibeOptions {
   styleProfile?: StyleProfile;
   styleSource?: ProductionBrief["style"]["source"];
   styleNeedsAudioAnalysis?: boolean;
+  styleComponents?: ResolvedStyleComponent[];
+  styleExplanation?: string[];
+  stylePersonalization?: ProductionBrief["style"]["personalization"];
 }
 
 export function compileVibe(prompt: string, options: CompileVibeOptions = {}): ProductionBrief {
@@ -42,6 +46,9 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
       name: style?.name ?? `Generic ${genre}`,
       source: options.styleSource ?? (style ? "curated" : "default"),
       needsAudioAnalysis: options.styleNeedsAudioAnalysis ?? Boolean(style),
+      components: structuredClone(options.styleComponents ?? []),
+      explanation: [...(options.styleExplanation ?? [])],
+      personalization: options.stylePersonalization ?? { applied: false, evidenceCount: 0, adjustments: [] },
     },
     sections: buildSections(bars, genre),
     mixTargets: { headroomDb: -6, sidechainRequested: ["minimal", "house", "techno"].includes(genre), spectralAnalysisRequired: true },

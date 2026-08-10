@@ -15,16 +15,17 @@ import { textResult } from "./mcp/helpers.js";
 import { createReferenceService } from "./reference/create-reference-service.js";
 import { FeedbackStore } from "./feedback/feedback-store.js";
 import { LockStore } from "./locks/lock-store.js";
+import { LIVEBRAIN_VERSION } from "./version.js";
 
 const config = loadConfig();
-const server = new McpServer({ name: "livebrain-mcp", version: "0.2.1" });
+const server = new McpServer({ name: "livebrain-mcp", version: LIVEBRAIN_VERSION });
 const ableton = config.adapter === "mock" ? new MockAbletonAdapter() : new PythonRemoteScriptAdapter();
 const references = createReferenceService(config.dataDir);
 const feedback = new FeedbackStore(config.dataDir);
 const locks = new LockStore(config.dataDir);
 
 server.tool("health", "Check LiveBrain MCP and configured adapter.", {}, async () => textResult({
-  ok: true, version: "0.2.1", adapter: config.adapter,
+  ok: true, version: LIVEBRAIN_VERSION, adapter: config.adapter,
 }));
 server.tool("ableton_capabilities", "Read bridge version and explicitly supported operations.", {},
   async () => textResult(await ableton.capabilities()));
@@ -34,7 +35,7 @@ registerMusicTools(server, ableton, references, feedback, locks);
 registerReferenceTools(server, references, ableton);
 registerFeedbackTools(server, feedback);
 registerLockTools(server, locks);
-registerProductionTools(server, ableton, references);
+registerProductionTools(server, ableton, references, feedback);
 
 const shutdown = async () => {
   log("info", "LiveBrain shutting down");

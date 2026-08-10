@@ -30,6 +30,13 @@ Timeless / Francesco Del Garda and a little Montevideo electro tension.
 Plan it first. Keep every section editable and avoid generic tech-house tropes.
 ```
 
+Several references are blended automatically and remain explainable:
+
+```text
+Make something between Timeless, Phonotheque and Perlon, with more Timeless
+than the others. Resolve the style first and show me the weights.
+```
+
 LiveBrain can then:
 
 - create eight independent, editable MIDI tracks;
@@ -40,6 +47,7 @@ LiveBrain can then:
 - mutate selected musical dimensions while preserving the parts you lock;
 - analyze local reference audio and build reusable style profiles.
 - resolve researched underground contexts including Timeless / Francesco Del Garda, Partout, Wicked Bass / Noizar, Phonotheque / Z@p and Club der Visionaere / Hoppetosse.
+- blend every recognized context in one prompt, report normalized weights and apply locally learned directional or A/B preferences.
 
 Everything remains editable in Ableton. LiveBrain does not render a mysterious finished audio file and hide the production decisions from you.
 
@@ -135,6 +143,8 @@ All important write paths support a preview-first workflow:
 5. Repeat with `dryRun: false` — build the production.
 6. Listen, then request changes in natural language.
 
+Applied productions return a `generationId`. Give direct feedback with tags such as `bass-too-obvious`, `less-melody`, `more-space`, `more-swing` or their documented Spanish equivalents. You can also generate two alternatives and call `feedback_compare_generations`; later plans apply the resulting preference delta conservatively.
+
 Production runs are resumable by the canonical `LB Kick`…`LB FX` names. Repeating the same prompt, seed and length reuses those tracks, replaces the source MIDI deterministically, skips existing Arrangement positions and completes missing device work.
 
 To teach LiveBrain your own taste without uploading audio, put legally owned reference files in a local folder and ask your client:
@@ -192,7 +202,7 @@ These gaps are tracked in the [roadmap](docs/ROADMAP.md).
 
 ## MCP tools
 
-LiveBrain currently exposes 47 tools across these groups:
+LiveBrain currently exposes 49 tools across these groups:
 
 - **Ableton:** Live Set analysis, MIDI tracks/clips/notes, mixer, song settings, transport, Browser, devices and Arrangement;
 - **Production:** full production planning and execution;
@@ -239,7 +249,7 @@ Run without Ableton using the deterministic mock adapter:
 LIVEBRAIN_ADAPTER=mock npm run dev
 ```
 
-The current suite contains 35 automated tests covering the bridge contract, MIDI note compatibility, deterministic generation, curated contexts, reference-folder imports, locks, dry-run safety and resumable full-production execution.
+The current suite contains 40 automated tests covering the bridge contract, MIDI note compatibility, version alignment, deterministic generation, automatic multi-context resolution, A/B preference learning, reference-folder imports, locks, dry-run safety and resumable full-production execution.
 
 ## Documentation
 

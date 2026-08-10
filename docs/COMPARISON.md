@@ -6,7 +6,7 @@ The detailed baseline below was audited on 2026-08-10 from the local `ahujasid/a
 
 ## Summary
 
-| Area | `ahujasid/ableton-mcp` local extended branch | LiveBrain 0.2.1 |
+| Area | `ahujasid/ableton-mcp` local extended branch | LiveBrain 0.4.0 |
 | --- | --- | --- |
 | Primary goal | Broad natural-language control of Ableton | Reproducible AI-assisted music production |
 | MCP tools | 56 | 47 |

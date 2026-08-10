@@ -137,6 +137,176 @@ export const curatedStyleContexts: CuratedStyleContext[] = [
       arrangement: { evolutionRate: .14, subtraction: .84 }, mix: { loudness: .4, lowEnd: .61, brightness: .3, space: .82 },
     }),
   },
+  {
+    id: "my_own_jupiter", name: "My Own Jupiter / Nicolas Lutz", kind: "label",
+    aliases: ["my own jupiter", "nicolas lutz", "michelle", "sentimental stab"], location: "Germany / Uruguay",
+    artists: ["Nicolas Lutz", "Michelle", "Z@p", "Binh", "Tunik"],
+    summary: "Cosmic, tense and playful machine music linking Uruguayan acid/electro with obscure European club records.",
+    sourceUrls: ["https://ra.co/labels/12868", "https://ra.co/news/41352"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("my_own_jupiter", "My Own Jupiter / Nicolas Lutz", {
+      tempo: { min: 125, max: 135, preferred: 130 },
+      rhythm: { density: .36, syncopation: .86, swing: .11, mutationRate: .3, silence: .58, predictability: .18 },
+      drums: { kickWeight: .42, hatDensity: .32, ghostDensity: .27, electroInfluence: .77 },
+      bass: { density: .34, chromaticism: .63, tonalStability: .25, rests: .55 },
+      sequence: { density: .26, cycleSteps: 7, chromaticism: .76, rareEventProbability: .15 },
+      timbre: { weirdness: .9, brightness: .38, rawness: .73, digital: .74 },
+      arrangement: { evolutionRate: .26, subtraction: .72 }, mix: { loudness: .47, lowEnd: .67, brightness: .34, space: .73 },
+    }),
+  },
+  {
+    id: "yoyaku_ecosystem", name: "Yoyaku Ecosystem", kind: "label",
+    aliases: ["yoyaku", "yoy", "joule imprint", "yyk no label"], location: "Paris, France",
+    artists: ["Varhat", "Janeret", "Cabanne", "Zendid"],
+    summary: "Broad Paris vinyl ecosystem spanning deep hypnotic house, minimal, dub and raw futuristic electro.",
+    sourceUrls: ["https://www.yoyaku.fr/label.html", "https://yoyaku.io/label/yoyaku/"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("yoyaku_ecosystem", "Yoyaku Ecosystem", {
+      tempo: { min: 124, max: 134, preferred: 129 },
+      rhythm: { density: .4, syncopation: .73, swing: .18, repetition: .8, mutationRate: .22, silence: .49 },
+      drums: { kickWeight: .46, hatDensity: .39, ghostDensity: .23, electroInfluence: .5 },
+      bass: { density: .37, chromaticism: .38, tonalStability: .47, rests: .48 },
+      sequence: { density: .28, cycleSteps: 8, chromaticism: .48, chordProbability: .17 },
+      timbre: { weirdness: .67, brightness: .45, rawness: .56, digital: .54 },
+      arrangement: { evolutionRate: .21, subtraction: .61 }, mix: { loudness: .52, lowEnd: .65, brightness: .43, space: .64 },
+    }),
+  },
+  {
+    id: "slow_life_berlin", name: "Slow Life Berlin", kind: "label",
+    aliases: ["slow life", "slowlife", "s. moreira", "s moreira"], location: "Berlin, Germany",
+    artists: ["S. Moreira", "Laurine", "Primary Perception", "Ethereal Logic"],
+    summary: "Deep astral grooves combining broken beats, pads, acid bass, ambient passages and Detroit/electro color.",
+    sourceUrls: ["https://slowlife.bandcamp.com/", "https://www.decks.de/label/slow-life"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("slow_life_berlin", "Slow Life Berlin", {
+      tempo: { min: 122, max: 132, preferred: 127 },
+      rhythm: { density: .38, syncopation: .8, swing: .2, microtiming: .25, repetition: .78, mutationRate: .27, silence: .52 },
+      drums: { kickWeight: .38, hatDensity: .36, ghostDensity: .3, electroInfluence: .69 },
+      bass: { density: .34, chromaticism: .45, tonalStability: .42, rests: .53 },
+      sequence: { density: .3, cycleSteps: 8, chromaticism: .55, chordProbability: .2 },
+      timbre: { weirdness: .7, brightness: .43, rawness: .52, digital: .55 },
+      arrangement: { evolutionRate: .28, subtraction: .58 }, mix: { loudness: .44, lowEnd: .62, brightness: .39, space: .79 },
+    }),
+  },
+  {
+    id: "melliflow", name: "Melliflow / Vera & Alexandra", kind: "label",
+    aliases: ["melliflow", "vera", "alexandra", "spacetravel"], location: "Berlin, Germany",
+    artists: ["Vera", "Alexandra", "Spacetravel"],
+    summary: "Spacey, swung and subtle house/techno with elastic microtiming, low-density detail and psychedelic restraint.",
+    sourceUrls: ["https://ra.co/news/33727"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("melliflow", "Melliflow / Vera & Alexandra", {
+      tempo: { min: 125, max: 133, preferred: 129 },
+      rhythm: { density: .32, syncopation: .79, swing: .24, microtiming: .31, repetition: .84, mutationRate: .19, silence: .65 },
+      drums: { kickWeight: .37, hatDensity: .29, ghostDensity: .21, electroInfluence: .42 },
+      bass: { density: .27, chromaticism: .44, tonalStability: .4, rests: .64 },
+      sequence: { density: .2, cycleSteps: 7, chromaticism: .57, chordProbability: .1 },
+      timbre: { weirdness: .78, brightness: .4, rawness: .48, digital: .59 },
+      arrangement: { evolutionRate: .16, subtraction: .82 }, mix: { loudness: .39, lowEnd: .58, brightness: .35, space: .84 },
+    }),
+  },
+  {
+    id: "pressure_traxx", name: "Pressure Traxx", kind: "label",
+    aliases: ["pressure traxx", "pressuretraxx", "ptx", "frost and arno"], location: "Offenbach, Germany",
+    artists: ["Frost", "Arno", "Christian AB", "Transparent Sound"],
+    summary: "Direct acid, house and techno roots with solid low-end pressure, machine funk and an unpolished club focus.",
+    sourceUrls: ["https://pressuretraxx.bandcamp.com/"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("pressure_traxx", "Pressure Traxx", {
+      tempo: { min: 126, max: 136, preferred: 131 },
+      rhythm: { density: .43, syncopation: .76, swing: .12, repetition: .76, mutationRate: .25, silence: .46 },
+      drums: { kickWeight: .56, hatDensity: .41, ghostDensity: .26, electroInfluence: .62 },
+      bass: { density: .4, chromaticism: .5, tonalStability: .35, rests: .45 },
+      sequence: { density: .3, cycleSteps: 8, chromaticism: .62, rareEventProbability: .11 },
+      timbre: { weirdness: .7, brightness: .39, rawness: .8, digital: .63 },
+      arrangement: { evolutionRate: .22, subtraction: .57 }, mix: { loudness: .58, lowEnd: .76, brightness: .36, space: .57 },
+    }),
+  },
+  {
+    id: "perlon", name: "Perlon", kind: "label",
+    aliases: ["perlon", "get perlonized", "zip", "dimbiman", "markus nikolai"], location: "Berlin, Germany",
+    artists: ["Zip", "Ricardo Villalobos", "Baby Ford", "Akufen", "Thomas Melchior"],
+    summary: "Funky, stripped-back and off-kilter minimal house/techno built around rhythm, soul, silence and playful detail.",
+    sourceUrls: ["https://www.nts.live/shows/the-nts-guide-to/episodes/the-nts-guide-to-perlon-2nd-october-2025", "https://www.roughtrade.com/label/perlon"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("perlon", "Perlon", {
+      tempo: { min: 124, max: 133, preferred: 128 },
+      rhythm: { density: .33, syncopation: .75, swing: .22, microtiming: .29, repetition: .87, mutationRate: .17, silence: .67 },
+      drums: { kickWeight: .39, hatDensity: .3, ghostDensity: .2, electroInfluence: .3 },
+      bass: { density: .29, chromaticism: .34, tonalStability: .48, rests: .62 },
+      sequence: { density: .2, cycleSteps: 7, chromaticism: .45, chordProbability: .12 },
+      timbre: { weirdness: .73, brightness: .38, rawness: .55, digital: .43 },
+      arrangement: { evolutionRate: .15, subtraction: .83 }, mix: { loudness: .41, lowEnd: .6, brightness: .34, space: .81 },
+    }),
+  },
+  {
+    id: "seekers_barcelona", name: "Seekers", kind: "label",
+    aliases: ["seekers", "seekers records"], location: "Barcelona, Spain",
+    artists: ["Binh"],
+    summary: "Digging-led minimal and electro context favoring hypnotic repetition, obscure details and patient dancefloor development.",
+    sourceUrls: ["https://seekers.bandcamp.com/", "https://seekers.net/artist/binh/"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("seekers_barcelona", "Seekers", {
+      tempo: { min: 126, max: 134, preferred: 130 },
+      rhythm: { density: .34, syncopation: .81, swing: .15, repetition: .86, mutationRate: .2, silence: .62 },
+      drums: { kickWeight: .4, hatDensity: .3, ghostDensity: .22, electroInfluence: .5 },
+      bass: { density: .29, chromaticism: .49, tonalStability: .34, rests: .6 },
+      sequence: { density: .21, cycleSteps: 7, chromaticism: .65, rareEventProbability: .11 },
+      timbre: { weirdness: .84, brightness: .36, rawness: .61, digital: .59 },
+      arrangement: { evolutionRate: .18, subtraction: .79 }, mix: { loudness: .43, lowEnd: .63, brightness: .32, space: .78 },
+    }),
+  },
+  {
+    id: "cartulis_london", name: "Cartulis Music", kind: "label",
+    aliases: ["cartulis", "cartulis music"], location: "London, UK",
+    artists: [],
+    summary: "London underground context joining minimal house, electro, breaks and psychedelic machine-led club music.",
+    sourceUrls: ["https://cartulismusic.bandcamp.com/artists"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("cartulis_london", "Cartulis Music", {
+      tempo: { min: 126, max: 135, preferred: 130 },
+      rhythm: { density: .4, syncopation: .83, swing: .14, mutationRate: .29, silence: .5, predictability: .2 },
+      drums: { kickWeight: .45, hatDensity: .37, ghostDensity: .29, electroInfluence: .7 },
+      bass: { density: .37, chromaticism: .56, tonalStability: .3, rests: .49 },
+      sequence: { density: .3, cycleSteps: 7, chromaticism: .7, rareEventProbability: .14 },
+      timbre: { weirdness: .82, brightness: .4, rawness: .71, digital: .7 },
+      arrangement: { evolutionRate: .27, subtraction: .65 }, mix: { loudness: .52, lowEnd: .7, brightness: .37, space: .66 },
+    }),
+  },
+  {
+    id: "limousine_dream", name: "Limousine Dream / Gene On Earth", kind: "label",
+    aliases: ["limousine dream", "gene on earth", "gene on earth records"], location: "Berlin, Germany",
+    artists: ["Gene On Earth"],
+    summary: "Warm, playful and rolling modern club music with human swing, memorable motifs and polished but unforced low end.",
+    sourceUrls: ["https://www.limousinedream.com/pages/about", "https://ra.co/labels/15624"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("limousine_dream", "Limousine Dream / Gene On Earth", {
+      tempo: { min: 125, max: 132, preferred: 128 },
+      rhythm: { density: .43, syncopation: .7, swing: .23, repetition: .79, mutationRate: .2, silence: .45 },
+      drums: { kickWeight: .45, hatDensity: .43, ghostDensity: .28, electroInfluence: .38 },
+      bass: { density: .41, chromaticism: .31, tonalStability: .55, rests: .42 },
+      sequence: { density: .31, cycleSteps: 8, chromaticism: .38, chordProbability: .2 },
+      timbre: { weirdness: .58, brightness: .5, rawness: .45, digital: .42 },
+      arrangement: { evolutionRate: .23, subtraction: .55 }, mix: { loudness: .54, lowEnd: .7, brightness: .47, space: .58 },
+    }),
+  },
+  {
+    id: "half_baked_london", name: "Half Baked London", kind: "label",
+    aliases: ["half baked", "half baked records"], location: "London, UK",
+    artists: [],
+    summary: "Long-running London minimal-house context with warm rolling grooves, understated funk and afterhours pacing.",
+    sourceUrls: ["https://halfbakedrecords.bandcamp.com/"],
+    confidence: "curation-only", needsAudioAnalysis: true,
+    profile: profile("half_baked_london", "Half Baked London", {
+      tempo: { min: 124, max: 132, preferred: 128 },
+      rhythm: { density: .38, syncopation: .69, swing: .21, repetition: .84, mutationRate: .17, silence: .54 },
+      drums: { kickWeight: .44, hatDensity: .37, ghostDensity: .23, electroInfluence: .28 },
+      bass: { density: .37, chromaticism: .3, tonalStability: .55, rests: .5 },
+      sequence: { density: .25, cycleSteps: 8, chromaticism: .38, chordProbability: .16 },
+      timbre: { weirdness: .57, brightness: .43, rawness: .5, digital: .4 },
+      arrangement: { evolutionRate: .17, subtraction: .67 }, mix: { loudness: .49, lowEnd: .67, brightness: .4, space: .67 },
+    }),
+  },
 ];
 
 export function listCuratedStyleContexts(): CuratedStyleContext[] {
@@ -149,10 +319,42 @@ export function getCuratedStyleContext(id: string): CuratedStyleContext | undefi
 }
 
 export function resolveCuratedStyleContext(text: string): CuratedStyleContext | undefined {
+  return matchCuratedStyleContexts(text)[0]?.context;
+}
+
+export interface CuratedStyleMatch {
+  context: CuratedStyleContext;
+  matchedAliases: string[];
+  score: number;
+  weightModifier: number;
+}
+
+export function matchCuratedStyleContexts(text: string): CuratedStyleMatch[] {
   const normalized = text.toLowerCase();
-  const candidates = curatedStyleContexts
-    .flatMap((context) => context.aliases.map((alias) => ({ context, alias: alias.toLowerCase() })))
-    .filter(({ alias }) => normalized.includes(alias))
-    .sort((a, b) => b.alias.length - a.alias.length);
-  return candidates[0] ? structuredClone(candidates[0].context) : undefined;
+  return curatedStyleContexts.flatMap((context) => {
+    const matchedAliases = context.aliases.filter((alias) => includesAlias(normalized, alias.toLowerCase()));
+    if (!matchedAliases.length) return [];
+    const modifier = weightModifier(normalized, matchedAliases);
+    return [{ context: structuredClone(context), matchedAliases, score: (1 + (matchedAliases.length - 1) * .2) * modifier, weightModifier: modifier }];
+  }).sort((a, b) => b.score - a.score || a.context.id.localeCompare(b.context.id));
+}
+
+function includesAlias(text: string, alias: string) {
+  const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const left = /^[a-z0-9]/.test(alias) ? "(?:^|[^a-z0-9])" : "";
+  const right = /[a-z0-9]$/.test(alias) ? "(?:$|[^a-z0-9])" : "";
+  return new RegExp(`${left}${escaped}${right}`).test(text);
+}
+
+function weightModifier(text: string, aliases: string[]) {
+  let modifier = 1;
+  for (const alias of aliases) {
+    const index = text.indexOf(alias);
+    if (index < 0) continue;
+    const before = text.slice(Math.max(0, index - 32), index);
+    if (/(?:sobre todo|principalmente|mostly|mainly)\s+(?:de\s+)?$/.test(before)) modifier = Math.max(modifier, 1.75);
+    else if (/(?:más|mas|more)\s+(?:de\s+)?$/.test(before)) modifier = Math.max(modifier, 1.5);
+    if (/(?:un toque de|toque de|a touch of|a little|un poco de)\s+$/.test(before)) modifier = Math.min(modifier, .5);
+  }
+  return modifier;
 }
