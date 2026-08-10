@@ -1,81 +1,84 @@
-# LiveBrain
+# LiveBrain MCP — AI Music Production for Ableton Live
 
-**AI music production brain for Ableton Live.**
+**Turn a musical idea into an editable, multi-track Ableton Live project with Claude, Codex, Cursor, or another MCP client.**
 
-LiveBrain is an agent-agnostic music-production system for deep control of Ableton Live 12. Unlike a generic remote-control MCP, it combines a normalized Ableton API with deterministic musical generation, mutation, project analysis, a local Reference Brain and a preference model.
+[![GitHub stars](https://img.shields.io/github/stars/Fasping/livebrain-mcp?style=social)](https://github.com/Fasping/livebrain-mcp/stargazers)
+[![MIT License](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
+[![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-339933.svg?logo=node.js&logoColor=white)](package.json)
+[![Ableton Live 12](https://img.shields.io/badge/Ableton%20Live-12-111111.svg)](https://www.ableton.com/live/)
+[![MCP](https://img.shields.io/badge/Model%20Context%20Protocol-compatible-7c3aed.svg)](https://modelcontextprotocol.io/)
 
-The same LiveBrain core is intended to work with Claude Desktop, Claude Code, ChatGPT, Codex, Cursor, VS Code and other MCP-compatible clients. Each client may require a different transport or deployment model.
+LiveBrain is an open-source Ableton Live MCP server **and** a deterministic music-production engine. It can inspect a Live Set, compose MIDI, load installed instruments and effects, build an Arrangement, create variations, and remember the musical characteristics you prefer.
 
-## Architecture
+> LiveBrain is currently a macOS-first beta verified with Ableton Live 12 and Node.js 20. Save your Live Set before letting any AI client make large changes.
 
-- **MCP Server (TypeScript)** — stable tools exposed to any compatible AI client.
-- **Music Brain (TypeScript)** — grooves, basslines, percussion and style-aware decisions.
-- **Ableton Bridge (temporary Python Remote Script)** — deliberately small JSON-lines adapter to Live's current Python API.
-- **Reference Brain** — local audio analysis, reusable style profiles, ratings and per-dimension influence.
-- **Production Engine (beta)** — natural-language vibe compilation, eight-role composition, device discovery, Arrangement construction and role-aware mix setup.
-- **Ableton Extensions SDK adapter (planned)** — preferred native bridge once the required Ableton APIs are available and stable; it will replace the temporary Python layer.
-- **React dashboard (optional)** — observability and manual control later.
+## What can it make?
 
-## Client and transport strategy
+Ask for a vibe instead of manually describing every MIDI note:
 
 ```text
-Claude Desktop / Claude Code / Cursor / VS Code
-                    │
-                 MCP stdio
-                    │
-                    ▼
-              LiveBrain Core
-                    ▲
-                    │
-        remote MCP / secure tunnel
-                    │
-             ChatGPT / Codex
+Create a dark, hypnotic and spacious 128-bar minimal track at 130 BPM.
+Use separate kick, hats, percussion, bass, chords, lead, texture and FX tracks.
+Show me the plan first, then build it in Arrangement View.
 ```
 
-- **Local clients:** use the `stdio` MCP transport.
-- **Remote clients:** will use a remote MCP transport or secure tunnel.
-- **Music Brain:** remains identical for every client.
-- **Ableton adapter:** is isolated behind a typed interface so its implementation can change without rewriting the MCP tools or Music Brain.
+LiveBrain can then:
 
-## Ableton integration policy
+- create eight independent, editable MIDI tracks;
+- generate deterministic drums, bass, harmony, melody, texture and FX material;
+- search your Ableton Browser and load devices that are actually installed;
+- set tempo, scale, mixer levels, panning, sends, EQ and compression starting points;
+- place sections in Arrangement View and resume an interrupted build without duplicating tracks;
+- mutate selected musical dimensions while preserving the parts you lock;
+- analyze local reference audio and build reusable style profiles.
 
-Python is a compatibility bridge, not LiveBrain's long-term foundation. During the early releases it should contain only the code that must execute inside Ableton Live:
+Everything remains editable in Ableton. LiveBrain does not render a mysterious finished audio file and hide the production decisions from you.
 
-- read and serialize Live Set state;
-- execute validated commands on Live objects;
-- return normalized results and errors;
-- avoid musical-generation or agent logic.
+## Why LiveBrain?
 
-Musical reasoning, reference analysis, validation, schemas and orchestration belong in TypeScript. When Ableton's Extensions SDK exposes the control surface LiveBrain needs, a native Extensions adapter will replace the Python bridge while preserving the higher-level APIs.
+Most Ableton MCP projects expose DAW controls and leave all musical reasoning to the chat model. LiveBrain keeps the control layer, then adds a reusable production brain above it.
 
-## Quick start
+| Capability | Generic Ableton controller | LiveBrain |
+| --- | ---: | ---: |
+| Read/write tracks, clips, devices and mixer | Yes | Yes |
+| Deterministic groove, bass, harmony and melody engines | Agent-dependent | Built in |
+| Natural-language vibe → complete production plan | Agent-dependent | Built in |
+| Safe preview before changing Live | Rare | `dryRun` by default |
+| Resume an interrupted full-song build | Rare | Built in |
+| Local reference-audio profiles | No | Built in |
+| Persistent locks and structured feedback | No | Built in |
+| Same seed produces the same musical plan | No guarantee | Yes |
+
+LiveBrain is **not yet the widest Ableton control surface**. Mature controller-focused projects still cover operations such as scenes, audio tracks, automation envelopes, routing and undo/redo more completely. See the honest [comparison and gap analysis](docs/COMPARISON.md).
+
+## Quick start on macOS
+
+### Requirements
+
+- Ableton Live 12
+- Node.js 20 or newer
+- Git
+
+### 1. Install LiveBrain
 
 ```bash
-npm install
-npm run build
-npm run dev
+git clone https://github.com/Fasping/livebrain-mcp.git
+cd livebrain-mcp
+./scripts/setup-macos.sh
 ```
 
-Use Node.js 20 or newer. Run without Ableton during development with:
+The setup script installs dependencies, builds the MCP server, copies the Remote Script into your Ableton User Library, and prints a ready-to-paste MCP configuration. It does not overwrite your AI client's configuration.
 
-```bash
-LIVEBRAIN_ADAPTER=mock npm run dev
-```
+### 2. Enable it in Ableton
 
-The initial MCP server uses stdio. The temporary Python bridge listens only on `127.0.0.1:9877`.
+1. Restart Ableton Live.
+2. Open **Settings → Link, Tempo & MIDI**.
+3. Select **LiveBrain** as a Control Surface.
+4. Leave its MIDI Input and Output set to **None**.
 
-## Ableton Remote Script
+### 3. Connect an AI client
 
-1. Run `./scripts/install-remote-script.sh`. By default this installs the bridge as `LiveBrainDev` under `~/Music/Ableton/User Library/Remote Scripts`.
-2. Restart Live.
-3. In **Settings → Link, Tempo & MIDI**, select **LiveBrainDev** as a Control Surface.
-4. Keep port `9877` on localhost; never expose the bridge publicly.
-
-If your User Library is elsewhere, set `ABLETON_USER_LIBRARY` before running the installer. See `docs/ABLETON_API.md`.
-
-## Claude Desktop
-
-After `npm run build`, add the server to Claude Desktop's MCP configuration:
+For Claude Desktop, add this to `claude_desktop_config.json`, replacing the path with your clone:
 
 ```json
 {
@@ -83,83 +86,145 @@ After `npm run build`, add the server to Claude Desktop's MCP configuration:
     "livebrain": {
       "command": "node",
       "args": ["/absolute/path/to/livebrain-mcp/dist/index.js"],
-      "env": { "LIVEBRAIN_HOST": "127.0.0.1", "LIVEBRAIN_PORT": "9877" }
+      "env": {
+        "LIVEBRAIN_HOST": "127.0.0.1",
+        "LIVEBRAIN_PORT": "9877"
+      }
     }
   }
 }
 ```
 
-Bridge requests use a 15-second timeout by default to allow Live's Browser to traverse large libraries. Override it with `LIVEBRAIN_TIMEOUT_MS` only if necessary.
+Restart the client and ask:
 
-## Development and testing
+```text
+Run LiveBrain health and tell me the bridge version.
+```
+
+See [AI client setup](docs/CLIENTS.md) for Claude Desktop, Codex, Cursor, VS Code and ChatGPT availability.
+
+## Client compatibility
+
+| Client | Status | Connection |
+| --- | --- | --- |
+| Claude Desktop | Verified | Local MCP over stdio |
+| Codex | Compatible | Local MCP over stdio |
+| Cursor / VS Code MCP clients | Compatible | Local MCP over stdio |
+| Other local MCP clients | Compatible | Launch `node dist/index.js` |
+| ChatGPT | Architecture-ready, remote transport pending | ChatGPT does not connect directly to a localhost MCP server |
+
+ChatGPT's current custom MCP support expects a remote server or a supported secure tunnel; LiveBrain currently ships a local stdio transport. We document this boundary instead of claiming one-click ChatGPT support that is not implemented yet. See OpenAI's [developer mode and MCP apps documentation](https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt).
+
+## Recommended workflow
+
+All important write paths support a preview-first workflow:
+
+1. `health` — confirm MCP, adapter and bridge versions.
+2. `livebrain_analyze_set` — inspect the current Live Set.
+3. `music_plan_production` — compile the vibe without changing Ableton.
+4. `music_create_production` with `dryRun: true` — validate targets and planned changes.
+5. Repeat with `dryRun: false` — build the production.
+6. Listen, then request changes in natural language.
+
+Production runs are resumable by the canonical `LB Kick`…`LB FX` names. Repeating the same prompt, seed and length reuses those tracks, replaces the source MIDI deterministically, skips existing Arrangement positions and completes missing device work.
+
+## Music and production features
+
+### Production Engine
+
+- vibe compiler for minimal, house, techno, trap, lo-fi, pop and ambient starting points;
+- structured 64–512 bar arrangements;
+- independent kick, hats, percussion, bass, chords, lead, texture and FX roles;
+- deterministic harmony, motif-based melody, drums, bass and generative sequences;
+- Browser device discovery with installed-device fallbacks;
+- conservative gain staging, panning, sends, EQ, compression and reverb setup;
+- batched Arrangement placement and idempotent resume.
+
+### Music Brain
+
+- deterministic generation by seed;
+- groove, bass and alien/digital sequence generators;
+- selective mutation and “make it less obvious” workflows;
+- 16→64-bar section evolution;
+- persistent generation, track and clip locks.
+
+### Reference Brain
+
+- register local reference audio without copying it into Git;
+- analyze PCM WAV directly and other formats through `ffmpeg`;
+- separate measured features from human ratings and tags;
+- build, explain and blend reusable style profiles;
+- store structured feedback without pretending to retrain an AI model.
+
+## Current boundaries
+
+LiveBrain is honest about what has and has not been verified:
+
+- device selection depends on the Ableton content installed on the machine;
+- EQ and compression are role-aware starting points, not analyzer-backed mastering decisions;
+- external compressor sidechain routing is not consistently exposed by the current Python Live Object Model bridge;
+- scenes, audio-track workflows, automation envelopes, nested racks and broad routing are not yet at parity with mature Ableton controllers;
+- the automatic installer is currently macOS-first;
+- ChatGPT requires a future remote MCP transport or secure tunnel.
+
+These gaps are tracked in the [roadmap](docs/ROADMAP.md).
+
+## MCP tools
+
+LiveBrain currently exposes 47 tools across these groups:
+
+- **Ableton:** Live Set analysis, MIDI tracks/clips/notes, mixer, song settings, transport, Browser, devices and Arrangement;
+- **Production:** full production planning and execution;
+- **Music:** drums, bass, sequences, mutation and section evolution;
+- **References:** local audio analysis, ratings, influence and profile blending;
+- **Learning controls:** structured feedback and persistent dimension locks.
+
+See [Ableton API](docs/ABLETON_API.md) and [Production Engine](docs/PRODUCTION_ENGINE.md) for the exact surface.
+
+## Architecture
+
+```text
+Claude / Codex / Cursor / another local MCP client
+                         │
+                      MCP stdio
+                         │
+                         ▼
+                 LiveBrain (TypeScript)
+                  ├─ Production Engine
+                  ├─ Music Brain
+                  ├─ Reference Brain
+                  └─ Typed Ableton Adapter
+                         │
+                  JSON-lines on localhost
+                         │
+                         ▼
+             Ableton Live Remote Script (Python)
+```
+
+The bridge listens only on `127.0.0.1:9877`. Musical reasoning stays outside Ableton in typed, tested TypeScript. The adapter boundary allows the Python compatibility layer to be replaced by Ableton's Extensions SDK when the required APIs become stable.
+
+## Development
 
 ```bash
+npm install
 npm run typecheck
 npm test
 npm run build
 ```
 
-Structured logs go only to stderr so MCP stdio is never corrupted.
-
-## Current MCP tools
-
-- `health`, `ableton_capabilities`
-- `livebrain_analyze_set` (`compact` or `detailed`)
-- `ableton_create_midi_track`, `ableton_delete_track`, `ableton_create_midi_clip`
-- `ableton_get_clip_notes`, `ableton_replace_notes`, `ableton_duplicate_clip`, `ableton_set_clip_loop`
-- `ableton_get_devices`, `ableton_get_device_parameters`, `ableton_set_device_parameter`
-- `ableton_set_song`, `ableton_set_track_mixer`, `ableton_transport`
-- `ableton_search_browser`, `ableton_load_browser_item`
-- `ableton_duplicate_to_arrangement`, `ableton_duplicate_many_to_arrangement`, `ableton_get_arrangement_clips`, `ableton_show_arrangement`
-- `music_generate_drum_groove`, `music_generate_bass`, `music_generate_sequence`
-- `music_plan_production`, `music_create_production`
-- `music_mutate_clip`, `music_make_less_obvious`, `music_make_bass_less_obvious`, `music_evolve_section`
-- `music_compare_to_profile`
-- `reference_add`, `reference_analyze`, `reference_tag`, `reference_rate`
-- `reference_set_influence`, `reference_get`, `reference_list`, `reference_build_profile`, `reference_explain_profile`, `reference_blend_profiles`
-- `feedback_generation`, `feedback_get_preferences`
-- `generation_set_locks`, `generation_get_locks`
-
-Write operations support `dryRun` where useful.
-
-## Full production workflow (beta)
-
-LiveBrain can translate a natural-language brief into a deterministic production plan and then build it in Ableton:
-
-```text
-Plan a dark, hypnotic, spacious minimal track with a quirky 2019 afterhours feel.
-Use 128 bars and seed 19. Show me the plan before changing Ableton.
-```
-
-Call `music_plan_production` first. Then call `music_create_production` with the same prompt and `dryRun: true`; after review, repeat with `dryRun: false`.
-
-The current beta creates independent kick, hats, percussion, bass, chords, lead, texture and FX tracks; writes 16-bar source clips; searches the local Ableton browser for suitable instruments/effects; applies conservative mixer, EQ and compressor starting points; and places active layers across a structured Arrangement.
-
-Production runs are resumable by the canonical `LB Kick`…`LB FX` track names. Repeating the same prompt and seed reuses those tracks, replaces their source MIDI deterministically, skips existing Arrangement positions and completes missing devices instead of duplicating the production. Arrangement placement is sent to Live in one batch, and the song loop is set only after clips establish the Arrangement length.
-
-Important boundaries:
-
-- Device selection depends on what is installed in the local Ableton library and uses fallbacks.
-- EQ and compression are role-aware starting points, not measured mastering decisions.
-- True adaptive frequency cleanup requires an audio/spectrum analyzer feedback path.
-- Compressor sidechain input routing is not consistently exposed by the Python Live Object Model; LiveBrain reports this instead of claiming it was applied.
-
-## Reference workflow
-
-Reference audio remains at its original local path and is never copied into Git. LiveBrain stores shareable measurements separately from a gitignored local path index.
+Run without Ableton using the deterministic mock adapter:
 
 ```bash
-livebrain reference-add --audio "/local/music/reference.wav" --title "Reference 01" --groups afterhours_2019
-livebrain reference-analyze --id UUID
-livebrain reference-rate --id UUID --ratings '{"groove":9,"space":8,"cheese":0.5}'
-livebrain reference-set-influence --id UUID --influence '{"groove":1,"bass":0,"arrangement":0.8}'
-livebrain reference-build-profile --group afterhours_2019
+LIVEBRAIN_ADAPTER=mock npm run dev
 ```
 
-PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install it and optionally set `LIVEBRAIN_FFMPEG_PATH`.
+The current suite contains 31 automated tests covering the bridge contract, MIDI note compatibility, deterministic generation, references, locks, dry-run safety and resumable full-production execution.
 
 ## Documentation
 
+- [AI client setup](docs/CLIENTS.md)
+- [Production Engine](docs/PRODUCTION_ENGINE.md)
+- [Comparison with controller-focused Ableton MCPs](docs/COMPARISON.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Ableton API](docs/ABLETON_API.md)
 - [Music Brain](docs/MUSIC_BRAIN.md)
@@ -167,25 +232,14 @@ PCM WAV analysis is built in. MP3, AIFF, FLAC, M4A and OGG use `ffmpeg`; install
 - [Style Engine](docs/STYLE_ENGINE.md)
 - [Feedback Engine](docs/FEEDBACK_ENGINE.md)
 - [Selective Generation & Evolution](docs/SELECTIVE_EVOLUTION.md)
-- [Production Engine](docs/PRODUCTION_ENGINE.md)
 - [Roadmap](docs/ROADMAP.md)
 
-## Layout
+## Contributing
 
-```text
-src/
-  index.ts
-  bridge/client.ts
-  music-brain/
-bridge/LiveBrain/
-```
+Bug reports, musical examples, device-compatibility reports and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Roadmap
+If LiveBrain helps your workflow, consider [starring the repository](https://github.com/Fasping/livebrain-mcp) and sharing what you made. Real Ableton projects, reproducible prompts and honest failure reports are more valuable than hype.
 
-- **v0.1:** MCP, minimal bridge and first Music Brain.
-- **v0.1.1:** thread-safe Live execution, versioned bridge protocol and replaceable Ableton adapter.
-- **v0.2:** Reference Brain, selective generation, persistent locks and the first full-production beta.
-- **v0.2.1:** Live 12 Browser/Arrangement compatibility fix, batched placement and idempotent production resume.
-- **v0.3:** verified Live browser/device/Arrangement parity, richer sound design and resilient resumable production runs.
-- **v0.4:** analyzer-backed EQ decisions, verified sidechain workflows and adaptive producer profiles.
-- **Future:** remote MCP transport and migration from the Python compatibility bridge to Ableton Extensions SDK.
+## License and disclaimer
+
+[MIT](LICENSE). LiveBrain is an independent open-source project and is not affiliated with or endorsed by Ableton, Anthropic or OpenAI. Ableton and Ableton Live are trademarks of Ableton AG.

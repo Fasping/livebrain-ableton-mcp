@@ -51,6 +51,16 @@
 - [ ] Scene CRUD and performance workflows
 - [ ] Audio clip/stem placement
 
+## Distribution and community
+
+- [x] macOS setup script and client-specific setup guide
+- [x] MIT license, security policy, contribution guide and issue templates
+- [ ] Windows Remote Script installer and verified setup path
+- [ ] Publish a versioned npm package and/or trusted MCP registry listing
+- [ ] Demo video, screenshots and downloadable example Live Set made only from redistributable material
+- [ ] Remote MCP gateway or Secure MCP Tunnel path for supported ChatGPT plans
+- [ ] Release notes, changelog and signed version tags
+
 ## Future adapter
 
 The Python Remote Script remains a compatibility bridge. Migrate to Ableton's Extensions SDK when it exposes the required control surface while preserving the typed TypeScript adapter.
