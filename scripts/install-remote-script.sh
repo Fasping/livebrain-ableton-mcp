@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE="$ROOT/bridge/LiveBrain"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SOURCE="$PROJECT_DIR/bridge/LiveBrain"
 ABLETON_USER_LIBRARY="${ABLETON_USER_LIBRARY:-$HOME/Music/Ableton/User Library}"
 TARGET_ROOT="$ABLETON_USER_LIBRARY/Remote Scripts"
-TARGET_NAME="${LIVEBRAIN_REMOTE_SCRIPT_NAME:-LiveBrainDev}"
+TARGET_NAME="${LIVEBRAIN_REMOTE_SCRIPT_NAME:-LiveBrain}"
 TARGET="$TARGET_ROOT/$TARGET_NAME"
-BACKUP_ROOT="$ROOT/data/remote-script-backups"
+BACKUP_ROOT="$PROJECT_DIR/data/remote-script-backups"
 
 if [[ ! -d "$ABLETON_USER_LIBRARY" ]]; then
   echo "Ableton User Library not found: $ABLETON_USER_LIBRARY" >&2

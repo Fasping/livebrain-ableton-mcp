@@ -42,6 +42,6 @@ This verifies TypeScript adapter → socket → Python bridge → Live Object Mo
 
 ## Remote Script
 
-Run `./scripts/install-remote-script.sh`, restart Live, and select `LiveBrainDev` as the Control Surface. The installer uses `~/Music/Ableton/User Library/Remote Scripts` by default so Live upgrades do not overwrite it. Set `ABLETON_USER_LIBRARY` if your User Library lives elsewhere.
+Run `./scripts/install-remote-script.sh`, restart Live, and select `LiveBrain` as the Control Surface. The installer uses `~/Music/Ableton/User Library/Remote Scripts` by default so Live upgrades do not overwrite it. Set `ABLETON_USER_LIBRARY` if your User Library lives elsewhere. Developers can choose a parallel name such as `LiveBrainDev` with `LIVEBRAIN_REMOTE_SCRIPT_NAME=LiveBrainDev`.
 
 The bridge binds to `127.0.0.1`, rejects unknown commands and oversized messages, and never evaluates code or executes shell commands.

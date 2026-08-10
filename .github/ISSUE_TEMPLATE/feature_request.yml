@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest an Ableton control or music-production capability
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Producer workflow
+      description: Describe the musical or Ableton task, not only the API method.
+      placeholder: When building a house arrangement, I want...
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome in Ableton
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and dry-run considerations
+      description: What existing material must be preserved?

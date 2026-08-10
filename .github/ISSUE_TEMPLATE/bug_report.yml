@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible LiveBrain or Ableton bridge problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Save your Live Set first. Remove private paths, tokens and copyrighted audio from reports.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: macOS/Windows, Ableton edition/version, LiveBrain MCP version and bridge version
+      placeholder: macOS 15, Live 12 Standard, MCP 0.2.1, bridge 0.2.1
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the tool, exact input, initial Live Set state and steps.
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Exact error and partial changes
+      description: Paste the error and state whether Ableton changed before it failed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
