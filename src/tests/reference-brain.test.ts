@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { generateDrumGroove } from "../music-brain/drum-generator.js";
@@ -26,6 +26,26 @@ test("reference library stores local paths separately and builds a consumable pr
   const profile = await service.buildProfile("machine_funk");
   assert.equal(profile.styleProfile.id, "machine_funk");
   assert.ok(profile.styleProfile.rhythm.density >= 0 && profile.styleProfile.rhythm.density <= 1);
+});
+
+test("a local reference folder imports, analyzes and builds a profile without duplicating paths", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "livebrain-folder-"));
+  const folder = join(directory, "records");
+  await mkdir(folder);
+  await writeFile(join(folder, "Timeless Tool.wav"), pulseWav(8, 22050, 128));
+  await writeFile(join(folder, "Phonotheque Cut.wav"), pulseWav(8, 22050, 130));
+  await writeFile(join(folder, "notes.txt"), "ignored");
+  const service = new ReferenceService(new ReferenceStore(join(directory, "data")), new AnalyzerRegistry([new WavAudioAnalyzer()]));
+  const first = await service.importDirectory({ directoryPath: folder, group: "my_afterhours" });
+  assert.equal(first.discovered, 2);
+  assert.equal(first.imported.length, 2);
+  assert.equal(first.failed.length, 0);
+  assert.ok(first.imported.every((reference) => reference.measured));
+  assert.equal(first.profile?.styleProfile.id, "my_afterhours");
+  const second = await service.importDirectory({ directoryPath: folder, group: "my_afterhours" });
+  assert.equal(second.imported.length, 0);
+  assert.equal(second.skipped.length, 2);
+  assert.equal((await service.list("my_afterhours")).length, 2);
 });
 
 test("different reference profiles produce measurably different patterns", () => {

@@ -3,7 +3,7 @@ import { basename, extname, join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { influenceKeys, ratingKeys, type HumanRatings, type ReferenceInfluence, type ReferenceMetadata, type ReferenceProfile, type ReferenceTrack } from "./models.js";
 
-const AUDIO_EXTENSIONS = new Set([".wav", ".wave", ".aif", ".aiff", ".mp3", ".flac", ".m4a", ".ogg"]);
+export const AUDIO_EXTENSIONS = new Set([".wav", ".wave", ".aif", ".aiff", ".mp3", ".flac", ".m4a", ".ogg"]);
 
 interface LocalIndex { paths: Record<string, string> }
 
@@ -58,6 +58,12 @@ export class ReferenceStore {
     if (!path) throw new Error("Local audio path is missing. Re-add the reference on this machine.");
     await stat(path);
     return path;
+  }
+
+  async idForAudioPath(audioPath: string): Promise<string | undefined> {
+    const absolutePath = resolve(audioPath);
+    const entry = Object.entries((await this.readLocalIndex()).paths).find(([, path]) => resolve(path) === absolutePath);
+    return entry?.[0];
   }
 
   async update(id: string, update: (reference: ReferenceTrack) => ReferenceTrack): Promise<ReferenceTrack> {

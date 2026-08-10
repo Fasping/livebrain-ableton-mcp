@@ -1,4 +1,6 @@
 import type { MidiNote, TrackMixerInput } from "../ableton/types.js";
+import type { StyleProfile } from "../music-brain/style-profile.js";
+import type { ResolvedStyleComponent, StyleComponentSource } from "../style/style-resolver.js";
 
 export type ProductionGenre = "minimal" | "house" | "techno" | "trap" | "lofi" | "pop" | "ambient";
 export type TrackRole = "kick" | "hats" | "percussion" | "bass" | "chords" | "lead" | "texture" | "fx";
@@ -29,12 +31,29 @@ export interface ProductionBrief {
     space: number;
     swing: number;
   };
+  style: {
+    id: string;
+    name: string;
+    source: StyleComponentSource;
+    needsAudioAnalysis: boolean;
+    components: ResolvedStyleComponent[];
+    explanation: string[];
+    personalization: { applied: boolean; evidenceCount: number; adjustments: string[] };
+  };
   sections: ProductionSection[];
   mixTargets: {
     headroomDb: number;
     sidechainRequested: boolean;
     spectralAnalysisRequired: boolean;
   };
+}
+
+export interface ProductionClipPlan {
+  slotIndex: number;
+  name: string;
+  sectionName: string;
+  notes: MidiNote[];
+  arrangementPositions: number[];
 }
 
 export interface ProductionTrackPlan {
@@ -46,10 +65,12 @@ export interface ProductionTrackPlan {
   effectQueries: string[];
   mixer: TrackMixerInput;
   arrangementPositions: number[];
+  clips: ProductionClipPlan[];
 }
 
 export interface ProductionPlan {
   brief: ProductionBrief;
+  styleProfile: StyleProfile;
   tracks: ProductionTrackPlan[];
   limitations: string[];
 }

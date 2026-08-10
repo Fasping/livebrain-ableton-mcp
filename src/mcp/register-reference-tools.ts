@@ -31,6 +31,15 @@ export function registerReferenceTools(server: McpServer, references: ReferenceS
     id: idSchema,
   }, async ({ id }) => textResult(await references.analyze(id)));
 
+  server.tool("reference_import_directory", "Recursively import a local folder of audio references, avoid duplicate paths, analyze them and build a reusable style profile in one step.", {
+    directoryPath: z.string().min(1),
+    group: z.string().regex(/^[a-zA-Z0-9._-]+$/),
+    artist: z.string().min(1).optional(), label: z.string().min(1).optional(),
+    tags: z.array(z.string().min(1)).default([]),
+    analyze: z.boolean().default(true), buildProfile: z.boolean().default(true),
+    influence: influenceSchema.optional(),
+  }, async (options) => textResult(await references.importDirectory(options)));
+
   server.tool("reference_tag", "Add human tags and curation groups to a reference.", {
     id: idSchema, tags: z.array(z.string().min(1)).default([]), groups: z.array(z.string().min(1)).default([]),
   }, async ({ id, tags, groups }) => textResult(await references.tag(id, tags, groups)));

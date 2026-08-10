@@ -1,4 +1,6 @@
 import type { ProductionBrief, ProductionGenre, ProductionSection, TrackRole } from "./types.js";
+import type { StyleProfile } from "../music-brain/style-profile.js";
+import type { ResolvedStyleComponent } from "../style/style-resolver.js";
 
 const roots = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 const allRoles: TrackRole[] = ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"];
@@ -8,6 +10,12 @@ export interface CompileVibeOptions {
   seed?: number;
   bpm?: number;
   rootNote?: number;
+  styleProfile?: StyleProfile;
+  styleSource?: ProductionBrief["style"]["source"];
+  styleNeedsAudioAnalysis?: boolean;
+  styleComponents?: ResolvedStyleComponent[];
+  styleExplanation?: string[];
+  stylePersonalization?: ProductionBrief["style"]["personalization"];
 }
 
 export function compileVibe(prompt: string, options: CompileVibeOptions = {}): ProductionBrief {
@@ -19,19 +27,29 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
   const weird = has(text, "weird", "raro", "quirky", "alien", "extrañ") || has(text, "binh", "cabaret");
   const bars = normalizeBars(options.bars ?? (genre === "pop" ? 112 : genre === "ambient" ? 96 : 128));
   const defaults = genreDefaults(genre);
-  const bpm = options.bpm ?? defaults.bpm;
+  const style = options.styleProfile;
+  const bpm = options.bpm ?? style?.tempo.preferred ?? defaults.bpm;
   const rootNote = options.rootNote ?? (dark ? 2 : dreamy ? 7 : defaults.rootNote);
   const mode = dark ? (genre === "minimal" ? "Dorian" : genre === "techno" ? "Phrygian" : "Minor") : dreamy ? "Lydian" : defaults.mode;
   const traits = {
     darkness: dark ? .82 : genre === "lofi" ? .55 : .3,
     energy: energetic ? .85 : genre === "ambient" ? .2 : genre === "minimal" ? .58 : .65,
-    weirdness: weird ? .88 : genre === "pop" ? .18 : .45,
-    space: dreamy || genre === "ambient" ? .88 : genre === "minimal" ? .72 : .48,
-    swing: genre === "lofi" ? .42 : genre === "minimal" ? .18 : genre === "house" ? .1 : .04,
+    weirdness: weird ? Math.max(.88, style?.timbre.weirdness ?? 0) : style?.timbre.weirdness ?? (genre === "pop" ? .18 : .45),
+    space: dreamy || genre === "ambient" ? Math.max(.88, style?.mix.space ?? 0) : style?.mix.space ?? (genre === "minimal" ? .72 : .48),
+    swing: style?.rhythm.swing ?? (genre === "lofi" ? .42 : genre === "minimal" ? .18 : genre === "house" ? .1 : .04),
   };
   return {
     title: titleFromPrompt(prompt), prompt, genre, bpm, rootNote, rootName: roots[rootNote]!, mode,
     bars, clipBars: 16, seed: options.seed ?? 1, traits,
+    style: {
+      id: style?.id ?? "generic",
+      name: style?.name ?? `Generic ${genre}`,
+      source: options.styleSource ?? (style ? "curated" : "default"),
+      needsAudioAnalysis: options.styleNeedsAudioAnalysis ?? Boolean(style),
+      components: structuredClone(options.styleComponents ?? []),
+      explanation: [...(options.styleExplanation ?? [])],
+      personalization: options.stylePersonalization ?? { applied: false, evidenceCount: 0, adjustments: [] },
+    },
     sections: buildSections(bars, genre),
     mixTargets: { headroomDb: -6, sidechainRequested: ["minimal", "house", "techno"].includes(genre), spectralAnalysisRequired: true },
   };

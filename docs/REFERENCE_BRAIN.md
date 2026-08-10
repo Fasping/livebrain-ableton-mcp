@@ -26,6 +26,22 @@ Profiles will aggregate median, range, variance and outliers instead of flatteni
 
 No reference audio is copied. Common audio extensions under `data/references` are also gitignored as a safety net.
 
+## One-step local folder import
+
+`reference_import_directory` recursively discovers supported audio, ignores already registered absolute paths, analyzes each new file and builds the requested group profile. WAV is analyzed directly; MP3, FLAC, M4A, OGG and AIFF require `ffmpeg`.
+
+```json
+{
+  "directoryPath": "/absolute/path/to/my/records",
+  "group": "my_afterhours",
+  "tags": ["owned-reference", "afterhours"],
+  "analyze": true,
+  "buildProfile": true
+}
+```
+
+The returned `profile.id` can be passed directly as `profileId` to `music_plan_production` and `music_create_production`.
+
 ## Analysis
 
 The built-in PCM WAV analyzer measures:
