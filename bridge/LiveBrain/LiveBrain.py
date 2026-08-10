@@ -3,11 +3,12 @@ import queue
 import socket
 import threading
 
+from Live.Clip import MidiNoteSpecification
 from ableton.v2.control_surface import ControlSurface
 
 
 PROTOCOL_VERSION = "1.0"
-BRIDGE_VERSION = "0.1.1"
+BRIDGE_VERSION = "0.1.3"
 MAX_REQUEST_BYTES = 1024 * 1024
 REQUEST_TIMEOUT_SECONDS = 5.0
 
@@ -276,9 +277,10 @@ class LiveBrain(ControlSurface):
         notes = self._validate_notes(params.get("notes"))
         dry_run = bool(params.get("dryRun", False))
         if not dry_run:
+            note_specifications = self._note_specifications(notes)
             def operation():
                 clip.remove_notes_extended(0, 128, 0.0, max(float(clip.length), 999999.0))
-                clip.add_new_notes(tuple(notes))
+                clip.add_new_notes(note_specifications)
             self._undo(operation)
         return self._change("clip.replace_notes", not dry_run, dry_run, self._clip_target(params), {"noteCount": len(notes)})
 
@@ -287,7 +289,8 @@ class LiveBrain(ControlSurface):
         notes = self._validate_notes(params.get("notes"))
         dry_run = bool(params.get("dryRun", False))
         if not dry_run:
-            self._undo(lambda: clip.add_new_notes(tuple(notes)))
+            note_specifications = self._note_specifications(notes)
+            self._undo(lambda: clip.add_new_notes(note_specifications))
         return self._change("clip.add_notes", not dry_run, dry_run, self._clip_target(params), {"noteCount": len(notes)})
 
     def _duplicate_clip(self, params):
@@ -354,10 +357,12 @@ class LiveBrain(ControlSurface):
         if hasattr(clip, "get_notes_extended"):
             raw = clip.get_notes_extended(0, 128, 0.0, max(float(clip.length), 999999.0))
             return [{
-                "pitch": int(note["pitch"]), "start": float(note["start_time"]),
-                "duration": float(note["duration"]), "velocity": int(note["velocity"]),
-                "mute": bool(note.get("mute", False)),
-                "probability": float(note.get("probability", 1.0)),
+                "pitch": int(self._note_value(note, "pitch")),
+                "start": float(self._note_value(note, "start_time")),
+                "duration": float(self._note_value(note, "duration")),
+                "velocity": int(self._note_value(note, "velocity")),
+                "mute": bool(self._note_value(note, "mute", False)),
+                "probability": float(self._note_value(note, "probability", 1.0)),
             } for note in raw]
         raw = clip.get_notes(0.0, 0, max(float(clip.length), 999999.0), 128)
         return [{"pitch": int(n[0]), "start": float(n[1]), "duration": float(n[2]), "velocity": int(n[3]), "mute": bool(n[4])} for n in raw]
@@ -379,6 +384,21 @@ class LiveBrain(ControlSurface):
                 "probability": max(0.0, min(1.0, float(note.get("probability", 1.0)))),
             })
         return result
+
+    def _note_specifications(self, notes):
+        return tuple(MidiNoteSpecification(
+            pitch=note["pitch"],
+            start_time=note["start_time"],
+            duration=note["duration"],
+            velocity=note["velocity"],
+            mute=note["mute"],
+            probability=note["probability"],
+        ) for note in notes)
+
+    def _note_value(self, note, key, default=None):
+        if isinstance(note, dict):
+            return note.get(key, default)
+        return getattr(note, key, default)
 
     def _undo(self, operation):
         self.song.begin_undo_step()

@@ -65,12 +65,12 @@ The initial MCP server uses stdio. The temporary Python bridge listens only on `
 
 ## Ableton Remote Script
 
-1. Copy `bridge/LiveBrain` into a MIDI Remote Scripts location recognized by your Ableton Live 12 installation.
+1. Run `./scripts/install-remote-script.sh`. By default this installs the bridge as `LiveBrainDev` under `~/Music/Ableton/User Library/Remote Scripts`.
 2. Restart Live.
-3. In **Settings → Link, Tempo & MIDI**, select **LiveBrain** as a Control Surface.
+3. In **Settings → Link, Tempo & MIDI**, select **LiveBrainDev** as a Control Surface.
 4. Keep port `9877` on localhost; never expose the bridge publicly.
 
-Live installations can use different Remote Script locations. See `docs/ABLETON_API.md`.
+If your User Library is elsewhere, set `ABLETON_USER_LIBRARY` before running the installer. See `docs/ABLETON_API.md`.
 
 ## Claude Desktop
 

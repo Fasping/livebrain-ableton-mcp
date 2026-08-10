@@ -3,23 +3,27 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SOURCE="$ROOT/bridge/LiveBrain"
-ABLETON_APP="${ABLETON_APP:-/Applications/Ableton Live 12 Standard.app}"
-TARGET_ROOT="$ABLETON_APP/Contents/App-Resources/MIDI Remote Scripts"
-TARGET="$TARGET_ROOT/LiveBrain"
+ABLETON_USER_LIBRARY="${ABLETON_USER_LIBRARY:-$HOME/Music/Ableton/User Library}"
+TARGET_ROOT="$ABLETON_USER_LIBRARY/Remote Scripts"
+TARGET_NAME="${LIVEBRAIN_REMOTE_SCRIPT_NAME:-LiveBrainDev}"
+TARGET="$TARGET_ROOT/$TARGET_NAME"
+BACKUP_ROOT="$ROOT/data/remote-script-backups"
 
-if [[ ! -d "$TARGET_ROOT" ]]; then
-  echo "Ableton MIDI Remote Scripts directory not found: $TARGET_ROOT" >&2
-  echo "Set ABLETON_APP to your Ableton Live application path." >&2
+if [[ ! -d "$ABLETON_USER_LIBRARY" ]]; then
+  echo "Ableton User Library not found: $ABLETON_USER_LIBRARY" >&2
+  echo "Set ABLETON_USER_LIBRARY to your configured User Library path." >&2
   exit 1
 fi
 
+mkdir -p "$TARGET_ROOT"
 echo "Installing LiveBrain Remote Script into: $TARGET"
 if [[ -d "$TARGET" ]]; then
-  BACKUP="$TARGET.backup.$(date +%Y%m%d%H%M%S)"
+  mkdir -p "$BACKUP_ROOT"
+  BACKUP="$BACKUP_ROOT/$TARGET_NAME.$(date +%Y%m%d%H%M%S)"
   echo "Backing up existing script to: $BACKUP"
   cp -R "$TARGET" "$BACKUP"
 fi
 
 mkdir -p "$TARGET"
 cp "$SOURCE/__init__.py" "$SOURCE/LiveBrain.py" "$TARGET/"
-echo "Installed. Restart Ableton Live and select LiveBrain as a Control Surface."
+echo "Installed. Restart Ableton Live and select $TARGET_NAME as a Control Surface."
