@@ -11,12 +11,28 @@ test("Binh/Cabaret language compiles into a complete deterministic minimal produ
 
   assert.deepEqual(first, second);
   assert.equal(first.brief.genre, "minimal");
+  assert.equal(first.brief.style.id, "afterhours_2019");
+  assert.equal(first.brief.style.source, "curated");
   assert.equal(first.brief.bpm, 130);
   assert.equal(first.brief.mode, "Dorian");
   assert.equal(first.tracks.length, 8);
   assert.deepEqual(first.tracks.map((track) => track.role), ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"]);
   assert.ok(first.tracks.every((track) => track.notes.length > 0));
+  assert.ok(first.tracks.every((track) => track.clips.length > 0));
   assert.equal(first.brief.sections.reduce((sum, section) => sum + section.bars, 0), 128);
+});
+
+test("requested scene profiles shape the plan and sections receive independent clip variants", () => {
+  const timeless = planProduction("minimal house rollo Francesco Del Garda y Timeless", { bars: 128, seed: 22 });
+  const wicked = planProduction("minimal electro raw de Wicked Bass y Noizar", { bars: 128, seed: 22 });
+  assert.equal(timeless.brief.style.id, "timeless_del_garda");
+  assert.equal(timeless.brief.bpm, 129);
+  assert.equal(wicked.brief.style.id, "wicked_bass_noizar");
+  assert.equal(wicked.brief.bpm, 131);
+  assert.notDeepEqual(timeless.tracks.find((track) => track.role === "bass")?.notes, wicked.tracks.find((track) => track.role === "bass")?.notes);
+  const timelessLead = timeless.tracks.find((track) => track.role === "lead");
+  assert.ok(timelessLead && timelessLead.clips.length >= 3);
+  assert.ok(new Set(timelessLead.clips.map((clip) => JSON.stringify(clip.notes))).size > 1);
 });
 
 test("production execution dry-runs safely and builds independent tracks with mock Ableton", async () => {
@@ -31,6 +47,7 @@ test("production execution dry-runs safely and builds independent tracks with mo
   assert.equal(applied.trackIndices.kick, 0);
   assert.equal(snapshot.trackCount, 8);
   assert.ok(snapshot.tracks.every((track) => track.clips[0]?.noteCount && track.clips[0].noteCount! > 0));
+  assert.ok(snapshot.tracks.some((track) => track.clips.length >= 4));
   assert.ok(snapshot.tracks.every((track) => track.devices.length >= 1));
   assert.ok((await ableton.getArrangementClips(3)).length > 0);
   const kickDevices = await ableton.getDevices(0);

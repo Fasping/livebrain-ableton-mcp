@@ -20,18 +20,22 @@
 - [x] Mixer, sends, EQ/compressor loading and role-aware parameter starting points
 - [x] Session source clips → structured Arrangement placement
 - [x] Safe full-production dry-run
+- [x] Curated underground style contexts with explicit provenance
+- [x] Select a bundled or locally analyzed profile for full-production planning
 - [ ] Verify every new operation against the installed Live 12.4 Remote Script
 - [x] Idempotent resume for interrupted canonical multi-track builds
 - [ ] Explicit persisted checkpoints for custom/non-canonical productions
 
 ## Production quality
 
-- [ ] Multiple source variations per role and section-specific MIDI evolution
+- [x] Multiple source variations per role and section-specific MIDI evolution
 - [ ] Harmonic voice leading across sections and stronger melodic development
 - [ ] Sound-palette ranking informed by the Reference Brain
 - [ ] Drum Rack pad-aware pitch mapping
 - [ ] Device racks and macro-based sound design
 - [ ] Audio stem/reference render and comparison loop
+- [x] Recursive local reference-folder import, duplicate detection and one-step profile build
+- [ ] A/B preference comparisons that update dimension weights without opaque “AI training” claims
 
 ## Mixing and routing
 

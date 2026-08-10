@@ -22,6 +22,14 @@ Use separate kick, hats, percussion, bass, chords, lead, texture and FX tracks.
 Show me the plan first, then build it in Arrangement View.
 ```
 
+Or name an underground context directly:
+
+```text
+Make a restrained 128-bar afterhours track with the off-kilter space of
+Timeless / Francesco Del Garda and a little Montevideo electro tension.
+Plan it first. Keep every section editable and avoid generic tech-house tropes.
+```
+
 LiveBrain can then:
 
 - create eight independent, editable MIDI tracks;
@@ -31,6 +39,7 @@ LiveBrain can then:
 - place sections in Arrangement View and resume an interrupted build without duplicating tracks;
 - mutate selected musical dimensions while preserving the parts you lock;
 - analyze local reference audio and build reusable style profiles.
+- resolve researched underground contexts including Timeless / Francesco Del Garda, Partout, Wicked Bass / Noizar, Phonotheque / Z@p and Club der Visionaere / Hoppetosse.
 
 Everything remains editable in Ableton. LiveBrain does not render a mysterious finished audio file and hide the production decisions from you.
 
@@ -128,12 +137,23 @@ All important write paths support a preview-first workflow:
 
 Production runs are resumable by the canonical `LB Kick`…`LB FX` names. Repeating the same prompt, seed and length reuses those tracks, replaces the source MIDI deterministically, skips existing Arrangement positions and completes missing device work.
 
+To teach LiveBrain your own taste without uploading audio, put legally owned reference files in a local folder and ask your client:
+
+```text
+Use reference_import_directory on /absolute/path/to/my/references with group
+my_afterhours. Analyze the files and build the profile, then plan a track with
+profileId my_afterhours.
+```
+
+The bundled scene profiles are transparent curation hypotheses, not fake audio measurements. Your local reference profile is what makes the system personal. See [Taste Lab](docs/TASTE_LAB.md).
+
 ## Music and production features
 
 ### Production Engine
 
 - vibe compiler for minimal, house, techno, trap, lo-fi, pop and ambient starting points;
 - structured 64–512 bar arrangements;
+- a distinct deterministic source variation for every active track section;
 - independent kick, hats, percussion, bass, chords, lead, texture and FX roles;
 - deterministic harmony, motif-based melody, drums, bass and generative sequences;
 - Browser device discovery with installed-device fallbacks;
@@ -154,6 +174,7 @@ Production runs are resumable by the canonical `LB Kick`…`LB FX` names. Repeat
 - analyze PCM WAV directly and other formats through `ffmpeg`;
 - separate measured features from human ratings and tags;
 - build, explain and blend reusable style profiles;
+- recursively import and analyze a reference folder in one call;
 - store structured feedback without pretending to retrain an AI model.
 
 ## Current boundaries
@@ -218,7 +239,7 @@ Run without Ableton using the deterministic mock adapter:
 LIVEBRAIN_ADAPTER=mock npm run dev
 ```
 
-The current suite contains 31 automated tests covering the bridge contract, MIDI note compatibility, deterministic generation, references, locks, dry-run safety and resumable full-production execution.
+The current suite contains 35 automated tests covering the bridge contract, MIDI note compatibility, deterministic generation, curated contexts, reference-folder imports, locks, dry-run safety and resumable full-production execution.
 
 ## Documentation
 
@@ -229,6 +250,7 @@ The current suite contains 31 automated tests covering the bridge contract, MIDI
 - [Ableton API](docs/ABLETON_API.md)
 - [Music Brain](docs/MUSIC_BRAIN.md)
 - [Reference Brain](docs/REFERENCE_BRAIN.md)
+- [Taste Lab: underground contexts and personal profiles](docs/TASTE_LAB.md)
 - [Style Engine](docs/STYLE_ENGINE.md)
 - [Feedback Engine](docs/FEEDBACK_ENGINE.md)
 - [Selective Generation & Evolution](docs/SELECTIVE_EVOLUTION.md)

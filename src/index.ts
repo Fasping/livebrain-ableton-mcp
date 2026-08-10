@@ -34,7 +34,7 @@ registerMusicTools(server, ableton, references, feedback, locks);
 registerReferenceTools(server, references, ableton);
 registerFeedbackTools(server, feedback);
 registerLockTools(server, locks);
-registerProductionTools(server, ableton);
+registerProductionTools(server, ableton, references);
 
 const shutdown = async () => {
   log("info", "LiveBrain shutting down");

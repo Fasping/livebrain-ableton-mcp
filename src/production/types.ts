@@ -29,12 +29,26 @@ export interface ProductionBrief {
     space: number;
     swing: number;
   };
+  style: {
+    id: string;
+    name: string;
+    source: "default" | "curated" | "reference-profile";
+    needsAudioAnalysis: boolean;
+  };
   sections: ProductionSection[];
   mixTargets: {
     headroomDb: number;
     sidechainRequested: boolean;
     spectralAnalysisRequired: boolean;
   };
+}
+
+export interface ProductionClipPlan {
+  slotIndex: number;
+  name: string;
+  sectionName: string;
+  notes: MidiNote[];
+  arrangementPositions: number[];
 }
 
 export interface ProductionTrackPlan {
@@ -46,6 +60,7 @@ export interface ProductionTrackPlan {
   effectQueries: string[];
   mixer: TrackMixerInput;
   arrangementPositions: number[];
+  clips: ProductionClipPlan[];
 }
 
 export interface ProductionPlan {

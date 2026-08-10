@@ -15,7 +15,8 @@ export async function executeProduction(ableton: AbletonAdapter, plan: Productio
   if (dryRun) {
     result.changes.push({
       operation: "production.plan", tracks: plan.tracks.length, arrangementBars: plan.brief.bars,
-      noteCount: plan.tracks.reduce((sum, track) => sum + track.notes.length, 0),
+      clipCount: plan.tracks.reduce((sum, track) => sum + track.clips.length, 0),
+      noteCount: plan.tracks.reduce((sum, track) => sum + track.clips.reduce((clipSum, clip) => clipSum + clip.notes.length, 0), 0),
       reusableTracks: plan.tracks.filter((track) => existingByName.has(track.name)).map((track) => track.name),
     });
     return result;
@@ -45,13 +46,15 @@ export async function executeProduction(ableton: AbletonAdapter, plan: Productio
       if (loaded) knownDeviceNames.add(loaded.toLowerCase());
     }
 
-    const existingClip = existing?.clips.find((clip) => clip.slotIndex === 0);
-    if (!existingClip) {
-      result.changes.push(await ableton.createMidiClip({ trackIndex, slotIndex: 0, length: plan.brief.clipBars * 4, name: `${track.name} ${plan.brief.clipBars}bar`, dryRun: false }));
-    } else {
-      result.changes.push({ operation: "clip.reuse", changed: false, dryRun: false, target: { trackIndex, slotIndex: 0 }, details: { name: existingClip.name } });
+    for (const clip of track.clips) {
+      const existingClip = existing?.clips.find((candidate) => candidate.slotIndex === clip.slotIndex);
+      if (!existingClip) {
+        result.changes.push(await ableton.createMidiClip({ trackIndex, slotIndex: clip.slotIndex, length: plan.brief.clipBars * 4, name: clip.name, dryRun: false }));
+      } else {
+        result.changes.push({ operation: "clip.reuse", changed: false, dryRun: false, target: { trackIndex, slotIndex: clip.slotIndex }, details: { name: existingClip.name } });
+      }
+      result.changes.push(await ableton.replaceClipNotes({ trackIndex, slotIndex: clip.slotIndex }, clip.notes, false));
     }
-    result.changes.push(await ableton.replaceClipNotes({ trackIndex, slotIndex: 0 }, track.notes, false));
     const mixer = { ...track.mixer, sends: track.mixer.sends?.filter((send) => send.sendIndex < snapshot.returnCount) };
     result.changes.push(await ableton.setTrackMixer(trackIndex, mixer, false));
     for (const effect of track.effectQueries) {
@@ -69,9 +72,11 @@ export async function executeProduction(ableton: AbletonAdapter, plan: Productio
   for (const track of plan.tracks) {
     const trackIndex = result.trackIndices[track.role]!;
     const existingArrangement = resolvedTracks.has(track.name) ? await ableton.getArrangementClips(trackIndex) : [];
-    for (const destinationTime of track.arrangementPositions) {
-      const alreadyPlaced = existingArrangement.some((clip) => Math.abs(clip.startTime - destinationTime) < .001);
-      if (!alreadyPlaced) placements.push({ trackIndex, slotIndex: 0, destinationTime });
+    for (const clip of track.clips) {
+      for (const destinationTime of clip.arrangementPositions) {
+        const alreadyPlaced = existingArrangement.some((candidate) => Math.abs(candidate.startTime - destinationTime) < .001);
+        if (!alreadyPlaced) placements.push({ trackIndex, slotIndex: clip.slotIndex, destinationTime });
+      }
     }
   }
   if (placements.length) {
