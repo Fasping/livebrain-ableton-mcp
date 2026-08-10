@@ -1,43 +1,56 @@
 # Roadmap
 
-## Phase 1 — Solid Ableton foundation
+## Shipped foundation
 
 - [x] Versioned localhost bridge and main-thread execution
-- [x] Replaceable and mock adapters
-- [x] Compact/detailed snapshots
-- [x] Core Session MIDI and device parameters
-- [ ] Mixer, track mutation and Live integration fixture
+- [x] Replaceable real/mock adapters
+- [x] Compact/detailed Live Set snapshots
+- [x] Session MIDI track/clip/note operations
+- [x] Device and normalized parameter control
+- [x] Deterministic drums, bass, sequences, mutation and 16→64-bar evolution
+- [x] Local Reference Brain, style profiles, ratings and influence
+- [x] Persistent locks and structured feedback
 
-## Phase 2 — Advanced Ableton control
+## Full-production beta
 
-Arrangement, automation, racks/macros, nested chains, sends/returns, routing and verified browser loading.
+- [x] Natural-language vibe → tempo, key/mode, traits, sections and mix intent
+- [x] Independent kick, hats, percussion, bass, chords, lead, texture and FX plans
+- [x] Deterministic harmony and motif-based melody generation
+- [x] Browser search with instrument fallbacks
+- [x] Mixer, sends, EQ/compressor loading and role-aware parameter starting points
+- [x] Session source clips → structured Arrangement placement
+- [x] Safe full-production dry-run
+- [ ] Verify every new operation against the installed Live 12.4 Remote Script
+- [x] Idempotent resume for interrupted canonical multi-track builds
+- [ ] Explicit persisted checkpoints for custom/non-canonical productions
 
-## Phase 3 — Music generators
+## Production quality
 
-- [x] Deterministic drums, MIDI mutation and less-obvious transformation
-- [x] Rhythm-first bass and alien sequence generators
-- [x] Persistent dimension locks and bass-selective mutation
-- [x] Deterministic 16→64-bar MIDI evolution with duplicate-before-transform
-- [ ] Multi-clip variation sets and verified filter/send automation
+- [ ] Multiple source variations per role and section-specific MIDI evolution
+- [ ] Harmonic voice leading across sections and stronger melodic development
+- [ ] Sound-palette ranking informed by the Reference Brain
+- [ ] Drum Rack pad-aware pitch mapping
+- [ ] Device racks and macro-based sound design
+- [ ] Audio stem/reference render and comparison loop
 
-## Phase 4 — Reference Brain
+## Mixing and routing
 
-- [x] Local catalog and gitignored path index
-- [x] `AudioAnalyzer` abstraction with WAV and optional ffmpeg decoders
-- [x] Rhythm-focused measurements and human ratings
-- [x] Distribution aggregation into generator-ready profiles
-- [ ] Section-boundary and tonal/spectral expansion
+- [x] Conservative gain staging, panorama and send plans
+- [x] Role-aware EQ/Compressor parameter setup where parameters are discoverable
+- [ ] Verified external sidechain source routing
+- [ ] Analyzer-backed masking detection and corrective EQ
+- [ ] Return-track creation, naming and effect-chain setup
+- [ ] Loudness/peak measurement and master headroom verification
+- [ ] Compound transaction/undo for a complete production run
 
-## Phase 5 — Feedback and personal profile
+## Advanced Ableton control
 
-- [x] Generation IDs and structured local feedback
-- [x] Statistical preference summaries
-- [ ] Parameter-prior adaptation and versioned `natural-goofy` profiles
+- [ ] Arrangement automation envelopes
+- [ ] Nested racks, chains and Drum Rack pads
+- [ ] Track routing and monitoring
+- [ ] Scene CRUD and performance workflows
+- [ ] Audio clip/stem placement
 
-## Phase 6 — Comparison
+## Future adapter
 
-Compare clips/projects to profiles while labeling measured, heuristic and subjective conclusions.
-
-## Phase 7 — Optional dashboard
-
-React only when observability or manual control justifies it.
+The Python Remote Script remains a compatibility bridge. Migrate to Ableton's Extensions SDK when it exposes the required control surface while preserving the typed TypeScript adapter.

@@ -13,6 +13,10 @@ export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter)
     index: z.number().int().min(0).optional(), name: z.string().min(1).max(120).optional(), dryRun: dryRunSchema,
   }, async (input) => textResult(await ableton.createMidiTrack(input)));
 
+  server.tool("ableton_delete_track", "Delete one explicitly indexed track as an undoable action.", {
+    trackIndex: z.number().int().min(0), dryRun: dryRunSchema,
+  }, async ({ trackIndex, dryRun }) => textResult(await ableton.deleteTrack(trackIndex, dryRun)));
+
   server.tool("ableton_create_midi_clip", "Create an empty Session View MIDI clip.", {
     ...clipTargetSchema, length: z.number().positive().max(4096), name: z.string().max(120).optional(), dryRun: dryRunSchema,
   }, async (input) => textResult(await ableton.createMidiClip(input)));
@@ -47,4 +51,50 @@ export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter)
     trackIndex: z.number().int().min(0), deviceIndex: z.number().int().min(0), parameterIndex: z.number().int().min(0),
     normalizedValue: z.number().min(0).max(1), dryRun: dryRunSchema,
   }, async ({ normalizedValue, dryRun, ...target }) => textResult(await ableton.setDeviceParameter(target, normalizedValue, dryRun)));
+
+  server.tool("ableton_set_song", "Set validated tempo, time signature, scale and arrangement loop settings.", {
+    tempo: z.number().min(20).max(999).optional(),
+    timeSignature: z.object({ numerator: z.number().int().min(1).max(16), denominator: z.union([z.literal(1), z.literal(2), z.literal(4), z.literal(8), z.literal(16)]) }).optional(),
+    scale: z.object({ rootNote: z.number().int().min(0).max(11), name: z.string().min(1).max(80) }).optional(),
+    loop: z.object({ start: z.number().min(0), length: z.number().positive(), enabled: z.boolean().default(true) }).optional(),
+    dryRun: dryRunSchema,
+  }, async ({ dryRun, ...settings }) => textResult(await ableton.setSongSettings(settings, dryRun)));
+
+  server.tool("ableton_set_track_mixer", "Set normalized mixer values, state and sends for one track.", {
+    trackIndex: z.number().int().min(0), volume: z.number().min(0).max(1).optional(), pan: z.number().min(-1).max(1).optional(),
+    mute: z.boolean().optional(), solo: z.boolean().optional(), arm: z.boolean().optional(),
+    sends: z.array(z.object({ sendIndex: z.number().int().min(0), value: z.number().min(0).max(1) })).max(32).optional(), dryRun: dryRunSchema,
+  }, async ({ trackIndex, dryRun, ...mixer }) => textResult(await ableton.setTrackMixer(trackIndex, mixer, dryRun)));
+
+  server.tool("ableton_transport", "Start or stop Ableton playback.", {
+    action: z.enum(["start", "stop"]), dryRun: dryRunSchema,
+  }, async ({ action, dryRun }) => textResult(await ableton.setTransport(action, dryRun)));
+
+  server.tool("ableton_search_browser", "Search loadable instruments, sounds, drums and effects in Ableton's browser.", {
+    query: z.string().min(1).max(160),
+    categories: z.array(z.enum(["instruments", "sounds", "drums", "audio_effects", "midi_effects"])).max(5).optional(),
+    maxResults: z.number().int().min(1).max(50).default(12),
+  }, async (input) => textResult({ items: await ableton.searchBrowser(input) }));
+
+  server.tool("ableton_load_browser_item", "Load a browser item URI onto a selected track.", {
+    trackIndex: z.number().int().min(0), uri: z.string().min(1).max(2048), dryRun: dryRunSchema,
+  }, async ({ trackIndex, uri, dryRun }) => textResult(await ableton.loadBrowserItem(trackIndex, uri, dryRun)));
+
+  server.tool("ableton_duplicate_to_arrangement", "Copy a Session clip into Arrangement at a beat position.", {
+    ...clipTargetSchema, destinationTime: z.number().min(0).max(100000), dryRun: dryRunSchema,
+  }, async ({ destinationTime, dryRun, ...target }) => textResult(await ableton.duplicateToArrangement(target, destinationTime, dryRun)));
+
+  server.tool("ableton_duplicate_many_to_arrangement", "Copy many Session clips into Arrangement in one bridge operation.", {
+    placements: z.array(z.object({
+      trackIndex: z.number().int().min(0), slotIndex: z.number().int().min(0), destinationTime: z.number().min(0).max(100000),
+    })).min(1).max(2048), dryRun: dryRunSchema,
+  }, async ({ placements, dryRun }) => textResult(await ableton.duplicateManyToArrangement(placements, dryRun)));
+
+  server.tool("ableton_get_arrangement_clips", "List clips currently placed in Arrangement for a track.", {
+    trackIndex: z.number().int().min(0),
+  }, async ({ trackIndex }) => textResult({ clips: await ableton.getArrangementClips(trackIndex) }));
+
+  server.tool("ableton_show_arrangement", "Switch Ableton's main view to Arrangement.", {
+    dryRun: dryRunSchema,
+  }, async ({ dryRun }) => textResult(await ableton.showArrangement(dryRun)));
 }

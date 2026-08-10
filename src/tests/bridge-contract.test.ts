@@ -20,3 +20,14 @@ test("Python bridge reads Live MidiNote objects without subscripting them", asyn
   assert.match(source, /return getattr\(note, key, default\)/);
   assert.doesNotMatch(readMethod, /note\["pitch"\]/);
 });
+
+test("Python bridge advertises the resumable production control surface", async () => {
+  const source = await readFile(bridgePath, "utf8");
+
+  for (const method of ["song.settings", "track.mixer", "track.delete", "browser.search", "browser.load", "arrangement.duplicate", "arrangement.duplicate_many", "arrangement.clips"]) {
+    assert.match(source, new RegExp(`"${method.replace(".", "\\.")}"`));
+  }
+  assert.match(source, /self\.application\.browser/);
+  assert.match(source, /self\.application\.view/);
+  assert.doesNotMatch(source, /self\.application\(\)/);
+});
