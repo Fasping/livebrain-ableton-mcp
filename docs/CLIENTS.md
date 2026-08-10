@@ -1,6 +1,6 @@
 # AI client setup
 
-LiveBrain currently exposes a local MCP server over stdio. The client launches `node /absolute/path/to/livebrain-mcp/dist/index.js`; that process talks to the Ableton Remote Script on localhost.
+LiveBrain currently exposes a local MCP server over stdio. The client launches `node /absolute/path/to/livebrain-ableton-mcp/dist/index.js`; that process talks to the Ableton Remote Script on localhost.
 
 Run `npm install && npm run build` and enable the `LiveBrain` Control Surface in Ableton before configuring a client.
 
@@ -13,7 +13,7 @@ Add this server to `claude_desktop_config.json` and restart Claude Desktop:
   "mcpServers": {
     "livebrain": {
       "command": "node",
-      "args": ["/absolute/path/to/livebrain-mcp/dist/index.js"],
+      "args": ["/absolute/path/to/livebrain-ableton-mcp/dist/index.js"],
       "env": {
         "LIVEBRAIN_HOST": "127.0.0.1",
         "LIVEBRAIN_PORT": "9877"
@@ -33,7 +33,7 @@ Register the local stdio server from a terminal:
 codex mcp add livebrain \
   --env LIVEBRAIN_HOST=127.0.0.1 \
   --env LIVEBRAIN_PORT=9877 \
-  -- node /absolute/path/to/livebrain-mcp/dist/index.js
+  -- node /absolute/path/to/livebrain-ableton-mcp/dist/index.js
 ```
 
 Restart or open a new Codex task after changing MCP configuration.
@@ -49,7 +49,7 @@ Only launch one LiveBrain MCP server against the bridge while diagnosing connect
 Any client that supports local stdio servers can launch:
 
 ```bash
-node /absolute/path/to/livebrain-mcp/dist/index.js
+node /absolute/path/to/livebrain-ableton-mcp/dist/index.js
 ```
 
 The process writes MCP messages to stdout and structured logs to stderr.

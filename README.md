@@ -1,8 +1,8 @@
-# LiveBrain MCP — AI Music Production for Ableton Live
+# LiveBrain Ableton MCP — AI Music Production for Ableton Live
 
 **Turn a musical idea into an editable, multi-track Ableton Live project with Claude, Codex, Cursor, or another MCP client.**
 
-[![GitHub stars](https://img.shields.io/github/stars/Fasping/livebrain-mcp?style=social)](https://github.com/Fasping/livebrain-mcp/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Fasping/livebrain-ableton-mcp?style=social)](https://github.com/Fasping/livebrain-ableton-mcp/stargazers)
 [![MIT License](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 [![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-339933.svg?logo=node.js&logoColor=white)](package.json)
 [![Ableton Live 12](https://img.shields.io/badge/Ableton%20Live-12-111111.svg)](https://www.ableton.com/live/)
@@ -62,8 +62,8 @@ LiveBrain is **not yet the widest Ableton control surface**. Mature controller-f
 ### 1. Install LiveBrain
 
 ```bash
-git clone https://github.com/Fasping/livebrain-mcp.git
-cd livebrain-mcp
+git clone https://github.com/Fasping/livebrain-ableton-mcp.git
+cd livebrain-ableton-mcp
 ./scripts/setup-macos.sh
 ```
 
@@ -85,7 +85,7 @@ For Claude Desktop, add this to `claude_desktop_config.json`, replacing the path
   "mcpServers": {
     "livebrain": {
       "command": "node",
-      "args": ["/absolute/path/to/livebrain-mcp/dist/index.js"],
+      "args": ["/absolute/path/to/livebrain-ableton-mcp/dist/index.js"],
       "env": {
         "LIVEBRAIN_HOST": "127.0.0.1",
         "LIVEBRAIN_PORT": "9877"
@@ -238,7 +238,7 @@ The current suite contains 31 automated tests covering the bridge contract, MIDI
 
 Bug reports, musical examples, device-compatibility reports and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-If LiveBrain helps your workflow, consider [starring the repository](https://github.com/Fasping/livebrain-mcp) and sharing what you made. Real Ableton projects, reproducible prompts and honest failure reports are more valuable than hype.
+If LiveBrain helps your workflow, consider [starring the repository](https://github.com/Fasping/livebrain-ableton-mcp) and sharing what you made. Real Ableton projects, reproducible prompts and honest failure reports are more valuable than hype.
 
 ## License and disclaimer
 
