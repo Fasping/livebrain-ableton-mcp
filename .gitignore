@@ -18,3 +18,4 @@ data/references/**/*.ogg
 data/feedback/*.local.json
 data/feedback/generations.json
 data/locks/locks.json
+data/remote-script-backups/
