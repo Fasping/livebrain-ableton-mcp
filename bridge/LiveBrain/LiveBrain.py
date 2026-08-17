@@ -1,4 +1,5 @@
 import json
+import math
 import queue
 import socket
 import threading
@@ -8,9 +9,11 @@ from ableton.v2.control_surface import ControlSurface
 
 
 PROTOCOL_VERSION = "1.0"
-BRIDGE_VERSION = "0.2.1"
+BRIDGE_VERSION = "0.3.0"
 MAX_REQUEST_BYTES = 1024 * 1024
 REQUEST_TIMEOUT_SECONDS = 15.0
+MASTER_TRACK_INDEX = -1
+RETURN_TRACK_INDEX_BASE = 200
 
 
 class LiveBrain(ControlSurface):
@@ -142,6 +145,7 @@ class LiveBrain(ControlSurface):
             "device.set_parameter": self._set_device_parameter,
             "song.settings": self._set_song_settings,
             "track.mixer": self._set_track_mixer,
+            "master.meter": self._get_master_meter,
             "transport.set": self._set_transport,
             "browser.search": self._search_browser,
             "browser.load": self._load_browser_item,
@@ -164,6 +168,7 @@ class LiveBrain(ControlSurface):
                 "clip.create_midi", "clip.get_notes", "clip.replace_notes",
                 "clip.add_notes", "clip.duplicate", "clip.set_loop", "device.list", "device.parameters",
                 "device.set_parameter", "song.settings", "track.mixer", "transport.set",
+                "master.meter",
                 "browser.search", "browser.load", "arrangement.duplicate", "arrangement.duplicate_many", "arrangement.clips",
                 "view.arrangement",
             ],
@@ -179,7 +184,7 @@ class LiveBrain(ControlSurface):
         mode = params.get("mode", "compact")
         if mode not in ("compact", "detailed"):
             raise ValueError("mode must be compact or detailed")
-        return {
+        snapshot = {
             "mode": mode,
             "tempo": float(song.tempo),
             "timeSignature": {
@@ -191,46 +196,60 @@ class LiveBrain(ControlSurface):
             "trackCount": len(song.tracks),
             "returnCount": len(song.return_tracks),
             "tracks": [
-                self._serialize_track(track, index, mode)
+                self._serialize_track(track, index, mode, "midi" if track.has_midi_input else "audio")
                 for index, track in enumerate(song.tracks)
             ],
         }
+        if mode == "detailed":
+            snapshot["masterTrack"] = self._serialize_track(song.master_track, MASTER_TRACK_INDEX, mode, "master")
+            snapshot["returnTracks"] = [
+                self._serialize_track(track, RETURN_TRACK_INDEX_BASE + index, mode, "return")
+                for index, track in enumerate(song.return_tracks)
+            ]
+        return snapshot
 
-    def _serialize_track(self, track, index, mode):
+    def _serialize_track(self, track, index, mode, kind):
         clips = []
-        for slot_index, slot in enumerate(track.clip_slots):
-            if not slot.has_clip:
-                continue
-            clip = slot.clip
-            item = {
-                "slotIndex": slot_index,
-                "name": clip.name,
-                "isMidi": bool(clip.is_midi_clip),
-                "length": float(clip.length),
-                "loopStart": float(clip.loop_start),
-                "loopEnd": float(clip.loop_end),
-            }
-            if clip.is_midi_clip:
-                note_count = len(self._read_notes(clip))
-                item["noteCount"] = note_count
-                item["noteDensity"] = note_count / max(float(clip.length), 0.0001)
-            clips.append(item)
+        if kind not in ("master", "return"):
+            for slot_index, slot in enumerate(track.clip_slots):
+                if not slot.has_clip:
+                    continue
+                clip = slot.clip
+                item = {
+                    "slotIndex": slot_index,
+                    "name": clip.name,
+                    "isMidi": bool(clip.is_midi_clip),
+                    "length": float(clip.length),
+                    "loopStart": float(clip.loop_start),
+                    "loopEnd": float(clip.loop_end),
+                }
+                if clip.is_midi_clip:
+                    note_count = len(self._read_notes(clip))
+                    item["noteCount"] = note_count
+                    item["noteDensity"] = note_count / max(float(clip.length), 0.0001)
+                clips.append(item)
 
         return {
             "index": index,
             "name": track.name,
-            "kind": "midi" if track.has_midi_input else "audio",
-            "mixer": {
-                "volume": float(track.mixer_device.volume.value),
-                "pan": float(track.mixer_device.panning.value),
-                "mute": bool(track.mute),
-                "solo": bool(track.solo),
-                "arm": bool(track.arm) if track.can_be_armed else False,
-                "sends": [float(send.value) for send in track.mixer_device.sends],
-            },
+            "kind": kind,
+            "mixer": self._serialize_mixer(track, kind),
             "devices": [self._serialize_device(device, i, mode == "detailed") for i, device in enumerate(track.devices)],
             "clips": clips,
         }
+
+    def _serialize_mixer(self, track, kind):
+        mixer = {
+            "volume": float(track.mixer_device.volume.value),
+            "pan": float(track.mixer_device.panning.value),
+            "sends": [float(send.value) for send in track.mixer_device.sends],
+        }
+        if kind != "master":
+            mixer["mute"] = bool(track.mute)
+            mixer["solo"] = bool(track.solo)
+        if kind not in ("master", "return"):
+            mixer["arm"] = bool(track.arm) if track.can_be_armed else False
+        return mixer
 
     def _serialize_device(self, device, index, include_parameters):
         result = {"index": index, "name": device.name, "className": device.class_name}
@@ -352,7 +371,7 @@ class LiveBrain(ControlSurface):
         return self._change("clip.set_loop", not dry_run, dry_run, self._clip_target(params), {"loopStart": loop_start, "loopEnd": loop_end})
 
     def _list_devices(self, params):
-        track = self._track(self._int(params, "trackIndex"))
+        track, _kind = self._resolve_track(self._int(params, "trackIndex"))
         return [self._serialize_device(device, i, False) for i, device in enumerate(track.devices)]
 
     def _device_parameters(self, params):
@@ -420,7 +439,7 @@ class LiveBrain(ControlSurface):
 
     def _set_track_mixer(self, params):
         track_index = self._int(params, "trackIndex")
-        track = self._track(track_index)
+        track, kind = self._resolve_track(track_index)
         dry_run = bool(params.get("dryRun", False))
         volume = params.get("volume")
         pan = params.get("pan")
@@ -429,6 +448,14 @@ class LiveBrain(ControlSurface):
             raise ValueError("pan must be between -1 and 1")
         if volume is not None and (float(volume) < 0 or float(volume) > 1):
             raise ValueError("volume must be between 0 and 1")
+        if kind in ("master", "return") and params.get("arm") is not None:
+            raise ValueError("arm is not applicable to master/return tracks")
+        if kind == "master" and params.get("mute") is not None:
+            raise ValueError("mute is not applicable to master tracks")
+        if kind == "master" and params.get("solo") is not None:
+            raise ValueError("solo is not applicable to master tracks")
+        if kind == "master" and sends:
+            raise ValueError("sends are not applicable to master tracks")
         for send in sends:
             send_index = int(send.get("sendIndex", -1))
             value = float(send.get("value", -1))
@@ -457,6 +484,26 @@ class LiveBrain(ControlSurface):
             "volume": volume, "pan": pan, "mute": params.get("mute"), "solo": params.get("solo"),
             "arm": params.get("arm"), "sends": sends,
         })
+
+    def _get_master_meter(self, _params):
+        master = self.song.master_track
+        if not hasattr(master, "output_meter_left") or not hasattr(master, "output_meter_right"):
+            raise ValueError("master output meter is not supported by this Live version")
+        left = float(master.output_meter_left)
+        right = float(master.output_meter_right)
+        left_dbfs = self._linear_to_dbfs(left)
+        right_dbfs = self._linear_to_dbfs(right)
+        dbfs_values = [value for value in (left_dbfs, right_dbfs) if value is not None]
+        return {
+            "leftLinear": left,
+            "rightLinear": right,
+            "leftDbfs": left_dbfs,
+            "rightDbfs": right_dbfs,
+            "peakDbfs": max(dbfs_values) if dbfs_values else None,
+        }
+
+    def _linear_to_dbfs(self, value):
+        return 20.0 * math.log10(value) if value > 0.0 else None
 
     def _set_transport(self, params):
         action = str(params.get("action", ""))
@@ -675,6 +722,16 @@ class LiveBrain(ControlSurface):
             raise ValueError("track index out of range")
         return self.song.tracks[index]
 
+    def _resolve_track(self, index):
+        if index == MASTER_TRACK_INDEX:
+            return self.song.master_track, "master"
+        if index >= RETURN_TRACK_INDEX_BASE:
+            return_index = index - RETURN_TRACK_INDEX_BASE
+            if return_index >= len(self.song.return_tracks):
+                raise ValueError("return track index out of range")
+            return self.song.return_tracks[return_index], "return"
+        return self._track(index), "track"
+
     def _slot(self, track, index):
         if index < 0 or index >= len(track.clip_slots):
             raise ValueError("clip slot index out of range")
@@ -688,7 +745,7 @@ class LiveBrain(ControlSurface):
         return slot.clip
 
     def _device(self, params):
-        track = self._track(self._int(params, "trackIndex"))
+        track, _kind = self._resolve_track(self._int(params, "trackIndex"))
         index = self._int(params, "deviceIndex")
         if index < 0 or index >= len(track.devices):
             raise ValueError("device index out of range")
