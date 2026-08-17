@@ -42,10 +42,12 @@
 
 - [x] Conservative gain staging, panorama and send plans
 - [x] Role-aware EQ/Compressor parameter setup where parameters are discoverable
+- [x] Address existing Master/Return devices and mixer controls through stable track aliases
+- [x] Read the Master momentary stereo output meter in linear amplitude and dBFS
 - [ ] Verified external sidechain source routing
 - [ ] Analyzer-backed masking detection and corrective EQ
 - [ ] Return-track creation, naming and effect-chain setup
-- [ ] Loudness/peak measurement and master headroom verification
+- [ ] Integrated loudness measurement and automated master headroom verification
 - [ ] Compound transaction/undo for a complete production run
 
 ## Advanced Ableton control

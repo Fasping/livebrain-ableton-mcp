@@ -12,6 +12,7 @@ import type {
   DeviceTarget,
   LiveDeviceSnapshot,
   LiveSetSnapshot,
+  MasterMeterSnapshot,
   MidiNote,
   ParameterTarget,
   SongSettingsInput,
@@ -37,6 +38,7 @@ export interface AbletonAdapter {
   setDeviceParameter(target: ParameterTarget, normalizedValue: number, dryRun?: boolean): Promise<ChangeSummary>;
   setSongSettings(input: SongSettingsInput, dryRun?: boolean): Promise<ChangeSummary>;
   setTrackMixer(trackIndex: number, input: TrackMixerInput, dryRun?: boolean): Promise<ChangeSummary>;
+  getMasterMeter(): Promise<MasterMeterSnapshot>;
   setTransport(action: TransportAction, dryRun?: boolean): Promise<ChangeSummary>;
   searchBrowser(input: BrowserSearchInput): Promise<BrowserItemSnapshot[]>;
   loadBrowserItem(trackIndex: number, uri: string, dryRun?: boolean): Promise<ChangeSummary>;

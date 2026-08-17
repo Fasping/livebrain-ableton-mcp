@@ -4,8 +4,12 @@ import type { AbletonAdapter } from "../ableton/adapter.js";
 import { clipTargetSchema, dryRunSchema, midiNoteSchema } from "./schemas.js";
 import { textResult } from "./helpers.js";
 
+const addressableTrackIndexSchema = z.number().int().min(-1).describe(
+  "Track address: -1 = Master, 0..N = regular tracks, 200 + i = Return i (A = 200, B = 201).",
+);
+
 export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter) {
-  server.tool("livebrain_analyze_set", "Return a compact or detailed normalized Live Set snapshot.", {
+  server.tool("livebrain_analyze_set", "Return a compact or detailed normalized Live Set snapshot. Detailed mode includes Master and Return tracks.", {
     mode: z.enum(["compact", "detailed"]).default("compact"),
   }, async ({ mode }) => textResult(await ableton.snapshot(mode)));
 
@@ -40,15 +44,15 @@ export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter)
     ...clipTargetSchema, loopStart: z.number().min(0), loopEnd: z.number().positive(), dryRun: dryRunSchema,
   }, async ({ loopStart, loopEnd, dryRun, ...target }) => textResult(await ableton.setClipLoop(target, loopStart, loopEnd, dryRun)));
 
-  server.tool("ableton_get_devices", "List devices on a track.", { trackIndex: z.number().int().min(0) },
+  server.tool("ableton_get_devices", "List devices on a regular, Master (-1), or Return (200 + return index) track.", { trackIndex: addressableTrackIndexSchema },
     async ({ trackIndex }) => textResult({ devices: await ableton.getDevices(trackIndex) }));
 
   server.tool("ableton_get_device_parameters", "Read every normalized parameter on a device.", {
-    trackIndex: z.number().int().min(0), deviceIndex: z.number().int().min(0),
+    trackIndex: addressableTrackIndexSchema, deviceIndex: z.number().int().min(0),
   }, async (target) => textResult({ parameters: await ableton.getDeviceParameters(target) }));
 
   server.tool("ableton_set_device_parameter", "Set one device parameter using a normalized 0..1 value.", {
-    trackIndex: z.number().int().min(0), deviceIndex: z.number().int().min(0), parameterIndex: z.number().int().min(0),
+    trackIndex: addressableTrackIndexSchema, deviceIndex: z.number().int().min(0), parameterIndex: z.number().int().min(0),
     normalizedValue: z.number().min(0).max(1), dryRun: dryRunSchema,
   }, async ({ normalizedValue, dryRun, ...target }) => textResult(await ableton.setDeviceParameter(target, normalizedValue, dryRun)));
 
@@ -60,11 +64,14 @@ export function registerAbletonTools(server: McpServer, ableton: AbletonAdapter)
     dryRun: dryRunSchema,
   }, async ({ dryRun, ...settings }) => textResult(await ableton.setSongSettings(settings, dryRun)));
 
-  server.tool("ableton_set_track_mixer", "Set normalized mixer values, state and sends for one track.", {
-    trackIndex: z.number().int().min(0), volume: z.number().min(0).max(1).optional(), pan: z.number().min(-1).max(1).optional(),
+  server.tool("ableton_set_track_mixer", "Set mixer values on a regular, Master (-1), or Return (200 + return index) track. Arm is not applicable to Master/Returns; mute, solo and sends are not applicable to Master.", {
+    trackIndex: addressableTrackIndexSchema, volume: z.number().min(0).max(1).optional(), pan: z.number().min(-1).max(1).optional(),
     mute: z.boolean().optional(), solo: z.boolean().optional(), arm: z.boolean().optional(),
     sends: z.array(z.object({ sendIndex: z.number().int().min(0), value: z.number().min(0).max(1) })).max(32).optional(), dryRun: dryRunSchema,
   }, async ({ trackIndex, dryRun, ...mixer }) => textResult(await ableton.setTrackMixer(trackIndex, mixer, dryRun)));
+
+  server.tool("ableton_get_master_meter", "Read the Master output meter as linear amplitude and dBFS. dBFS is null at digital silence.", {},
+    async () => textResult(await ableton.getMasterMeter()));
 
   server.tool("ableton_transport", "Start or stop Ableton playback.", {
     action: z.enum(["start", "stop"]), dryRun: dryRunSchema,
