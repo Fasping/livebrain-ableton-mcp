@@ -42,3 +42,12 @@ test("returned contexts are defensive copies", () => {
   context.profile.rhythm.density = 0;
   assert.notEqual(getCuratedStyleContext("partout_city_series")?.profile.rhythm.density, 0);
 });
+
+test("partial curated profiles inherit omitted values from the afterhours baseline", () => {
+  const context = getCuratedStyleContext("timeless_del_garda");
+  assert.ok(context);
+  assert.equal(context.profile.rhythm.repetition, 0.82);
+  assert.deepEqual(context.profile.bass.register, [28, 48]);
+  assert.equal(context.profile.sequence.chordProbability, 0.12);
+  assert.deepEqual(context.profile.arrangement.cycleBars, [2, 4, 8, 16, 32, 64]);
+});
