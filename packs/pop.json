@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1, "id": "pop", "version": "1.0.0", "name": "Pop Songwriting", "description": "Hook-focused pop writing with clear verse, pre-chorus, chorus and bridge sections plus an editable vocal guide.",
+  "aliases": ["pop", "radio pop", "indie pop", "synth pop", "synth-pop", "electropop", "dance pop", "catchy", "pegadizo", "cancion pop"], "genres": ["pop", "indie pop", "synth pop", "electropop"], "priority": 2, "defaultGenre": "pop", "defaultBars": 112, "clipBars": 8, "defaultRootNote": 0, "defaultMode": "Major", "drumPattern": "backbeat",
+  "profile": {
+    "id": "pop_songwriting_core", "version": "1.0", "name": "Pop Songwriting Core", "tempo": { "min": 88, "max": 142, "preferred": 116 },
+    "rhythm": { "density": 0.56, "syncopation": 0.34, "swing": 0.03, "microtiming": 0.05, "repetition": 0.72, "mutationRate": 0.24, "silence": 0.28, "predictability": 0.7 },
+    "drums": { "kickWeight": 0.68, "hatDensity": 0.58, "ghostDensity": 0.16, "electroInfluence": 0.32 }, "bass": { "density": 0.48, "chromaticism": 0.1, "tonalStability": 0.86, "rests": 0.3, "register": [28, 50] },
+    "sequence": { "density": 0.5, "cycleSteps": 8, "chromaticism": 0.1, "chordProbability": 0.68, "rareEventProbability": 0.04, "register": [48, 84] },
+    "timbre": { "weirdness": 0.2, "brightness": 0.68, "rawness": 0.2, "digital": 0.52 }, "arrangement": { "evolutionRate": 0.46, "subtraction": 0.38, "cycleBars": [4, 8, 16, 32] },
+    "mix": { "loudness": 0.72, "lowEnd": 0.6, "brightness": 0.66, "space": 0.38 }, "constraints": ["hook-first", "clear-section-contrast", "leave-room-for-vocal"], "negativeTraits": ["endless-loop", "overlong-intro", "busy-vocal-range"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB Pop Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["Pop", "Studio Drums", "Drum Rack", "Core Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.72, "pan": 0 } },
+    { "role": "bass", "name": "LB Pop Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Bass", "Drift", "Operator", "Electric Bass"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.64, "pan": 0 } },
+    { "role": "piano", "name": "LB Piano", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Piano", "Electric", "Grand Piano"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": -0.12, "sends": [{ "sendIndex": 0, "value": 0.14 }] } },
+    { "role": "synth", "name": "LB Pop Synth", "color": 7108071, "generator": "sequence", "instrumentQueries": ["Wavetable", "Drift", "Synth", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.44, "pan": 0.14, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "lead", "name": "LB Hook", "color": 10181046, "generator": "melody", "instrumentQueries": ["Pluck", "Wavetable", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": 0.08, "sends": [{ "sendIndex": 0, "value": 0.2 }] } },
+    { "role": "vocal-guide", "name": "LB Vocal Guide", "color": 16765286, "generator": "melody", "pitchOffset": -12, "instrumentQueries": ["Piano", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.36, "pan": 0 } },
+    { "role": "fx", "name": "LB Pop FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.34, "pan": 0.2, "sends": [{ "sendIndex": 0, "value": 0.3 }] } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 8, "activeRoles": ["piano", "synth", "fx"], "energy": 0.22 }, { "name": "Verse 1", "bars": 16, "activeRoles": ["drums", "bass", "piano", "vocal-guide"], "energy": 0.5 },
+    { "name": "Pre-Chorus", "bars": 8, "activeRoles": ["drums", "bass", "piano", "synth", "vocal-guide", "fx"], "energy": 0.68 }, { "name": "Chorus", "bars": 16, "activeRoles": ["drums", "bass", "piano", "synth", "lead", "vocal-guide", "fx"], "energy": 0.9 },
+    { "name": "Verse 2", "bars": 16, "activeRoles": ["drums", "bass", "piano", "synth", "vocal-guide"], "energy": 0.58 }, { "name": "Bridge", "bars": 8, "activeRoles": ["piano", "synth", "lead", "vocal-guide"], "energy": 0.4 },
+    { "name": "Final Chorus", "bars": 16, "activeRoles": ["drums", "bass", "piano", "synth", "lead", "vocal-guide", "fx"], "energy": 0.96 }, { "name": "Outro", "bars": 8, "activeRoles": ["piano", "synth", "lead"], "energy": 0.28 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": false, "spectralAnalysisRequired": true }
+}

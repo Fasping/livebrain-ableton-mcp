@@ -1,9 +1,10 @@
 import type { MidiNote, TrackMixerInput } from "../ableton/types.js";
 import type { StyleProfile } from "../music-brain/style-profile.js";
 import type { ResolvedStyleComponent, StyleComponentSource } from "../style/style-resolver.js";
+import type { PackGeneratorKind } from "../packs/types.js";
 
-export type ProductionGenre = "minimal" | "house" | "techno" | "trap" | "lofi" | "pop" | "ambient";
-export type TrackRole = "kick" | "hats" | "percussion" | "bass" | "chords" | "lead" | "texture" | "fx";
+export type ProductionGenre = string;
+export type TrackRole = string;
 
 export interface ProductionSection {
   name: string;
@@ -30,6 +31,14 @@ export interface ProductionBrief {
     weirdness: number;
     space: number;
     swing: number;
+  };
+  pack: {
+    id: string;
+    name: string;
+    version: string;
+    source: "built-in" | "user";
+    selectionReason: string;
+    matchedAliases: string[];
   };
   style: {
     id: string;
@@ -58,6 +67,7 @@ export interface ProductionClipPlan {
 
 export interface ProductionTrackPlan {
   role: TrackRole;
+  generator: PackGeneratorKind;
   name: string;
   color: number;
   notes: MidiNote[];

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1, "id": "rnb-soul", "version": "1.0.0", "name": "R&B & Neo-Soul", "description": "Laid-back R&B and neo-soul writing with half-time drums, bass, keys, guitar guide, pad and vocal-guide parts.",
+  "aliases": ["r&b", "rnb", "neo soul", "neo-soul", "soul", "slow jam", "contemporary r&b", "rhythm and blues"], "genres": ["r&b", "neo-soul", "soul"], "priority": 2, "defaultGenre": "r&b", "defaultBars": 96, "clipBars": 8, "defaultRootNote": 9, "defaultMode": "Minor", "drumPattern": "half-time",
+  "profile": {
+    "id": "rnb_soul_core", "version": "1.0", "name": "R&B & Neo-Soul Core", "tempo": { "min": 62, "max": 112, "preferred": 82 },
+    "rhythm": { "density": 0.4, "syncopation": 0.64, "swing": 0.3, "microtiming": 0.24, "repetition": 0.68, "mutationRate": 0.24, "silence": 0.46, "predictability": 0.5 },
+    "drums": { "kickWeight": 0.58, "hatDensity": 0.38, "ghostDensity": 0.34, "electroInfluence": 0.12 }, "bass": { "density": 0.42, "chromaticism": 0.3, "tonalStability": 0.68, "rests": 0.44, "register": [28, 52] },
+    "sequence": { "density": 0.38, "cycleSteps": 8, "chromaticism": 0.26, "chordProbability": 0.72, "rareEventProbability": 0.08, "register": [45, 84] },
+    "timbre": { "weirdness": 0.3, "brightness": 0.42, "rawness": 0.36, "digital": 0.24 }, "arrangement": { "evolutionRate": 0.34, "subtraction": 0.54, "cycleBars": [4, 8, 16, 32] },
+    "mix": { "loudness": 0.56, "lowEnd": 0.68, "brightness": 0.4, "space": 0.58 }, "constraints": ["laid-back-pocket", "leave-room-for-vocals", "warm-harmony"], "negativeTraits": ["rigid-quantization", "busy-topline", "harsh-brightness"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB R&B Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["R&B", "Soul", "Drum Rack", "Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.66, "pan": 0 } },
+    { "role": "bass", "name": "LB Soul Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Bass Guitar", "Electric Bass", "Bass", "Drift"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.64, "pan": 0 } },
+    { "role": "keys", "name": "LB Soul Keys", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Electric", "Rhodes", "Piano", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.5, "pan": -0.14, "sends": [{ "sendIndex": 0, "value": 0.2 }] } },
+    { "role": "guitar-guide", "name": "LB Guitar Guide", "color": 16757575, "generator": "sequence", "instrumentQueries": ["Electric Guitar", "Guitar", "Instrument Rack", "Sampler"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.42, "pan": 0.2, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "pad", "name": "LB Soul Pad", "color": 7108071, "generator": "texture", "instrumentQueries": ["Pad", "Atmosphere", "Drift", "Wavetable"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.36, "pan": -0.18, "sends": [{ "sendIndex": 0, "value": 0.3 }] } },
+    { "role": "vocal-guide", "name": "LB Vocal Guide", "color": 16765286, "generator": "melody", "pitchOffset": -12, "instrumentQueries": ["Piano", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.36, "pan": 0 } },
+    { "role": "adlibs", "name": "LB Adlib Guide", "color": 10181046, "generator": "melody", "instrumentQueries": ["Bell", "Mallet", "Drift"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.3, "pan": 0.24, "sends": [{ "sendIndex": 0, "value": 0.28 }] } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 8, "activeRoles": ["keys", "guitar-guide", "pad"], "energy": 0.2 }, { "name": "Verse 1", "bars": 16, "activeRoles": ["drums", "bass", "keys", "guitar-guide", "vocal-guide"], "energy": 0.48 },
+    { "name": "Hook", "bars": 8, "activeRoles": ["drums", "bass", "keys", "guitar-guide", "pad", "vocal-guide", "adlibs"], "energy": 0.74 }, { "name": "Verse 2", "bars": 16, "activeRoles": ["drums", "bass", "keys", "pad", "vocal-guide"], "energy": 0.54 },
+    { "name": "Bridge", "bars": 8, "activeRoles": ["bass", "keys", "guitar-guide", "pad", "vocal-guide", "adlibs"], "energy": 0.38 }, { "name": "Final Hook", "bars": 16, "activeRoles": ["drums", "bass", "keys", "guitar-guide", "pad", "vocal-guide", "adlibs"], "energy": 0.84 },
+    { "name": "Outro", "bars": 8, "activeRoles": ["keys", "guitar-guide", "pad", "adlibs"], "energy": 0.22 }
+  ],
+  "mixTargets": { "headroomDb": -7, "sidechainRequested": false, "spectralAnalysisRequired": true }
+}

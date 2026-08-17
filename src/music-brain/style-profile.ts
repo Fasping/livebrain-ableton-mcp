@@ -23,6 +23,19 @@ export interface StyleProfile {
   negativeTraits: string[];
 }
 
+export const generalStyleProfile: StyleProfile = {
+  id: "general_songwriting", version: "1.0", name: "General Songwriting",
+  tempo: { min: 70, max: 150, preferred: 110 },
+  rhythm: { density: .48, syncopation: .4, swing: .08, microtiming: .08, repetition: .65, mutationRate: .2, silence: .35, predictability: .55 },
+  drums: { kickWeight: .55, hatDensity: .48, ghostDensity: .18, electroInfluence: .15 },
+  bass: { density: .4, chromaticism: .18, tonalStability: .72, rests: .38, register: [28, 48] },
+  sequence: { density: .4, cycleSteps: 8, chromaticism: .18, chordProbability: .45, rareEventProbability: .08, register: [48, 79] },
+  timbre: { weirdness: .3, brightness: .5, rawness: .35, digital: .4 },
+  arrangement: { evolutionRate: .35, subtraction: .45, cycleBars: [4, 8, 16, 32] },
+  mix: { loudness: .55, lowEnd: .55, brightness: .5, space: .45 },
+  constraints: ["serve-the-prompt", "leave-headroom"], negativeTraits: ["genre-assumptions", "over-arrangement"],
+};
+
 export const afterhours2019: StyleProfile = {
   id: "afterhours_2019",
   version: "0.1",
@@ -45,7 +58,7 @@ export const afterhours2019: StyleProfile = {
   ],
 };
 
-export const defaultStyleProfile = afterhours2019;
+export const defaultStyleProfile = generalStyleProfile;
 
 export function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));

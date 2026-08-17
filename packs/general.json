@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1, "id": "general", "version": "1.0.0", "name": "General Songwriting", "description": "Neutral multi-genre songwriting fallback with drums, bass, harmony, melody, texture and effects.",
+  "aliases": [], "genres": ["general"], "defaultGenre": "general", "defaultBars": 96, "clipBars": 8, "defaultRootNote": 0, "defaultMode": "Minor", "drumPattern": "backbeat",
+  "profile": {
+    "id": "general_songwriting", "version": "1.0", "name": "General Songwriting", "tempo": { "min": 70, "max": 150, "preferred": 110 },
+    "rhythm": { "density": 0.48, "syncopation": 0.4, "swing": 0.08, "microtiming": 0.08, "repetition": 0.65, "mutationRate": 0.2, "silence": 0.35, "predictability": 0.55 },
+    "drums": { "kickWeight": 0.55, "hatDensity": 0.48, "ghostDensity": 0.18, "electroInfluence": 0.15 },
+    "bass": { "density": 0.4, "chromaticism": 0.18, "tonalStability": 0.72, "rests": 0.38, "register": [28, 48] },
+    "sequence": { "density": 0.4, "cycleSteps": 8, "chromaticism": 0.18, "chordProbability": 0.45, "rareEventProbability": 0.08, "register": [48, 79] },
+    "timbre": { "weirdness": 0.3, "brightness": 0.5, "rawness": 0.35, "digital": 0.4 }, "arrangement": { "evolutionRate": 0.35, "subtraction": 0.45, "cycleBars": [4, 8, 16, 32] },
+    "mix": { "loudness": 0.55, "lowEnd": 0.55, "brightness": 0.5, "space": 0.45 }, "constraints": ["serve-the-prompt", "leave-headroom"], "negativeTraits": ["genre-assumptions", "over-arrangement"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["Drum Rack", "Kit", "Core Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.68, "pan": 0 } },
+    { "role": "bass", "name": "LB Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Drift", "Operator", "Bass", "Simpler"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.64, "pan": 0 } },
+    { "role": "harmony", "name": "LB Harmony", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Electric", "Drift", "Piano", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.5, "pan": -0.08, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "melody", "name": "LB Melody", "color": 10181046, "generator": "melody", "instrumentQueries": ["Drift", "Wavetable", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.5, "pan": 0.08, "sends": [{ "sendIndex": 0, "value": 0.2 }] } },
+    { "role": "texture", "name": "LB Texture", "color": 7108071, "generator": "texture", "instrumentQueries": ["Atmosphere", "Texture", "Pad", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.4, "pan": -0.18, "sends": [{ "sendIndex": 0, "value": 0.28 }] } },
+    { "role": "fx", "name": "LB FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.36, "pan": 0.2, "sends": [{ "sendIndex": 0, "value": 0.32 }] } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 8, "activeRoles": ["harmony", "texture", "fx"], "energy": 0.25 }, { "name": "Verse A", "bars": 16, "activeRoles": ["drums", "bass", "harmony", "melody"], "energy": 0.55 },
+    { "name": "Main", "bars": 16, "activeRoles": ["drums", "bass", "harmony", "melody", "texture", "fx"], "energy": 0.8 }, { "name": "Break", "bars": 8, "activeRoles": ["harmony", "melody", "texture"], "energy": 0.35 },
+    { "name": "Final", "bars": 16, "activeRoles": ["drums", "bass", "harmony", "melody", "texture", "fx"], "energy": 0.9 }, { "name": "Outro", "bars": 8, "activeRoles": ["drums", "bass", "texture"], "energy": 0.3 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": false, "spectralAnalysisRequired": true }
+}

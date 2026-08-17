@@ -14,7 +14,7 @@
 ## Full-production beta
 
 - [x] Natural-language vibe → tempo, key/mode, traits, sections and mix intent
-- [x] Independent kick, hats, percussion, bass, chords, lead, texture and FX plans
+- [x] Pack-defined independent track plans, including electronic, band, hip-hop and ambient roles
 - [x] Deterministic harmony and motif-based melody generation
 - [x] Browser search with instrument fallbacks
 - [x] Mixer, sends, EQ/compressor loading and role-aware parameter starting points
@@ -37,6 +37,10 @@
 - [x] Recursive local reference-folder import, duplicate detection and one-step profile build
 - [x] A/B preference comparisons and directional tags that transparently personalize future profiles
 - [x] Automatic multi-label/scene resolution with explainable normalized weights
+- [x] Neutral core with validated, installable JSON style packs
+- [x] Nine bundled packs spanning general, electronic, underground, breaks/UKG, hip-hop, pop, R&B, rock and ambient
+- [x] Four-on-floor, broken, backbeat and half-time drum topologies
+- [x] Pack-aware track roles, arrangement sections, browser queries and mix defaults
 
 ## Mixing and routing
 

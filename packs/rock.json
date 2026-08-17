@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1, "id": "rock", "version": "1.0.0", "name": "Rock & Indie Band", "description": "Band-oriented songwriting with drums, electric bass, rhythm and lead guitar, keys and a MIDI vocal guide.",
+  "aliases": ["rock", "indie", "punk", "grunge", "alternative", "guitar", "guitarra", "garage band"], "genres": ["rock", "indie rock", "punk", "alternative"], "priority": 2, "defaultGenre": "rock", "defaultBars": 112, "clipBars": 8, "defaultRootNote": 4, "defaultMode": "Minor", "drumPattern": "backbeat",
+  "profile": {
+    "id": "rock_band_core", "version": "1.0", "name": "Rock Band Core", "tempo": { "min": 80, "max": 180, "preferred": 124 },
+    "rhythm": { "density": 0.58, "syncopation": 0.3, "swing": 0.03, "microtiming": 0.1, "repetition": 0.62, "mutationRate": 0.22, "silence": 0.25, "predictability": 0.68 },
+    "drums": { "kickWeight": 0.72, "hatDensity": 0.62, "ghostDensity": 0.24, "electroInfluence": 0.05 }, "bass": { "density": 0.54, "chromaticism": 0.18, "tonalStability": 0.8, "rests": 0.25, "register": [28, 50] },
+    "sequence": { "density": 0.5, "cycleSteps": 8, "chromaticism": 0.16, "chordProbability": 0.72, "rareEventProbability": 0.06, "register": [45, 79] },
+    "timbre": { "weirdness": 0.24, "brightness": 0.54, "rawness": 0.76, "digital": 0.08 }, "arrangement": { "evolutionRate": 0.42, "subtraction": 0.4, "cycleBars": [4, 8, 16, 32] },
+    "mix": { "loudness": 0.7, "lowEnd": 0.58, "brightness": 0.56, "space": 0.3 }, "constraints": ["band-dynamics", "playable-parts", "leave-room-for-vocal"], "negativeTraits": ["edm-builds", "over-quantization", "synth-dominance"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["Studio Drums", "Acoustic", "Drum Rack", "Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.72, "pan": 0 } },
+    { "role": "electric-bass", "name": "LB Electric Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Bass Guitar", "Electric Bass", "Bass", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.66, "pan": 0 } },
+    { "role": "rhythm-guitar", "name": "LB Rhythm Guitar", "color": 16757575, "generator": "harmony", "instrumentQueries": ["Electric Guitar", "Guitar", "Instrument Rack", "Sampler"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.56, "pan": -0.3, "sends": [{ "sendIndex": 0, "value": 0.1 }] } },
+    { "role": "lead-guitar", "name": "LB Lead Guitar", "color": 10181046, "generator": "melody", "instrumentQueries": ["Electric Guitar", "Guitar", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.5, "pan": 0.25, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "keys", "name": "LB Keys", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Organ", "Piano", "Electric", "Drift"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.42, "pan": 0.12, "sends": [{ "sendIndex": 0, "value": 0.14 }] } },
+    { "role": "vocal-guide", "name": "LB Vocal Guide", "color": 16765286, "generator": "melody", "pitchOffset": -12, "instrumentQueries": ["Piano", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.34, "pan": 0 } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 8, "activeRoles": ["rhythm-guitar", "keys"], "energy": 0.24 }, { "name": "Verse 1", "bars": 16, "activeRoles": ["drums", "electric-bass", "rhythm-guitar", "vocal-guide"], "energy": 0.56 },
+    { "name": "Chorus", "bars": 16, "activeRoles": ["drums", "electric-bass", "rhythm-guitar", "lead-guitar", "keys", "vocal-guide"], "energy": 0.86 }, { "name": "Verse 2", "bars": 16, "activeRoles": ["drums", "electric-bass", "rhythm-guitar", "keys", "vocal-guide"], "energy": 0.62 },
+    { "name": "Bridge", "bars": 8, "activeRoles": ["electric-bass", "lead-guitar", "keys", "vocal-guide"], "energy": 0.4 }, { "name": "Final Chorus", "bars": 16, "activeRoles": ["drums", "electric-bass", "rhythm-guitar", "lead-guitar", "keys", "vocal-guide"], "energy": 0.94 },
+    { "name": "Outro", "bars": 8, "activeRoles": ["drums", "electric-bass", "rhythm-guitar"], "energy": 0.34 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": false, "spectralAnalysisRequired": true }
+}

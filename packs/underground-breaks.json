@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1, "id": "underground-breaks", "version": "1.0.0", "name": "Underground Breaks & UK Garage", "description": "Broken-beat underground club writing for electro breaks, UK garage, 2-step and acid-leaning leftfield tracks.",
+  "aliases": ["breakbeat", "breaks", "broken beat", "electro breaks", "acid breaks", "uk garage", "ukg", "2-step", "2 step", "garage", "leftfield breaks", "broken electro"], "genres": ["breakbeat", "uk garage", "2-step", "electro breaks"], "priority": 3, "defaultGenre": "breakbeat", "defaultBars": 128, "clipBars": 16, "defaultRootNote": 2, "defaultMode": "Dorian", "drumPattern": "broken",
+  "profile": {
+    "id": "underground_breaks_core", "version": "1.0", "name": "Underground Breaks Core", "tempo": { "min": 122, "max": 140, "preferred": 132 },
+    "rhythm": { "density": 0.46, "syncopation": 0.88, "swing": 0.18, "microtiming": 0.22, "repetition": 0.74, "mutationRate": 0.3, "silence": 0.46, "predictability": 0.22 },
+    "drums": { "kickWeight": 0.5, "hatDensity": 0.48, "ghostDensity": 0.32, "electroInfluence": 0.82 }, "bass": { "density": 0.38, "chromaticism": 0.54, "tonalStability": 0.34, "rests": 0.5, "register": [26, 46] },
+    "sequence": { "density": 0.32, "cycleSteps": 7, "chromaticism": 0.68, "chordProbability": 0.12, "rareEventProbability": 0.14, "register": [48, 82] },
+    "timbre": { "weirdness": 0.8, "brightness": 0.44, "rawness": 0.7, "digital": 0.76 }, "arrangement": { "evolutionRate": 0.28, "subtraction": 0.62, "cycleBars": [4, 8, 16, 32, 64] },
+    "mix": { "loudness": 0.54, "lowEnd": 0.72, "brightness": 0.4, "space": 0.66 }, "constraints": ["broken-kick-grid", "syncopated-bass", "mutation-over-risers", "leave-negative-space"], "negativeTraits": ["four-on-floor-default", "festival-builds", "constant-rolling-bass", "perfect-quantization"]
+  },
+  "tracks": [
+    { "role": "breaks", "name": "LB Broken Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["Breaks", "Breakbeat", "Drum Rack", "909 Core Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.7, "pan": 0 } },
+    { "role": "sub-bass", "name": "LB Sub Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Operator", "Drift", "Sub Bass", "Analog"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.68, "pan": 0 } },
+    { "role": "acid-sequence", "name": "LB Acid Sequence", "color": 16757575, "generator": "sequence", "instrumentQueries": ["Acid", "Analog", "Operator", "Drift"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.46, "pan": -0.12, "sends": [{ "sendIndex": 0, "value": 0.14 }] } },
+    { "role": "chords", "name": "LB Broken Chords", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Electric", "Drift", "Wavetable", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.44, "pan": 0.12, "sends": [{ "sendIndex": 0, "value": 0.2 }] } },
+    { "role": "lead", "name": "LB Alien Lead", "color": 10181046, "generator": "melody", "instrumentQueries": ["Wavetable", "Operator", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.44, "pan": 0.16, "sends": [{ "sendIndex": 0, "value": 0.22 }] } },
+    { "role": "texture", "name": "LB Broken Texture", "color": 7108071, "generator": "texture", "instrumentQueries": ["Texture", "Atmosphere", "Simpler", "Drift"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.36, "pan": -0.2, "sends": [{ "sendIndex": 0, "value": 0.32 }] } },
+    { "role": "fx", "name": "LB Broken FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.34, "pan": 0.22, "sends": [{ "sendIndex": 0, "value": 0.36 }] } }
+  ],
+  "sections": [
+    { "name": "Atmospheric Intro", "bars": 16, "activeRoles": ["acid-sequence", "texture", "fx"], "energy": 0.2 }, { "name": "First Break", "bars": 16, "activeRoles": ["breaks", "sub-bass", "acid-sequence", "chords"], "energy": 0.58 },
+    { "name": "Pressure A", "bars": 24, "activeRoles": ["breaks", "sub-bass", "acid-sequence", "chords", "lead", "texture"], "energy": 0.8 }, { "name": "Suspension", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.32 },
+    { "name": "Pressure B", "bars": 32, "activeRoles": ["breaks", "sub-bass", "acid-sequence", "chords", "lead", "texture", "fx"], "energy": 0.92 }, { "name": "DJ Outro", "bars": 16, "activeRoles": ["breaks", "sub-bass", "acid-sequence", "texture"], "energy": 0.36 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": true, "spectralAnalysisRequired": true }
+}

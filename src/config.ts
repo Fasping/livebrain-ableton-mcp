@@ -1,9 +1,12 @@
+import { delimiter } from "node:path";
+
 export interface LiveBrainConfig {
   host: string;
   port: number;
   referenceDir?: string;
   dataDir: string;
   adapter: "remote-script" | "mock";
+  packDirs: string[];
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): LiveBrainConfig {
@@ -15,5 +18,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): LiveBrainConfi
     referenceDir: env.LIVEBRAIN_REFERENCE_DIR,
     dataDir: env.LIVEBRAIN_DATA_DIR ?? "data",
     adapter: env.LIVEBRAIN_ADAPTER === "mock" ? "mock" : "remote-script",
+    packDirs: env.LIVEBRAIN_PACK_DIR?.split(delimiter).filter(Boolean) ?? [],
   };
 }

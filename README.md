@@ -10,19 +10,19 @@
 
 LiveBrain is an open-source Ableton Live MCP server **and** a deterministic music-production engine. It can inspect a Live Set, compose MIDI, load installed instruments and effects, build an Arrangement, create variations, and remember the musical characteristics you prefer.
 
-> LiveBrain is currently a macOS-first beta verified with Ableton Live 12 and Node.js 20. Save your Live Set before letting any AI client make large changes.
+> LiveBrain 1.0 is a macOS-first release verified with Ableton Live 12 and Node.js 20. Save your Live Set before letting any AI client make large changes.
 
 ## What can it make?
 
-Ask for a vibe instead of manually describing every MIDI note:
+Ask for a vibe instead of manually describing every MIDI note. LiveBrain selects an installable style pack that defines the track roles, instruments, arrangement and mix starting point:
 
 ```text
-Create a dark, hypnotic and spacious 128-bar minimal track at 130 BPM.
-Use separate kick, hats, percussion, bass, chords, lead, texture and FX tracks.
+Create a raw 112-bar indie-rock song with a tense verse, a wide chorus,
+separate drums, bass and guitar parts, and an editable vocal-guide melody.
 Show me the plan first, then build it in Arrangement View.
 ```
 
-Or name an underground context directly:
+The bundled packs currently cover general songwriting, electronic/club, underground minimal/electro, underground breaks/UK garage, hip-hop/rap, pop, R&B/neo-soul, rock/indie and ambient/cinematic work. Or name an underground context directly:
 
 ```text
 Make a restrained 128-bar afterhours track with the off-kilter space of
@@ -39,7 +39,7 @@ than the others. Resolve the style first and show me the weights.
 
 LiveBrain can then:
 
-- create eight independent, editable MIDI tracks;
+- create a genre-appropriate set of independent, editable MIDI tracks;
 - generate deterministic drums, bass, harmony, melody, texture and FX material;
 - search your Ableton Browser and load devices that are actually installed;
 - set tempo, scale, mixer levels, panning, sends, EQ and compression starting points;
@@ -48,6 +48,7 @@ LiveBrain can then:
 - analyze local reference audio and build reusable style profiles.
 - resolve researched underground contexts including Timeless / Francesco Del Garda, Partout, Wicked Bass / Noizar, Phonotheque / Z@p and Club der Visionaere / Hoppetosse.
 - blend every recognized context in one prompt, report normalized weights and apply locally learned directional or A/B preferences.
+- load validated custom JSON packs from `~/.livebrain/packs/`, so personal or community genre knowledge stays outside the neutral core.
 
 Everything remains editable in Ableton. LiveBrain does not render a mysterious finished audio file and hide the production decisions from you.
 
@@ -60,6 +61,7 @@ Most Ableton MCP projects expose DAW controls and leave all musical reasoning to
 | Read/write tracks, clips, devices and mixer | Yes | Yes |
 | Deterministic groove, bass, harmony and melody engines | Agent-dependent | Built in |
 | Natural-language vibe → complete production plan | Agent-dependent | Built in |
+| Installable genre/style packs | No | Validated JSON packs |
 | Safe preview before changing Live | Rare | `dryRun` by default |
 | Resume an interrupted full-song build | Rare | Built in |
 | Local reference-audio profiles | No | Built in |
@@ -145,7 +147,9 @@ All important write paths support a preview-first workflow:
 
 Applied productions return a `generationId`. Give direct feedback with tags such as `bass-too-obvious`, `less-melody`, `more-space`, `more-swing` or their documented Spanish equivalents. You can also generate two alternatives and call `feedback_compare_generations`; later plans apply the resulting preference delta conservatively.
 
-Production runs are resumable by the canonical `LB Kick`…`LB FX` names. Repeating the same prompt, seed and length reuses those tracks, replaces the source MIDI deterministically, skips existing Arrangement positions and completes missing device work.
+Production runs are resumable by the canonical track names defined by the selected pack. Repeating the same prompt, seed and length reuses those tracks, replaces the source MIDI deterministically, skips existing Arrangement positions and completes missing device work.
+
+Run `music_list_style_packs` to see what is installed, or pass `packId` to choose one explicitly. See [Style Packs](docs/STYLE_PACKS.md) to install or author a pack without changing LiveBrain source.
 
 To teach LiveBrain your own taste without uploading audio, put legally owned reference files in a local folder and ask your client:
 
@@ -161,10 +165,13 @@ The bundled scene profiles are transparent curation hypotheses, not fake audio m
 
 ### Production Engine
 
-- vibe compiler for minimal, house, techno, trap, lo-fi, pop and ambient starting points;
+- neutral vibe compiler with automatic or explicit style-pack selection;
+- nine bundled packs: general, electronic, underground minimal/electro, underground breaks/UK garage, hip-hop, pop, R&B/neo-soul, rock and ambient;
+- distinct four-on-floor, broken, backbeat and half-time drum topologies;
+- versioned JSON pack schema for custom genres, track roles, browser queries, arrangements and mix defaults;
 - structured 64–512 bar arrangements;
 - a distinct deterministic source variation for every active track section;
-- independent kick, hats, percussion, bass, chords, lead, texture and FX roles;
+- pack-defined track roles instead of one fixed eight-track electronic template;
 - deterministic harmony, motif-based melody, drums, bass and generative sequences;
 - Browser device discovery with installed-device fallbacks;
 - conservative gain staging, panning, sends, EQ, compression and reverb setup;
@@ -202,7 +209,7 @@ These gaps are tracked in the [roadmap](docs/ROADMAP.md).
 
 ## MCP tools
 
-LiveBrain currently exposes 52 tools across these groups:
+LiveBrain currently exposes 54 tools across these groups:
 
 - **Ableton:** Live Set analysis, MIDI tracks/clips/notes, regular/Master/Return devices and mixer, Master output meter, song settings, transport, Browser and Arrangement;
 - **Production:** full production planning and execution;
@@ -222,6 +229,7 @@ Claude / Codex / Cursor / another local MCP client
                          ▼
                  LiveBrain (TypeScript)
                   ├─ Production Engine
+                  │    └─ Style Pack Registry (JSON)
                   ├─ Music Brain
                   ├─ Reference Brain
                   └─ Typed Ableton Adapter
@@ -249,12 +257,13 @@ Run without Ableton using the deterministic mock adapter:
 LIVEBRAIN_ADAPTER=mock npm run dev
 ```
 
-The current suite contains 40 automated tests covering the bridge contract, MIDI note compatibility, version alignment, deterministic generation, automatic multi-context resolution, A/B preference learning, reference-folder imports, locks, dry-run safety and resumable full-production execution.
+The current suite contains 52 automated tests covering the bridge contract, MIDI note compatibility, version alignment, deterministic generation, drum topologies, style-pack validation and routing, automatic multi-context resolution, A/B preference learning, reference-folder imports, locks, dry-run safety and resumable full-production execution.
 
 ## Documentation
 
 - [AI client setup](docs/CLIENTS.md)
 - [Production Engine](docs/PRODUCTION_ENGINE.md)
+- [Style Packs: install and author genres](docs/STYLE_PACKS.md)
 - [Comparison with controller-focused Ableton MCPs](docs/COMPARISON.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Ableton API](docs/ABLETON_API.md)

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1, "id": "electronic", "version": "1.0.0", "name": "Electronic & Club", "description": "General house, techno and electro production without assuming LiveBrain's underground reference library.",
+  "aliases": ["house", "techno", "electro", "dance", "club", "edm", "synthwave"], "genres": ["house", "techno", "electro", "electronic"], "priority": 1, "defaultGenre": "electronic", "defaultBars": 128, "clipBars": 16, "defaultRootNote": 2, "defaultMode": "Minor", "drumPattern": "four-on-floor",
+  "profile": {
+    "id": "electronic_core", "version": "1.0", "name": "Electronic Core", "tempo": { "min": 110, "max": 145, "preferred": 126 },
+    "rhythm": { "density": 0.52, "syncopation": 0.54, "swing": 0.08, "microtiming": 0.1, "repetition": 0.74, "mutationRate": 0.24, "silence": 0.34, "predictability": 0.52 },
+    "drums": { "kickWeight": 0.68, "hatDensity": 0.58, "ghostDensity": 0.22, "electroInfluence": 0.48 }, "bass": { "density": 0.44, "chromaticism": 0.24, "tonalStability": 0.64, "rests": 0.36, "register": [28, 48] },
+    "sequence": { "density": 0.42, "cycleSteps": 8, "chromaticism": 0.3, "chordProbability": 0.34, "rareEventProbability": 0.08, "register": [48, 82] },
+    "timbre": { "weirdness": 0.42, "brightness": 0.58, "rawness": 0.45, "digital": 0.68 }, "arrangement": { "evolutionRate": 0.34, "subtraction": 0.48, "cycleBars": [4, 8, 16, 32, 64] },
+    "mix": { "loudness": 0.66, "lowEnd": 0.66, "brightness": 0.58, "space": 0.48 }, "constraints": ["club-functional", "clear-low-end"], "negativeTraits": ["genre-caricature", "overfilled-arrangement"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["909 Core Kit", "Drum Rack", "Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.72, "pan": 0 } },
+    { "role": "bass", "name": "LB Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Drift", "Operator", "Analog", "Bass"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.66, "pan": 0 } },
+    { "role": "chords", "name": "LB Chords", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Drift", "Wavetable", "Electric"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": -0.1, "sends": [{ "sendIndex": 0, "value": 0.18 }] } },
+    { "role": "lead", "name": "LB Lead", "color": 10181046, "generator": "melody", "instrumentQueries": ["Wavetable", "Drift", "Operator"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": 0.1, "sends": [{ "sendIndex": 0, "value": 0.2 }] } },
+    { "role": "sequence", "name": "LB Sequence", "color": 16757575, "generator": "sequence", "instrumentQueries": ["Pluck", "Drift", "Operator"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.44, "pan": -0.15, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "texture", "name": "LB Texture", "color": 7108071, "generator": "texture", "instrumentQueries": ["Texture", "Atmosphere", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.38, "pan": 0.18, "sends": [{ "sendIndex": 0, "value": 0.3 }] } },
+    { "role": "fx", "name": "LB FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.36, "pan": 0.22, "sends": [{ "sendIndex": 0, "value": 0.34 }] } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 16, "activeRoles": ["sequence", "texture", "fx"], "energy": 0.24 }, { "name": "Groove", "bars": 16, "activeRoles": ["drums", "bass", "chords", "sequence"], "energy": 0.55 },
+    { "name": "Main A", "bars": 32, "activeRoles": ["drums", "bass", "chords", "lead", "sequence", "texture", "fx"], "energy": 0.8 }, { "name": "Break", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.34 },
+    { "name": "Main B", "bars": 32, "activeRoles": ["drums", "bass", "chords", "lead", "sequence", "texture", "fx"], "energy": 0.92 }, { "name": "Outro", "bars": 16, "activeRoles": ["drums", "bass", "sequence", "texture"], "energy": 0.3 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": true, "spectralAnalysisRequired": true }
+}

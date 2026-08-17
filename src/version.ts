@@ -1,1 +1,1 @@
-export const LIVEBRAIN_VERSION = "0.4.0";
+export const LIVEBRAIN_VERSION = "1.0.0";

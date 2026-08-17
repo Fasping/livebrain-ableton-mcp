@@ -1,10 +1,9 @@
 import type { ProductionBrief, ProductionGenre, ProductionSection, TrackRole } from "./types.js";
 import type { StyleProfile } from "../music-brain/style-profile.js";
 import type { ResolvedStyleComponent } from "../style/style-resolver.js";
+import type { StylePackResolution } from "../packs/types.js";
 
 const roots = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
-const allRoles: TrackRole[] = ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"];
-
 export interface CompileVibeOptions {
   bars?: number;
   seed?: number;
@@ -16,21 +15,24 @@ export interface CompileVibeOptions {
   styleComponents?: ResolvedStyleComponent[];
   styleExplanation?: string[];
   stylePersonalization?: ProductionBrief["style"]["personalization"];
+  packId?: string;
+  packResolution?: StylePackResolution;
 }
 
 export function compileVibe(prompt: string, options: CompileVibeOptions = {}): ProductionBrief {
   const text = prompt.toLowerCase();
-  const genre = detectGenre(text);
+  if (!options.packResolution) throw new Error("compileVibe requires a resolved style pack");
+  const pack = options.packResolution.pack;
+  const genre = detectGenre(text, pack.genres, pack.defaultGenre);
   const dark = has(text, "dark", "oscuro", "sinister", "amenaz", "teneb") || genre === "minimal" || genre === "techno";
   const dreamy = has(text, "dream", "soñ", "espacial", "atmos", "floating", "flotante");
   const energetic = has(text, "energy", "energ", "peak", "festival", "potente", "agresiv");
   const weird = has(text, "weird", "raro", "quirky", "alien", "extrañ") || has(text, "binh", "cabaret");
-  const bars = normalizeBars(options.bars ?? (genre === "pop" ? 112 : genre === "ambient" ? 96 : 128));
-  const defaults = genreDefaults(genre);
+  const bars = normalizeBars(options.bars ?? pack.defaultBars);
   const style = options.styleProfile;
-  const bpm = options.bpm ?? style?.tempo.preferred ?? defaults.bpm;
-  const rootNote = options.rootNote ?? (dark ? 2 : dreamy ? 7 : defaults.rootNote);
-  const mode = dark ? (genre === "minimal" ? "Dorian" : genre === "techno" ? "Phrygian" : "Minor") : dreamy ? "Lydian" : defaults.mode;
+  const bpm = options.bpm ?? style?.tempo.preferred ?? pack.profile.tempo.preferred;
+  const rootNote = options.rootNote ?? (dark ? 2 : dreamy ? 7 : pack.defaultRootNote);
+  const mode = dark ? (genre === "minimal" ? "Dorian" : genre === "techno" ? "Phrygian" : "Minor") : dreamy ? "Lydian" : pack.defaultMode;
   const traits = {
     darkness: dark ? .82 : genre === "lofi" ? .55 : .3,
     energy: energetic ? .85 : genre === "ambient" ? .2 : genre === "minimal" ? .58 : .65,
@@ -40,7 +42,8 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
   };
   return {
     title: titleFromPrompt(prompt), prompt, genre, bpm, rootNote, rootName: roots[rootNote]!, mode,
-    bars, clipBars: 16, seed: options.seed ?? 1, traits,
+    bars, clipBars: pack.clipBars, seed: options.seed ?? 1, traits,
+    pack: { id: pack.id, name: pack.name, version: pack.version, source: pack.source, selectionReason: options.packResolution.reason, matchedAliases: options.packResolution.matchedAliases },
     style: {
       id: style?.id ?? "generic",
       name: style?.name ?? `Generic ${genre}`,
@@ -50,50 +53,13 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
       explanation: [...(options.styleExplanation ?? [])],
       personalization: options.stylePersonalization ?? { applied: false, evidenceCount: 0, adjustments: [] },
     },
-    sections: buildSections(bars, genre),
-    mixTargets: { headroomDb: -6, sidechainRequested: ["minimal", "house", "techno"].includes(genre), spectralAnalysisRequired: true },
+    sections: sectionalize(bars, pack.sections.map((section) => [section.name, section.bars, section.activeRoles, section.energy])),
+    mixTargets: structuredClone(pack.mixTargets),
   };
 }
 
-function detectGenre(text: string): ProductionGenre {
-  if (has(text, "binh", "cabaret", "microhouse", "rominimal", "minimal")) return "minimal";
-  if (has(text, "trap", "808", "drill")) return "trap";
-  if (has(text, "lo-fi", "lofi", "chillhop", "boom bap")) return "lofi";
-  if (has(text, "ambient", "cinematic", "cinemat", "soundscape")) return "ambient";
-  if (has(text, "techno")) return "techno";
-  if (has(text, "pop", "coro", "chorus")) return "pop";
-  return "house";
-}
-
-function genreDefaults(genre: ProductionGenre) {
-  switch (genre) {
-    case "minimal": return { bpm: 130, rootNote: 2, mode: "Dorian" as const };
-    case "house": return { bpm: 125, rootNote: 9, mode: "Dorian" as const };
-    case "techno": return { bpm: 132, rootNote: 2, mode: "Phrygian" as const };
-    case "trap": return { bpm: 144, rootNote: 0, mode: "Minor" as const };
-    case "lofi": return { bpm: 82, rootNote: 9, mode: "Minor" as const };
-    case "pop": return { bpm: 116, rootNote: 0, mode: "Major" as const };
-    case "ambient": return { bpm: 76, rootNote: 7, mode: "Lydian" as const };
-  }
-}
-
-function buildSections(totalBars: number, genre: ProductionGenre): ProductionSection[] {
-  if (genre === "ambient") {
-    return sectionalize(totalBars, [
-      ["Emergence", 16, ["texture", "chords", "fx"], .2],
-      ["Expansion", 24, ["texture", "chords", "lead", "fx"], .45],
-      ["Pulse", 24, ["kick", "hats", "bass", "chords", "lead", "texture"], .65],
-      ["Dissolve", 16, ["chords", "texture", "fx"], .25],
-    ]);
-  }
-  return sectionalize(totalBars, [
-    ["Intro", 16, ["hats", "percussion", "texture", "fx"], .25],
-    ["Groove", 16, ["kick", "hats", "percussion", "bass", "chords"], .55],
-    ["Main A", 32, allRoles, .78],
-    ["Break", 16, ["chords", "lead", "texture", "fx"], .35],
-    ["Main B", 32, allRoles, .9],
-    ["Outro", 16, ["kick", "hats", "percussion", "bass", "texture"], .35],
-  ]);
+function detectGenre(text: string, genres: string[], fallback: string): ProductionGenre {
+  return [...genres].sort((a, b) => b.length - a.length).find((genre) => has(text, genre.toLowerCase())) ?? fallback;
 }
 
 function sectionalize(totalBars: number, template: Array<[string, number, TrackRole[], number]>): ProductionSection[] {

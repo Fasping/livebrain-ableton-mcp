@@ -26,3 +26,15 @@ test("drum generator preserves restrained four-on-the-floor kick", () => {
   assert.ok(kicks.length >= 12 && kicks.length <= 16);
   assert.ok(notes.every((note) => note.start >= 0 && note.velocity >= 1 && note.velocity <= 127));
 });
+
+test("drum patterns produce deterministic backbeat, half-time and broken topologies", () => {
+  const broken = generateDrumGroove(afterhours2019, { bars: 4, seed: 22, pattern: "broken" });
+  const backbeat = generateDrumGroove(afterhours2019, { bars: 4, seed: 22, pattern: "backbeat" });
+  const halfTime = generateDrumGroove(afterhours2019, { bars: 4, seed: 22, pattern: "half-time" });
+  assert.deepEqual(broken, generateDrumGroove(afterhours2019, { bars: 4, seed: 22, pattern: "broken" }));
+  assert.ok(broken.some((note) => note.pitch === 38));
+  assert.ok(backbeat.some((note) => note.pitch === 38));
+  assert.ok(halfTime.some((note) => note.pitch === 38));
+  assert.notDeepEqual(broken.filter((note) => note.pitch === 36), backbeat.filter((note) => note.pitch === 36));
+  assert.notDeepEqual(backbeat.filter((note) => note.pitch === 38), halfTime.filter((note) => note.pitch === 38));
+});
