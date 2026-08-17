@@ -13,6 +13,7 @@ import type {
   DeviceTarget,
   LiveDeviceSnapshot,
   LiveSetSnapshot,
+  MasterMeterSnapshot,
   MidiNote,
   ParameterTarget,
   SongSettingsInput,
@@ -85,6 +86,10 @@ export class PythonRemoteScriptAdapter implements AbletonAdapter {
     return this.bridge.request("track.mixer", { trackIndex, ...input, dryRun });
   }
 
+  getMasterMeter(): Promise<MasterMeterSnapshot> {
+    return this.bridge.request("master.meter");
+  }
+
   setTransport(action: TransportAction, dryRun = false): Promise<ChangeSummary> {
     return this.bridge.request("transport.set", { action, dryRun });
   }
@@ -114,6 +119,6 @@ export class PythonRemoteScriptAdapter implements AbletonAdapter {
   }
 
   async close(): Promise<void> {
-    // Connections are request-scoped in v0.1.1.
+    // Connections are request-scoped.
   }
 }
