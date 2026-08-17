@@ -14,15 +14,13 @@ export interface CuratedStyleContext {
   profile: StyleProfile;
 }
 
-function profile(id: string, name: string, changes: Partial<Omit<StyleProfile, "id" | "name">> & {
-  rhythm?: Partial<StyleProfile["rhythm"]>;
-  drums?: Partial<StyleProfile["drums"]>;
-  bass?: Partial<StyleProfile["bass"]>;
-  sequence?: Partial<StyleProfile["sequence"]>;
-  timbre?: Partial<StyleProfile["timbre"]>;
-  arrangement?: Partial<StyleProfile["arrangement"]>;
-  mix?: Partial<StyleProfile["mix"]>;
-}): StyleProfile {
+type ProfileSection = "tempo" | "rhythm" | "drums" | "bass" | "sequence" | "timbre" | "arrangement" | "mix";
+
+type CuratedProfileChanges = Partial<Omit<StyleProfile, "id" | "name" | ProfileSection>> & {
+  [Section in ProfileSection]?: Partial<StyleProfile[Section]>;
+};
+
+function profile(id: string, name: string, changes: CuratedProfileChanges): StyleProfile {
   return {
     ...structuredClone(afterhours2019), ...changes, id, name,
     tempo: { ...afterhours2019.tempo, ...changes.tempo },
