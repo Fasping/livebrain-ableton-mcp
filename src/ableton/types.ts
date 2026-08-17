@@ -42,9 +42,9 @@ export interface ClipSnapshot {
 export interface MixerSnapshot {
   volume: number;
   pan: number;
-  mute: boolean;
-  solo: boolean;
-  arm: boolean;
+  mute?: boolean;
+  solo?: boolean;
+  arm?: boolean;
   sends: number[];
 }
 
@@ -67,6 +67,16 @@ export interface LiveSetSnapshot {
   trackCount: number;
   returnCount: number;
   tracks: LiveTrackSnapshot[];
+  masterTrack?: LiveTrackSnapshot;
+  returnTracks?: LiveTrackSnapshot[];
+}
+
+export interface MasterMeterSnapshot {
+  leftLinear: number;
+  rightLinear: number;
+  leftDbfs: number | null;
+  rightDbfs: number | null;
+  peakDbfs: number | null;
 }
 
 export interface BridgeCapabilities {
