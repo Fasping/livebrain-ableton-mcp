@@ -1,4 +1,4 @@
-import { afterhours2019, clamp01, type StyleProfile } from "../music-brain/style-profile.js";
+import { generalStyleProfile as baselineStyle, clamp01, type StyleProfile } from "../music-brain/style-profile.js";
 import { influenceKeys, ratingKeys, type Distribution, type InfluenceKey, type RatingKey, type ReferenceProfile, type ReferenceTrack } from "./models.js";
 
 export function buildReferenceProfile(group: string, references: ReferenceTrack[]): ReferenceProfile {
@@ -35,36 +35,36 @@ export function buildReferenceProfile(group: string, references: ReferenceTrack[
 }
 
 function deriveStyleProfile(id: string, measured: ReferenceProfile["measured"], human: ReferenceProfile["human"]): StyleProfile {
-  const bpm = measured.bpm?.weightedMean ?? measured.bpm?.median ?? afterhours2019.tempo.preferred;
+  const bpm = measured.bpm?.weightedMean ?? measured.bpm?.median ?? baselineStyle.tempo.preferred;
   const rating01 = (key: RatingKey, fallback: number) => clamp01((human[key]?.weightedMean ?? human[key]?.median ?? fallback * 10) / 10);
   return {
-    ...structuredClone(afterhours2019), id, version: "reference-0.2", name: id.replaceAll("_", " "),
+    ...structuredClone(baselineStyle), id, version: "reference-0.2", name: id.replaceAll("_", " "),
     tempo: { min: Math.round(measured.bpm?.p25 ?? bpm - 4), max: Math.round(measured.bpm?.p75 ?? bpm + 4), preferred: Math.round(bpm) },
     rhythm: {
-      ...afterhours2019.rhythm,
+      ...baselineStyle.rhythm,
       density: clamp01((measured.onsetDensity?.weightedMean ?? 2.8) / 8),
-      syncopation: clamp01(measured.syncopation?.weightedMean ?? afterhours2019.rhythm.syncopation),
+      syncopation: clamp01(measured.syncopation?.weightedMean ?? baselineStyle.rhythm.syncopation),
       microtiming: clamp01((measured.microtimingStdMs?.weightedMean ?? 10) / 45),
-      repetition: clamp01(measured.repetition?.weightedMean ?? afterhours2019.rhythm.repetition),
-      mutationRate: clamp01(measured.longCycleVariation?.weightedMean ?? afterhours2019.rhythm.mutationRate),
-      silence: clamp01(measured.silenceRatio?.weightedMean ?? rating01("space", afterhours2019.rhythm.silence)),
-      predictability: rating01("predictability", afterhours2019.rhythm.predictability),
+      repetition: clamp01(measured.repetition?.weightedMean ?? baselineStyle.rhythm.repetition),
+      mutationRate: clamp01(measured.longCycleVariation?.weightedMean ?? baselineStyle.rhythm.mutationRate),
+      silence: clamp01(measured.silenceRatio?.weightedMean ?? rating01("space", baselineStyle.rhythm.silence)),
+      predictability: rating01("predictability", baselineStyle.rhythm.predictability),
     },
     drums: {
-      ...afterhours2019.drums,
+      ...baselineStyle.drums,
       hatDensity: clamp01((measured.onsetDensity?.weightedMean ?? 2.8) / 10),
       ghostDensity: clamp01(0.06 + rating01("drums", 0.5) * 0.22),
-      electroInfluence: rating01("electro", afterhours2019.drums.electroInfluence),
+      electroInfluence: rating01("electro", baselineStyle.drums.electroInfluence),
     },
     bass: {
-      ...afterhours2019.bass,
+      ...baselineStyle.bass,
       density: clamp01(0.12 + rating01("bass", 0.5) * 0.32 - rating01("space", 0.5) * 0.08),
-      rests: clamp01(measured.silenceRatio?.weightedMean ?? rating01("space", afterhours2019.bass.rests)),
+      rests: clamp01(measured.silenceRatio?.weightedMean ?? rating01("space", baselineStyle.bass.rests)),
       chromaticism: clamp01(0.15 + rating01("weirdness", 0.5) * 0.45),
       tonalStability: clamp01(0.72 - rating01("weirdness", 0.5) * 0.42),
     },
     sequence: {
-      ...afterhours2019.sequence,
+      ...baselineStyle.sequence,
       density: clamp01(.12 + rating01("synth", .5) * .22 - rating01("space", .5) * .08),
       cycleSteps: rating01("weirdness", .5) > .75 ? 11 : rating01("predictability", .5) < .35 ? 7 : 8,
       chromaticism: clamp01(.2 + rating01("weirdness", .5) * .55),
@@ -72,21 +72,21 @@ function deriveStyleProfile(id: string, measured: ReferenceProfile["measured"], 
       rareEventProbability: clamp01(.03 + rating01("weirdness", .5) * .1),
     },
     timbre: {
-      ...afterhours2019.timbre,
-      weirdness: rating01("weirdness", afterhours2019.timbre.weirdness),
+      ...baselineStyle.timbre,
+      weirdness: rating01("weirdness", baselineStyle.timbre.weirdness),
       brightness: clamp01(0.62 - rating01("darkness", 0.5) * 0.42),
-      rawness: rating01("rawness", afterhours2019.timbre.rawness),
+      rawness: rating01("rawness", baselineStyle.timbre.rawness),
       digital: clamp01(0.25 + rating01("electro", 0.5) * 0.5),
     },
     arrangement: {
-      ...afterhours2019.arrangement,
+      ...baselineStyle.arrangement,
       evolutionRate: clamp01(measured.longCycleVariation?.weightedMean ?? (1 - rating01("predictability", 0.5)) * 0.35),
-      subtraction: rating01("space", afterhours2019.arrangement.subtraction),
+      subtraction: rating01("space", baselineStyle.arrangement.subtraction),
     },
     mix: {
-      ...afterhours2019.mix,
+      ...baselineStyle.mix,
       brightness: clamp01(0.6 - rating01("darkness", 0.5) * 0.4),
-      space: rating01("space", afterhours2019.mix.space),
+      space: rating01("space", baselineStyle.mix.space),
       loudness: clamp01(0.62 - rating01("subtlety", 0.5) * 0.25),
     },
   };

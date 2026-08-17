@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1, "id": "underground-electronic", "version": "1.1.0", "name": "Underground Minimal & Electro", "description": "Sparse, record-led minimal, microhouse, acid and electro vocabulary based on LiveBrain's curated underground contexts.",
+  "aliases": ["afterhours", "after-hours", "cabaret", "time passages", "binh", "onur ozer", "minimal", "minimal electro", "leftfield minimal", "microhouse", "rominimal", "record-led", "spacey electro", "timeless", "francesco del garda", "del garda", "partout", "wicked bass", "wickedbass", "noizar", "noisar", "phonotheque", "montevideo", "z@p", "zap", "hoppetosse", "club der visionaere", "cdv", "my own jupiter", "nicolas lutz", "michelle", "sentimental stab", "yoyaku", "joule imprint", "slow life", "slowlife", "s moreira", "melliflow", "vera", "alexandra", "spacetravel", "pressure traxx", "pressuretraxx", "perlon", "get perlonized", "zip", "dimbiman", "seekers", "cartulis", "limousine dream", "gene on earth", "half baked"],
+  "genres": ["minimal house", "microhouse", "rominimal", "minimal electro"], "priority": 4, "defaultGenre": "minimal", "defaultBars": 128, "clipBars": 16, "defaultRootNote": 2, "defaultMode": "Dorian", "drumPattern": "four-on-floor",
+  "profileIds": ["afterhours_2019", "timeless_del_garda", "partout_city_series", "wicked_bass_noizar", "phonotheque_montevideo", "cdv_hoppetosse", "my_own_jupiter", "yoyaku_ecosystem", "slow_life_berlin", "melliflow", "pressure_traxx", "perlon", "seekers_barcelona", "cartulis_london", "limousine_dream", "half_baked_london"],
+  "profile": {
+    "id": "afterhours_2019", "version": "0.1", "name": "Afterhours 2019", "tempo": { "min": 126, "max": 134, "preferred": 130 },
+    "rhythm": { "density": 0.36, "syncopation": 0.78, "swing": 0.12, "microtiming": 0.22, "repetition": 0.82, "mutationRate": 0.24, "silence": 0.58, "predictability": 0.28 },
+    "drums": { "kickWeight": 0.42, "hatDensity": 0.33, "ghostDensity": 0.18, "electroInfluence": 0.35 }, "bass": { "density": 0.31, "chromaticism": 0.42, "tonalStability": 0.38, "rests": 0.55, "register": [28, 48] },
+    "sequence": { "density": 0.24, "cycleSteps": 7, "chromaticism": 0.58, "chordProbability": 0.12, "rareEventProbability": 0.08, "register": [48, 78] },
+    "timbre": { "weirdness": 0.85, "brightness": 0.38, "rawness": 0.62, "digital": 0.58 }, "arrangement": { "evolutionRate": 0.2, "subtraction": 0.72, "cycleBars": [2, 4, 8, 16, 32, 64] },
+    "mix": { "loudness": 0.48, "lowEnd": 0.62, "brightness": 0.35, "space": 0.72 }, "constraints": ["prefer-space", "mutation-over-novelty", "avoid-eight-bar-obligation"], "negativeTraits": ["generic-tech-house", "constant-rolling-bass", "edm-risers", "festival-rolls", "supersaws", "obvious-drops", "perfect-quantization", "overfilled-percussion"]
+  },
+  "tracks": [
+    { "role": "kick", "name": "LB Kick", "color": 16739125, "generator": "kick", "instrumentQueries": ["909 Core Kit", "Kick", "Kit", "Drum Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.72, "pan": 0 } },
+    { "role": "hats", "name": "LB Hats", "color": 16757575, "generator": "hats", "instrumentQueries": ["909 Core Kit", "Hihat", "Kit", "Drum Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.5, "pan": 0.14, "sends": [{ "sendIndex": 0, "value": 0.08 }] } },
+    { "role": "percussion", "name": "LB Percussion", "color": 16765286, "generator": "percussion", "instrumentQueries": ["909 Core Kit", "Percussion", "Kit", "Drum Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.54, "pan": -0.12, "sends": [{ "sendIndex": 0, "value": 0.12 }] } },
+    { "role": "bass", "name": "LB Bass", "color": 8115081, "generator": "bass", "instrumentQueries": ["Drift", "Operator", "Analog", "Simpler"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.66, "pan": 0 } },
+    { "role": "chords", "name": "LB Chords", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Drift", "Electric", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": -0.08, "sends": [{ "sendIndex": 0, "value": 0.2 }, { "sendIndex": 1, "value": 0.12 }] } },
+    { "role": "lead", "name": "LB Lead", "color": 10181046, "generator": "melody", "instrumentQueries": ["Drift", "Wavetable", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.5, "pan": 0.08, "sends": [{ "sendIndex": 0, "value": 0.24 }, { "sendIndex": 1, "value": 0.18 }] } },
+    { "role": "texture", "name": "LB Texture", "color": 7108071, "generator": "texture", "instrumentQueries": ["Atmosphere", "Texture", "Drift", "Instrument Rack", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.4, "pan": -0.2, "sends": [{ "sendIndex": 0, "value": 0.32 }, { "sendIndex": 1, "value": 0.2 }] } },
+    { "role": "fx", "name": "LB FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Drift", "Instrument Rack", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.38, "pan": 0.22, "sends": [{ "sendIndex": 0, "value": 0.38 }, { "sendIndex": 1, "value": 0.25 }] } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 16, "activeRoles": ["hats", "percussion", "texture", "fx"], "energy": 0.25 }, { "name": "Groove", "bars": 16, "activeRoles": ["kick", "hats", "percussion", "bass", "chords"], "energy": 0.55 },
+    { "name": "Main A", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"], "energy": 0.78 }, { "name": "Break", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.35 },
+    { "name": "Main B", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"], "energy": 0.9 }, { "name": "Outro", "bars": 16, "activeRoles": ["kick", "hats", "percussion", "bass", "texture"], "energy": 0.35 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": true, "spectralAnalysisRequired": true }
+}

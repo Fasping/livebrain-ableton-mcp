@@ -1,8 +1,8 @@
 {
   "name": "livebrain-mcp",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Ableton Live MCP server and deterministic AI music production engine for Claude, Codex, Cursor, and local MCP clients.",
+  "description": "Ableton Live MCP server with a deterministic, style-pack-driven AI music production engine for Claude, Codex, Cursor, and local MCP clients.",
   "keywords": [
     "ableton",
     "ableton-live",

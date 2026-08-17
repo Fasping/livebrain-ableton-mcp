@@ -7,7 +7,7 @@ import { generateSequence } from "../music-brain/sequence-generator.js";
 import { makeBassLessObvious } from "../music-brain/bass-less-obvious.js";
 import { evolveSection } from "../music-brain/section-evolution.js";
 import { makeLessObvious, mutateNotes } from "../music-brain/mutation-engine.js";
-import { afterhours2019 } from "../music-brain/style-profile.js";
+import { defaultStyleProfile } from "../music-brain/style-profile.js";
 import type { ReferenceService } from "../reference/reference-service.js";
 import { clipTargetSchema, dryRunSchema } from "./schemas.js";
 import { textResult } from "./helpers.js";
@@ -28,7 +28,7 @@ export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, r
     apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(),
     dryRun: dryRunSchema,
   }, async ({ bars, seed, profileId, bpm, traits, apply, trackIndex, slotIndex, dryRun }) => {
-    const base = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const base = profileId ? (await references.getProfile(profileId)).styleProfile : defaultStyleProfile;
     const profile = createEffectiveStyleProfile(base, { bpm, traits });
     const notes = generateDrumGroove(profile, { bars, seed });
     const generation = await feedback.record({ profileId: base.id, profileVersion: base.version, seed, parameters: { bars, bpm, traits, instrument: "drums" }, generatedFeatures: { noteCount: notes.length, bars } });
@@ -43,7 +43,7 @@ export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, r
     profileId: z.string().regex(/^[a-zA-Z0-9._-]+$/).optional(), bpm: z.number().min(40).max(300).optional(), traits: traitsSchema,
     apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(), dryRun: dryRunSchema,
   }, async ({ bars, seed, rootMidi, profileId, bpm, traits, apply, trackIndex, slotIndex, dryRun }) => {
-    const base = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const base = profileId ? (await references.getProfile(profileId)).styleProfile : defaultStyleProfile;
     const profile = createEffectiveStyleProfile(base, { bpm, traits });
     const notes = generateBass(profile, { bars, seed, rootMidi });
     const generation = await feedback.record({ profileId: base.id, profileVersion: base.version, seed, parameters: { bars, bpm, traits, instrument: "bass" }, generatedFeatures: { noteCount: notes.length, bars } });
@@ -59,7 +59,7 @@ export function registerMusicTools(server: McpServer, ableton: AbletonAdapter, r
     profileId: z.string().regex(/^[a-zA-Z0-9._-]+$/).optional(), bpm: z.number().min(40).max(300).optional(), traits: traitsSchema,
     apply: z.boolean().default(false), trackIndex: z.number().int().min(0).optional(), slotIndex: z.number().int().min(0).optional(), dryRun: dryRunSchema,
   }, async ({ bars, seed, rootMidi, kind, profileId, bpm, traits, apply, trackIndex, slotIndex, dryRun }) => {
-    const base = profileId ? (await references.getProfile(profileId)).styleProfile : afterhours2019;
+    const base = profileId ? (await references.getProfile(profileId)).styleProfile : defaultStyleProfile;
     const profile = createEffectiveStyleProfile(base, { bpm, traits });
     const notes = generateSequence(profile, { bars, seed, rootMidi, kind });
     const generation = await feedback.record({ profileId: base.id, profileVersion: base.version, seed, parameters: { bars, bpm, traits, kind }, generatedFeatures: { noteCount: notes.length, bars, kind } });

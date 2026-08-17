@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1, "id": "hip-hop", "version": "1.0.0", "name": "Hip-Hop & Rap", "description": "Beat-led hip-hop writing with drums, 808/bass, sample harmony, keys, lead and a MIDI vocal guide.",
+  "aliases": ["hip hop", "hip-hop", "rap", "trap", "drill", "boom bap", "808", "lofi", "lo-fi", "chillhop"], "genres": ["hip-hop", "rap", "trap", "boom bap"], "priority": 2, "defaultGenre": "hip-hop", "defaultBars": 96, "clipBars": 8, "defaultRootNote": 0, "defaultMode": "Minor", "drumPattern": "half-time",
+  "profile": {
+    "id": "hip_hop_core", "version": "1.0", "name": "Hip-Hop Core", "tempo": { "min": 70, "max": 160, "preferred": 92 },
+    "rhythm": { "density": 0.5, "syncopation": 0.7, "swing": 0.28, "microtiming": 0.2, "repetition": 0.76, "mutationRate": 0.2, "silence": 0.38, "predictability": 0.48 },
+    "drums": { "kickWeight": 0.72, "hatDensity": 0.56, "ghostDensity": 0.3, "electroInfluence": 0.22 }, "bass": { "density": 0.36, "chromaticism": 0.22, "tonalStability": 0.72, "rests": 0.46, "register": [24, 43] },
+    "sequence": { "density": 0.36, "cycleSteps": 8, "chromaticism": 0.22, "chordProbability": 0.38, "rareEventProbability": 0.1, "register": [48, 76] },
+    "timbre": { "weirdness": 0.4, "brightness": 0.38, "rawness": 0.62, "digital": 0.5 }, "arrangement": { "evolutionRate": 0.34, "subtraction": 0.5, "cycleBars": [4, 8, 16, 32] },
+    "mix": { "loudness": 0.68, "lowEnd": 0.78, "brightness": 0.42, "space": 0.38 }, "constraints": ["leave-room-for-vocals", "drums-lead"], "negativeTraits": ["busy-midrange", "constant-melody"]
+  },
+  "tracks": [
+    { "role": "drums", "name": "LB Drums", "color": 16739123, "generator": "drums", "instrumentQueries": ["Hip Hop", "Trap", "Drum Rack", "Kit"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.74, "pan": 0 } },
+    { "role": "808", "name": "LB 808", "color": 8115081, "generator": "bass", "pitchOffset": -12, "instrumentQueries": ["808", "Operator", "Drift", "Simpler"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.7, "pan": 0 } },
+    { "role": "sample", "name": "LB Sample", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Simpler", "Sampler", "Electric", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.48, "pan": -0.12, "sends": [{ "sendIndex": 0, "value": 0.12 }] } },
+    { "role": "keys", "name": "LB Keys", "color": 16757575, "generator": "harmony", "instrumentQueries": ["Piano", "Electric", "Drift"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.46, "pan": 0.12, "sends": [{ "sendIndex": 0, "value": 0.16 }] } },
+    { "role": "lead", "name": "LB Lead", "color": 10181046, "generator": "melody", "instrumentQueries": ["Drift", "Wavetable", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.46, "pan": 0.08, "sends": [{ "sendIndex": 0, "value": 0.18 }] } },
+    { "role": "vocal-guide", "name": "LB Vocal Guide", "color": 16765286, "generator": "melody", "pitchOffset": -12, "instrumentQueries": ["Piano", "Drift", "Instrument Rack"], "effectQueries": ["EQ Eight"], "mixer": { "volume": 0.36, "pan": 0 } }
+  ],
+  "sections": [
+    { "name": "Intro", "bars": 8, "activeRoles": ["sample", "keys"], "energy": 0.2 }, { "name": "Verse 1", "bars": 16, "activeRoles": ["drums", "808", "sample", "vocal-guide"], "energy": 0.58 },
+    { "name": "Hook", "bars": 8, "activeRoles": ["drums", "808", "sample", "keys", "lead", "vocal-guide"], "energy": 0.85 }, { "name": "Verse 2", "bars": 16, "activeRoles": ["drums", "808", "sample", "keys", "vocal-guide"], "energy": 0.65 },
+    { "name": "Hook 2", "bars": 8, "activeRoles": ["drums", "808", "sample", "keys", "lead", "vocal-guide"], "energy": 0.92 }, { "name": "Outro", "bars": 8, "activeRoles": ["sample", "keys", "lead"], "energy": 0.25 }
+  ],
+  "mixTargets": { "headroomDb": -6, "sidechainRequested": true, "spectralAnalysisRequired": true }
+}

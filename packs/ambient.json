@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1, "id": "ambient", "version": "1.0.0", "name": "Ambient & Cinematic", "description": "Slow evolving pads, texture, pulse, sparse melody and effects for ambient and cinematic work.",
+  "aliases": ["ambient", "cinematic", "soundscape", "atmospheric", "drone", "meditation", "paisaje sonoro"], "genres": ["ambient", "cinematic", "drone"], "priority": 2, "defaultGenre": "ambient", "defaultBars": 96, "clipBars": 16, "defaultRootNote": 7, "defaultMode": "Lydian", "drumPattern": "broken",
+  "profile": {
+    "id": "ambient_core", "version": "1.0", "name": "Ambient Core", "tempo": { "min": 45, "max": 100, "preferred": 72 },
+    "rhythm": { "density": 0.18, "syncopation": 0.18, "swing": 0.02, "microtiming": 0.12, "repetition": 0.62, "mutationRate": 0.3, "silence": 0.72, "predictability": 0.42 },
+    "drums": { "kickWeight": 0.12, "hatDensity": 0.08, "ghostDensity": 0.1, "electroInfluence": 0.18 }, "bass": { "density": 0.18, "chromaticism": 0.2, "tonalStability": 0.72, "rests": 0.7, "register": [28, 52] },
+    "sequence": { "density": 0.2, "cycleSteps": 12, "chromaticism": 0.28, "chordProbability": 0.52, "rareEventProbability": 0.16, "register": [48, 88] },
+    "timbre": { "weirdness": 0.55, "brightness": 0.45, "rawness": 0.2, "digital": 0.46 }, "arrangement": { "evolutionRate": 0.18, "subtraction": 0.72, "cycleBars": [8, 16, 32, 64] },
+    "mix": { "loudness": 0.3, "lowEnd": 0.38, "brightness": 0.44, "space": 0.92 }, "constraints": ["slow-evolution", "preserve-space", "avoid-obvious-cadences"], "negativeTraits": ["busy-drums", "hard-drops", "constant-density"]
+  },
+  "tracks": [
+    { "role": "pad", "name": "LB Pad", "color": 6139362, "generator": "harmony", "instrumentQueries": ["Pad", "Atmosphere", "Wavetable", "Drift"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.5, "pan": -0.12, "sends": [{ "sendIndex": 0, "value": 0.4 }] } },
+    { "role": "texture", "name": "LB Texture", "color": 7108071, "generator": "texture", "instrumentQueries": ["Texture", "Atmosphere", "Simpler", "Sampler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.42, "pan": 0.18, "sends": [{ "sendIndex": 0, "value": 0.48 }] } },
+    { "role": "pulse", "name": "LB Pulse", "color": 16757575, "generator": "sequence", "instrumentQueries": ["Pluck", "Drift", "Operator", "Instrument Rack"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.38, "pan": -0.08, "sends": [{ "sendIndex": 0, "value": 0.3 }] } },
+    { "role": "melody", "name": "LB Melody", "color": 10181046, "generator": "melody", "instrumentQueries": ["Bell", "Mallet", "Drift", "Wavetable"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.4, "pan": 0.1, "sends": [{ "sendIndex": 0, "value": 0.38 }] } },
+    { "role": "low-drone", "name": "LB Low Drone", "color": 8115081, "generator": "bass", "instrumentQueries": ["Drone", "Bass", "Drift", "Operator"], "effectQueries": ["EQ Eight", "Compressor"], "mixer": { "volume": 0.42, "pan": 0 } },
+    { "role": "fx", "name": "LB FX", "color": 10656254, "generator": "fx", "instrumentQueries": ["FX", "Noise", "Atmosphere", "Simpler"], "effectQueries": ["EQ Eight", "Reverb"], "mixer": { "volume": 0.34, "pan": 0.22, "sends": [{ "sendIndex": 0, "value": 0.52 }] } }
+  ],
+  "sections": [
+    { "name": "Emergence", "bars": 16, "activeRoles": ["pad", "texture", "fx"], "energy": 0.18 }, { "name": "Expansion", "bars": 24, "activeRoles": ["pad", "texture", "melody", "low-drone", "fx"], "energy": 0.42 },
+    { "name": "Pulse", "bars": 24, "activeRoles": ["pad", "texture", "pulse", "melody", "low-drone"], "energy": 0.62 }, { "name": "Dissolve", "bars": 16, "activeRoles": ["pad", "texture", "fx"], "energy": 0.2 }
+  ],
+  "mixTargets": { "headroomDb": -8, "sidechainRequested": false, "spectralAnalysisRequired": true }
+}

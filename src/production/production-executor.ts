@@ -144,19 +144,19 @@ async function configureRoleEffect(ableton: AbletonAdapter, trackIndex: number, 
     const settings: Array<{ pattern: RegExp; value: number | ((items: string[]) => number | undefined) }> = [];
     if (/compressor/i.test(effectName)) {
       settings.push(
-        { pattern: /^threshold$/i, value: track.role === "kick" ? .68 : .58 },
-        { pattern: /^ratio$/i, value: track.role === "kick" ? .2 : .3 },
-        { pattern: /^attack$/i, value: track.role === "kick" ? .12 : .22 },
+        { pattern: /^threshold$/i, value: track.generator === "kick" || track.generator === "drums" ? .68 : .58 },
+        { pattern: /^ratio$/i, value: track.generator === "kick" || track.generator === "drums" ? .2 : .3 },
+        { pattern: /^attack$/i, value: track.generator === "kick" || track.generator === "drums" ? .12 : .22 },
         { pattern: /^release$/i, value: .32 },
         { pattern: /dry.?wet/i, value: 1 },
       );
     }
     if (/eq eight/i.test(effectName)) {
-      const cutoffByRole = { kick: .05, hats: .42, percussion: .3, bass: .06, chords: .22, lead: .24, texture: .28, fx: .3 } as const;
+      const cutoffByGenerator = { kick: .05, hats: .42, percussion: .3, drums: .08, bass: .06, harmony: .22, melody: .24, sequence: .24, texture: .28, fx: .3 } as const;
       settings.push(
         { pattern: /^1 filter on/i, value: 1 },
         { pattern: /^1 filter type/i, value: (items) => quantizedItem(items, /low cut|high.?pass/i) },
-        { pattern: /^1 frequency/i, value: cutoffByRole[track.role] },
+        { pattern: /^1 frequency/i, value: cutoffByGenerator[track.generator] },
       );
     }
     for (const setting of settings) {

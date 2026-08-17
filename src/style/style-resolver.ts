@@ -1,8 +1,8 @@
-import { afterhours2019, type StyleProfile } from "../music-brain/style-profile.js";
+import { generalStyleProfile, type StyleProfile } from "../music-brain/style-profile.js";
 import { blendStyleProfiles } from "./profile-blender.js";
 import { matchCuratedStyleContexts } from "./curated-scenes.js";
 
-export type StyleComponentSource = "default" | "curated" | "reference-profile";
+export type StyleComponentSource = "default" | "pack" | "curated" | "reference-profile";
 
 export interface ResolvedStyleComponent {
   id: string;
@@ -49,9 +49,9 @@ export function resolveCuratedStyleMix(text: string): StyleResolution | undefine
 
 export function defaultStyleResolution(): StyleResolution {
   return {
-    profile: structuredClone(afterhours2019), source: "default", needsAudioAnalysis: false,
-    components: [{ id: afterhours2019.id, name: afterhours2019.name, source: "default", weight: 1, matchedAliases: [], needsAudioAnalysis: false, weightReason: "fallback default" }],
-    explanation: ["No named style context was detected; using the deterministic Afterhours 2019 default."],
+    profile: structuredClone(generalStyleProfile), source: "default", needsAudioAnalysis: false,
+    components: [{ id: generalStyleProfile.id, name: generalStyleProfile.name, source: "default", weight: 1, matchedAliases: [], needsAudioAnalysis: false, weightReason: "neutral fallback default" }],
+    explanation: ["No named style context was detected; using the neutral General Songwriting default."],
   };
 }
 

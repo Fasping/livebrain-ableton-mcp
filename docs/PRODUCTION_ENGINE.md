@@ -6,9 +6,9 @@ The Production Engine is the high-level layer that turns a musical request into 
 
 ### `music_plan_production`
 
-Pure planning. It compiles the prompt into tempo, key/mode, genre, musical traits, style provenance, sections, eight track roles, MIDI material, browser queries, mixer settings and Arrangement positions. It never changes Ableton.
+Pure planning. It resolves a style pack, then compiles the prompt into tempo, key/mode, genre, musical traits, style provenance, pack-defined track roles, MIDI material, browser queries, mixer settings and Arrangement positions. It never changes Ableton.
 
-Use optional `profileId` to select either a bundled underground context or a profile built from your own local references. Use `profileMix` for explicit weighted blends. Without either field, every recognized context in the prompt is resolved and blended automatically.
+Use optional `packId` to select instrumentation and arrangement explicitly. Use `profileId` to select either a bundled underground context or a profile built from your own local references, and `profileMix` for explicit weighted blends. Without these fields, the prompt selects a pack and any compatible named contexts are resolved automatically.
 
 `music_resolve_style` previews the normalized weights, matched aliases, provenance, final parameters and any learned personal adjustments without composing MIDI or changing Ableton.
 
@@ -57,7 +57,7 @@ Explicit blend example:
 
 An applied production returns a `generationId` for directional feedback and A/B comparisons.
 
-Run `music_list_style_profiles` to inspect bundled IDs, aliases, sources and analysis status. Curated profiles describe a musical direction; they do not claim to reproduce a specific artist or release.
+Run `music_list_style_packs` to inspect production vocabularies and `music_list_style_profiles` to inspect bundled underground references. Curated profiles describe a musical direction; they do not claim to reproduce a specific artist or release. See [Style Packs](STYLE_PACKS.md).
 
 ## Safety and honesty
 

@@ -25,6 +25,8 @@ Add this server to `claude_desktop_config.json` and restart Claude Desktop:
 
 If a GUI client cannot find Node installed through a version manager, replace `node` with the absolute output of `command -v node`.
 
+Personal style packs are discovered automatically in `~/.livebrain/packs`. To use a different directory, add `"LIVEBRAIN_PACK_DIR": "/absolute/path/to/packs"` to the same `env` object and restart the client.
+
 ## Codex
 
 Register the local stdio server from a terminal:
