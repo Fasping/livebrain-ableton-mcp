@@ -15,6 +15,7 @@ import type {
   LiveDeviceSnapshot,
   LiveSetSnapshot,
   LiveTrackSnapshot,
+  MasterMeterSnapshot,
   MidiNote,
   ParameterTarget,
   SongSettingsInput,
@@ -28,6 +29,11 @@ interface MockTrack extends Omit<LiveTrackSnapshot, "clips"> { clips: MockClip[]
 
 export class MockAbletonAdapter implements AbletonAdapter {
   private readonly tracks: MockTrack[] = [];
+  private readonly masterTrack: MockTrack = this.specialTrack(-1, "Master", "master");
+  private readonly returnTracks: MockTrack[] = [
+    this.specialTrack(200, "A-Reverb", "return"),
+    this.specialTrack(201, "B-Delay", "return"),
+  ];
   private readonly arrangement = new Map<number, ArrangementClipSnapshot[]>();
   private tempo = 130;
   private timeSignature = { numerator: 4, denominator: 4 };
@@ -47,14 +53,14 @@ export class MockAbletonAdapter implements AbletonAdapter {
   }
 
   async snapshot(mode: SnapshotMode = "compact"): Promise<LiveSetSnapshot> {
-    return {
+    const snapshot: LiveSetSnapshot = {
       mode,
       tempo: this.tempo,
       timeSignature: structuredClone(this.timeSignature),
       isPlaying: this.isPlaying,
       currentSongTime: 0,
       trackCount: this.tracks.length,
-      returnCount: 0,
+      returnCount: this.returnTracks.length,
       tracks: structuredClone(this.tracks).map(({ clips, ...track }) => ({
         ...track,
         clips: clips.map(({ notes, ...clip }) => ({
@@ -64,6 +70,11 @@ export class MockAbletonAdapter implements AbletonAdapter {
         })),
       })),
     };
+    if (mode === "detailed") {
+      snapshot.masterTrack = structuredClone(this.masterTrack);
+      snapshot.returnTracks = structuredClone(this.returnTracks);
+    }
+    return snapshot;
   }
 
   async createMidiTrack(input: CreateTrackInput & { dryRun?: boolean }): Promise<ChangeSummary> {
@@ -130,7 +141,7 @@ export class MockAbletonAdapter implements AbletonAdapter {
   }
 
   async getDevices(trackIndex: number): Promise<LiveDeviceSnapshot[]> {
-    return structuredClone(this.track(trackIndex).devices);
+    return structuredClone(this.resolveTrack(trackIndex).devices);
   }
 
   async getDeviceParameters(target: DeviceTarget): Promise<DeviceParameterSnapshot[]> {
@@ -158,7 +169,13 @@ export class MockAbletonAdapter implements AbletonAdapter {
   }
 
   async setTrackMixer(trackIndex: number, input: TrackMixerInput, dryRun = false): Promise<ChangeSummary> {
-    const track = this.track(trackIndex);
+    const track = this.resolveTrack(trackIndex);
+    if ((track.kind === "master" || track.kind === "return") && input.arm !== undefined) {
+      throw new Error("arm is not applicable to master/return tracks");
+    }
+    if (track.kind === "master" && input.mute !== undefined) throw new Error("mute is not applicable to master tracks");
+    if (track.kind === "master" && input.solo !== undefined) throw new Error("solo is not applicable to master tracks");
+    if (track.kind === "master" && input.sends?.length) throw new Error("sends are not applicable to master tracks");
     if (!dryRun) {
       if (input.volume !== undefined) track.mixer.volume = input.volume;
       if (input.pan !== undefined) track.mixer.pan = input.pan;
@@ -168,6 +185,10 @@ export class MockAbletonAdapter implements AbletonAdapter {
       for (const send of input.sends ?? []) track.mixer.sends[send.sendIndex] = send.value;
     }
     return this.summary("track.mixer", !dryRun, dryRun, { trackIndex }, structuredClone(input) as Record<string, unknown>);
+  }
+
+  async getMasterMeter(): Promise<MasterMeterSnapshot> {
+    return { leftLinear: 0, rightLinear: 0, leftDbfs: null, rightDbfs: null, peakDbfs: null };
   }
 
   async setTransport(action: TransportAction, dryRun = false): Promise<ChangeSummary> {
@@ -228,9 +249,23 @@ export class MockAbletonAdapter implements AbletonAdapter {
       volume: 0.85, pan: 0, mute: false, solo: false, arm: false, sends: [],
     }, devices: [], clips: [] };
   }
+  private specialTrack(index: number, name: string, kind: "master" | "return"): MockTrack {
+    return { index, name, kind, mixer: {
+      volume: 0.85, pan: 0, ...(kind === "return" ? { mute: false, solo: false } : {}), sends: [],
+    }, devices: [], clips: [] };
+  }
   private track(index: number) { const value = this.tracks[index]; if (!value) throw new Error("Track not found"); return value; }
+  private resolveTrack(index: number) {
+    if (index === -1) return this.masterTrack;
+    if (index >= 200) {
+      const value = this.returnTracks[index - 200];
+      if (!value) throw new Error("Return track not found");
+      return value;
+    }
+    return this.track(index);
+  }
   private clip(target: ClipTarget) { const value = this.track(target.trackIndex).clips.find((c) => c.slotIndex === target.slotIndex); if (!value) throw new Error("Clip not found"); return value; }
-  private device(target: DeviceTarget) { const value = this.track(target.trackIndex).devices[target.deviceIndex]; if (!value) throw new Error("Device not found"); return value; }
+  private device(target: DeviceTarget) { const value = this.resolveTrack(target.trackIndex).devices[target.deviceIndex]; if (!value) throw new Error("Device not found"); return value; }
   private mockParameters(name: string): DeviceParameterSnapshot[] {
     const parameter = (index: number, parameterName: string, normalizedValue = .5, valueItems?: string[]): DeviceParameterSnapshot => ({
       index, name: parameterName, value: normalizedValue, normalizedValue, min: 0, max: 1,
