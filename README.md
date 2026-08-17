@@ -202,9 +202,9 @@ These gaps are tracked in the [roadmap](docs/ROADMAP.md).
 
 ## MCP tools
 
-LiveBrain currently exposes 49 tools across these groups:
+LiveBrain currently exposes 52 tools across these groups:
 
-- **Ableton:** Live Set analysis, MIDI tracks/clips/notes, mixer, song settings, transport, Browser, devices and Arrangement;
+- **Ableton:** Live Set analysis, MIDI tracks/clips/notes, regular/Master/Return devices and mixer, Master output meter, song settings, transport, Browser and Arrangement;
 - **Production:** full production planning and execution;
 - **Music:** drums, bass, sequences, mutation and section evolution;
 - **References:** local audio analysis, ratings, influence and profile blending;
