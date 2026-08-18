@@ -1,60 +1,72 @@
-# LiveBrain Ableton MCP — AI Music Production for Ableton Live
+# LiveBrain Ableton MCP
 
-**Turn a musical idea into an editable, multi-track Ableton Live project with Claude, Codex, Cursor, or another MCP client.**
+<p align="center"><strong>Describe the track. Preview the plan. Build it in Ableton. Keep everything editable.</strong></p>
 
-[![GitHub stars](https://img.shields.io/github/stars/Fasping/livebrain-ableton-mcp?style=social)](https://github.com/Fasping/livebrain-ableton-mcp/stargazers)
-[![MIT License](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
-[![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-339933.svg?logo=node.js&logoColor=white)](package.json)
-[![Ableton Live 12](https://img.shields.io/badge/Ableton%20Live-12-111111.svg)](https://www.ableton.com/live/)
-[![MCP](https://img.shields.io/badge/Model%20Context%20Protocol-compatible-7c3aed.svg)](https://modelcontextprotocol.io/)
+<p align="center">
+  <a href="https://github.com/Fasping/livebrain-ableton-mcp/stargazers"><img src="https://img.shields.io/github/stars/Fasping/livebrain-ableton-mcp?style=social" alt="GitHub stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/Node.js-20%2B-339933.svg?logo=node.js&logoColor=white" alt="Node.js 20+"></a>
+  <a href="https://www.ableton.com/live/"><img src="https://img.shields.io/badge/Ableton%20Live-12-111111.svg" alt="Ableton Live 12"></a>
+  <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-compatible-7c3aed.svg" alt="MCP compatible"></a>
+</p>
 
-LiveBrain is an open-source Ableton Live MCP server **and** a deterministic music-production engine. It can inspect a Live Set, compose MIDI, load installed instruments and effects, build an Arrangement, create variations, and remember the musical characteristics you prefer.
+<p align="center">
+  <a href="#quick-start-on-macos">Quick start</a> ·
+  <a href="#from-prompt-to-project">See it work</a> ·
+  <a href="docs/STYLE_PACKS.md">Style packs</a> ·
+  <a href="docs/CLIENTS.md">AI clients</a> ·
+  <a href="docs/ROADMAP.md">Roadmap</a>
+</p>
 
-> LiveBrain 1.0 is a macOS-first release verified with Ableton Live 12 and Node.js 20. Save your Live Set before letting any AI client make large changes.
+LiveBrain is a local, open-source MCP server and deterministic music-production engine for Ableton Live. Claude, Codex, Cursor and other MCP clients can use it to inspect a Live Set, compose MIDI, load installed devices, arrange sections, shape a starting mix and revise the result through natural language.
 
-## What can it make?
+It builds a real Ableton project — separate tracks, clips, devices and Arrangement placements — rather than returning an opaque audio render.
 
-Ask for a vibe instead of manually describing every MIDI note. LiveBrain selects an installable style pack that defines the track roles, instruments, arrangement and mix starting point:
+| Local-first | Deterministic | Pack-driven | Previewable |
+| --- | --- | --- | --- |
+| Ableton communication stays on `127.0.0.1` | Same prompt + seed = same plan | 9 bundled styles, custom JSON packs supported | Important writes default to `dryRun` |
+
+> **LiveBrain 1.0** is macOS-first and verified with Ableton Live 12 and Node.js 20. Save your Live Set before applying large AI-generated changes.
+
+## From prompt to project
+
+Give your MCP client a production brief:
 
 ```text
-Create a raw 112-bar indie-rock song with a tense verse, a wide chorus,
-separate drums, bass and guitar parts, and an editable vocal-guide melody.
-Show me the plan first, then build it in Arrangement View.
+Plan a restrained 128-bar underground minimal/electro track at 130 BPM.
+Use sparse drums, an odd-cycle sequence, negative space and subtle evolution.
+Show me the plan and dry-run first, then build it in Arrangement View.
 ```
 
-The bundled packs currently cover general songwriting, electronic/club, underground minimal/electro, underground breaks/UK garage, hip-hop/rap, pop, R&B/neo-soul, rock/indie and ambient/cinematic work. Or name an underground context directly:
+LiveBrain turns that into:
 
 ```text
-Make a restrained 128-bar afterhours track with the off-kilter space of
-Timeless / Francesco Del Garda and a little Montevideo electro tension.
-Plan it first. Keep every section editable and avoid generic tech-house tropes.
+prompt
+  → style-pack and profile resolution
+  → tempo, key, traits and section plan
+  → independent MIDI parts and section variations
+  → installed Ableton instruments and effects
+  → mixer starting points and Arrangement placement
+  → editable Live Set + generation ID for feedback
 ```
 
-Several references are blended automatically and remain explainable:
+The production language is not fixed. The same engine can plan pop, R&B/neo-soul, hip-hop, rock, ambient, electronic, UK garage/breaks or a neutral custom workflow:
 
 ```text
-Make something between Timeless, Phonotheque and Perlon, with more Timeless
-than the others. Resolve the style first and show me the weights.
+Create a concise pop song with a quiet first verse, a clear pre-chorus,
+a memorable vocal-guide hook and a wider final chorus.
 ```
 
-LiveBrain can then:
+```text
+Build a raw indie-rock arrangement with separate drums, electric bass,
+rhythm guitar, lead guitar, keys and an editable vocal-guide melody.
+```
 
-- create a genre-appropriate set of independent, editable MIDI tracks;
-- generate deterministic drums, bass, harmony, melody, texture and FX material;
-- search your Ableton Browser and load devices that are actually installed;
-- set tempo, scale, mixer levels, panning, sends, EQ and compression starting points;
-- place sections in Arrangement View and resume an interrupted build without duplicating tracks;
-- mutate selected musical dimensions while preserving the parts you lock;
-- analyze local reference audio and build reusable style profiles.
-- resolve researched underground contexts including Timeless / Francesco Del Garda, Partout, Wicked Bass / Noizar, Phonotheque / Z@p and Club der Visionaere / Hoppetosse.
-- blend every recognized context in one prompt, report normalized weights and apply locally learned directional or A/B preferences.
-- load validated custom JSON packs from `~/.livebrain/packs/`, so personal or community genre knowledge stays outside the neutral core.
+Every result stays editable. Regenerate a section, lock the bass, reduce the melody, change the groove or resume an interrupted build without starting over.
 
-Everything remains editable in Ableton. LiveBrain does not render a mysterious finished audio file and hide the production decisions from you.
+## More than remote control
 
-## Why LiveBrain?
-
-Most Ableton MCP projects expose DAW controls and leave all musical reasoning to the chat model. LiveBrain keeps the control layer, then adds a reusable production brain above it.
+Many Ableton integrations expose DAW commands and leave every musical decision to the current chat. LiveBrain keeps that control layer, then adds a reusable, tested production brain above it.
 
 | Capability | Generic Ableton controller | LiveBrain |
 | --- | ---: | ---: |
@@ -68,7 +80,25 @@ Most Ableton MCP projects expose DAW controls and leave all musical reasoning to
 | Persistent locks and structured feedback | No | Built in |
 | Same seed produces the same musical plan | No guarantee | Yes |
 
-LiveBrain is **not yet the widest Ableton control surface**. Mature controller-focused projects still cover operations such as scenes, audio tracks, automation envelopes, routing and undo/redo more completely. See the honest [comparison and gap analysis](docs/COMPARISON.md).
+LiveBrain prioritizes repeatable musical decisions and full-production workflows. It is **not yet the widest Ableton control surface**: controller-focused projects still cover scenes, audio tracks, automation, routing and undo/redo more completely. See the honest [comparison and gap analysis](docs/COMPARISON.md).
+
+## Style packs, not genre bias
+
+The core is neutral. A validated JSON pack supplies genre vocabulary, track roles, Browser queries, arrangement shape, mix intent and drum topology.
+
+| Pack | Production direction | Drum topology |
+| --- | --- | --- |
+| `general` | neutral songwriting fallback | backbeat |
+| `electronic` | house, techno and general club music | four-on-floor |
+| `underground-electronic` | sparse minimal, microhouse and electro | four-on-floor |
+| `underground-breaks` | breakbeat, 2-step and UK garage | broken |
+| `hip-hop` | rap, trap, drill and boom-bap starting points | half-time |
+| `pop` | verse / pre-chorus / chorus songwriting | backbeat |
+| `rnb-soul` | R&B, neo-soul and slow-jam writing | half-time |
+| `rock` | indie, alternative, punk and guitar-led arrangements | backbeat |
+| `ambient` | pads, drones, cinematic texture and sparse pulse | broken |
+
+Install personal or community packs in `~/.livebrain/packs/`; no TypeScript fork is required. LiveBrain validates every pack before loading it and reports invalid files instead of executing arbitrary code. See [Style Packs](docs/STYLE_PACKS.md).
 
 ## Quick start on macOS
 
