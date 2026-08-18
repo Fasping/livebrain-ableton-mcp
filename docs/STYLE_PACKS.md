@@ -13,6 +13,8 @@ LiveBrain's core does not assume that every user makes underground electronic mu
 
 The built-in packs are `general`, `electronic`, `underground-electronic`, `underground-breaks`, `hip-hop`, `pop`, `rnb-soul`, `rock` and `ambient`. `general` is the neutral fallback. The underground catalogue and its researched label/scene profiles remain available, but they no longer bias unrelated prompts.
 
+Packs may also define prompt-selectable `variants`. A variant can override profile dimensions, drum topology, sections, instrument queries, mixer values and synthesis recipes while leaving the base pack reusable. Pass `variantId` for an exact choice or omit it for automatic alias matching. The bundled underground variants and their evidence are documented in the [Underground Vibe Atlas](UNDERGROUND_VIBE_ATLAS.md).
+
 Packs can choose `four-on-floor`, `broken`, `backbeat` or `half-time` drum topology. This prevents a rock, R&B or UK-garage request from receiving the same kick grid with different device names.
 
 ## Use a pack

@@ -1,7 +1,233 @@
 {
-  "schemaVersion": 1, "id": "underground-electronic", "version": "1.1.0", "name": "Underground Minimal & Electro", "description": "Sparse, record-led minimal, microhouse, acid and electro vocabulary based on LiveBrain's curated underground contexts.",
-  "aliases": ["afterhours", "after-hours", "cabaret", "time passages", "binh", "onur ozer", "minimal", "minimal electro", "leftfield minimal", "microhouse", "rominimal", "record-led", "spacey electro", "timeless", "francesco del garda", "del garda", "partout", "wicked bass", "wickedbass", "noizar", "noisar", "phonotheque", "montevideo", "z@p", "zap", "hoppetosse", "club der visionaere", "cdv", "my own jupiter", "nicolas lutz", "michelle", "sentimental stab", "yoyaku", "joule imprint", "slow life", "slowlife", "s moreira", "melliflow", "vera", "alexandra", "spacetravel", "pressure traxx", "pressuretraxx", "perlon", "get perlonized", "zip", "dimbiman", "seekers", "cartulis", "limousine dream", "gene on earth", "half baked"],
+  "schemaVersion": 1, "id": "underground-electronic", "version": "1.2.0", "name": "Underground Minimal & Electro", "description": "Sparse, record-led minimal, microhouse, acid and electro vocabulary with research-informed, independently selectable underground variations.",
+  "aliases": ["afterhours", "after-hours", "cabaret", "time passages", "binh", "onur ozer", "onur özer", "denial", "treatment", "dc salas", "dj salas", "evan baggs", "ekbox", "katsuya sano", "eris", "dojo zone", "oshana", "innershades", "minimal", "minimal electro", "leftfield minimal", "microhouse", "rominimal", "record-led", "spacey electro", "timeless", "francesco del garda", "del garda", "partout", "uhf", "nico etorena", "wicked bass", "wickedbass", "noizar", "noisar", "phonotheque", "montevideo", "z@p", "zap", "omar", "hoppetosse", "club der visionaere", "cdv", "my own jupiter", "nicolas lutz", "nicolas luts", "michelle", "sentimental stab", "yoyaku", "joule imprint", "slow life", "slowlife", "s moreira", "melliflow", "vera", "alexandra", "spacetravel", "pressure traxx", "pressuretraxx", "perlon", "get perlonized", "zip", "dimbiman", "seekers", "cartulis", "limousine dream", "gene on earth", "half baked"],
   "genres": ["minimal house", "microhouse", "rominimal", "minimal electro"], "priority": 4, "defaultGenre": "minimal", "defaultBars": 128, "clipBars": 16, "defaultRootNote": 2, "defaultMode": "Dorian", "drumPattern": "four-on-floor",
+  "variants": [
+    {
+      "id": "afterhours-mutant", "name": "Afterhours Mutant Techno", "description": "Low-slung, hypnotic techno/electro with nervous bleeps, wandering bass and restrained late-night mutation.",
+      "aliases": ["afterhours", "time passages", "binh", "onur ozer", "onur özer", "denial", "akmar", "treatment", "dc salas", "dj salas", "paranoid electro", "late night jam"], "priority": 3,
+      "defaultRootNote": 2, "defaultMode": "Phrygian", "drumPattern": "four-on-floor",
+      "profileOverride": {
+        "tempo": { "min": 128, "max": 134, "preferred": 131 },
+        "rhythm": { "density": 0.38, "syncopation": 0.84, "swing": 0.15, "microtiming": 0.25, "repetition": 0.86, "mutationRate": 0.29, "silence": 0.57, "predictability": 0.2 },
+        "drums": { "kickWeight": 0.5, "hatDensity": 0.34, "ghostDensity": 0.25, "electroInfluence": 0.66 },
+        "bass": { "density": 0.34, "chromaticism": 0.61, "tonalStability": 0.27, "rests": 0.54 },
+        "sequence": { "density": 0.28, "cycleSteps": 7, "chromaticism": 0.76, "chordProbability": 0.1, "rareEventProbability": 0.14 },
+        "timbre": { "weirdness": 0.88, "brightness": 0.35, "rawness": 0.73, "digital": 0.66 },
+        "arrangement": { "evolutionRate": 0.23, "subtraction": 0.76, "cycleBars": [2, 4, 8, 16, 32] },
+        "mix": { "loudness": 0.5, "lowEnd": 0.72, "brightness": 0.31, "space": 0.7 },
+        "constraints": ["one-stable-rhythm-with-rotating-melodic-leads", "minor-key-808-tension", "rare-events-not-drops"],
+        "negativeTraits": ["bright-commercial-tech-house", "constant-big-room-builds"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Operator", "Drift", "Analog", "Simpler"], "synthesis": { "architecture": "mono subtractive or FM hybrid", "oscillator": "sine/square fundamental with a quiet detuned upper partial", "filter": "low-pass with medium resonance and slow cutoff drift", "modulation": ["7-step pitch motif", "very small random velocity and timing changes"], "processing": ["light saturation", "mono below 120 Hz", "short sidechain release"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.28, "purpose": "keep the bass dark" }, { "namePatterns": ["resonance", "res"], "normalizedValue": 0.46, "purpose": "add a nagging metallic edge" }] } },
+        { "role": "lead", "instrumentQueries": ["Operator", "Drift", "Wavetable", "Instrument Rack"], "synthesis": { "architecture": "FM bleep voice", "oscillator": "short sine carrier with inharmonic modulation", "filter": "band-pass or low-pass, slightly resonant", "modulation": ["sample-and-hold pitch accent", "occasional octave displacement"], "processing": ["short dark delay", "small room reverb", "bit reduction in parallel"], "parameterHints": [{ "namePatterns": ["decay"], "normalizedValue": 0.18, "purpose": "make compact bleeps" }, { "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.48, "purpose": "leave room for the rhythm" }] } }
+      ],
+      "sections": [
+        { "name": "Signal", "bars": 16, "activeRoles": ["hats", "percussion", "texture", "fx"], "energy": 0.22 },
+        { "name": "Low-Slung Groove", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass"], "energy": 0.58 },
+        { "name": "Bleep Exchange", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "texture"], "energy": 0.76 },
+        { "name": "False Floor", "bars": 16, "activeRoles": ["bass", "chords", "lead", "fx"], "energy": 0.34 },
+        { "name": "Machine Return", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"], "energy": 0.9 },
+        { "name": "Dissolve", "bars": 16, "activeRoles": ["kick", "hats", "bass", "texture"], "energy": 0.32 }
+      ],
+      "reviewVocabulary": ["low-slung", "paranoid", "loopy and funky", "machine-like but tender", "late-night improvisation", "hypnotic without losing energy"],
+      "productionPractices": ["Keep one rhythm stable while melodies trade focus.", "Use minor or Phrygian color, short bleeps and a wandering chromatic bass.", "Let 808/909-derived drums swing; avoid perfectly stacked sixteenth notes.", "Create tension with mute/unmute, feedback and filter movement rather than festival risers."]
+    },
+    {
+      "id": "cabaret-eerie-machine", "name": "Cabaret Eerie Machine Funk", "description": "Razor-edged electro/minimal with elastic bass, beautiful-but-unsettling pads and distinct machine-funk hooks.",
+      "aliases": ["cabaret", "cabaret recordings", "evan baggs", "ekbox", "katsuya sano", "eris", "eerie machine", "panoramic electro"], "priority": 2,
+      "defaultRootNote": 9, "defaultMode": "Dorian", "drumPattern": "broken",
+      "profileOverride": {
+        "tempo": { "min": 127, "max": 134, "preferred": 130 },
+        "rhythm": { "density": 0.43, "syncopation": 0.88, "swing": 0.13, "microtiming": 0.19, "repetition": 0.78, "mutationRate": 0.31, "silence": 0.49, "predictability": 0.18 },
+        "drums": { "kickWeight": 0.46, "hatDensity": 0.39, "ghostDensity": 0.3, "electroInfluence": 0.84 },
+        "bass": { "density": 0.39, "chromaticism": 0.56, "tonalStability": 0.33, "rests": 0.47 },
+        "sequence": { "density": 0.32, "cycleSteps": 8, "chromaticism": 0.69, "chordProbability": 0.15, "rareEventProbability": 0.12 },
+        "timbre": { "weirdness": 0.87, "brightness": 0.49, "rawness": 0.69, "digital": 0.72 },
+        "arrangement": { "evolutionRate": 0.3, "subtraction": 0.61, "cycleBars": [2, 4, 8, 16, 32] },
+        "mix": { "loudness": 0.53, "lowEnd": 0.68, "brightness": 0.44, "space": 0.66 },
+        "constraints": ["eerie-pad-under-playful-hook", "each-section-new-machine-world", "elastic-bass-anchor"],
+        "negativeTraits": ["one-note-rolling-bass", "sterile-preset-electro"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Analog", "Drift", "Operator", "Wavetable"], "synthesis": { "architecture": "elastic mono analog voice", "oscillator": "square/saw blend with subtle pitch envelope", "filter": "resonant 24 dB low-pass", "modulation": ["short envelope to pitch and cutoff", "occasional acid glide"], "processing": ["soft clipping", "short chorus above the sub range"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.34, "purpose": "warm elastic bass" }, { "namePatterns": ["resonance", "res"], "normalizedValue": 0.58, "purpose": "rubbery Cabaret-like contour" }] } },
+        { "role": "chords", "instrumentQueries": ["Drift", "Analog", "Wavetable", "Instrument Rack"], "synthesis": { "architecture": "detuned poly pad", "oscillator": "two soft saws or wavetable partials", "filter": "dark low-pass with slow envelope", "modulation": ["very slow pitch drift", "uneven envelope lengths"], "processing": ["wide chorus", "dark plate reverb", "high-pass below 180 Hz"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.39, "purpose": "keep beauty under an eerie surface" }, { "namePatterns": ["attack"], "normalizedValue": 0.42, "purpose": "make the pad bloom behind the hook" }] } }
+      ],
+      "sections": [
+        { "name": "Panorama", "bars": 16, "activeRoles": ["texture", "fx", "hats"], "energy": 0.2 },
+        { "name": "Elastic Entry", "bars": 16, "activeRoles": ["kick", "hats", "percussion", "bass"], "energy": 0.6 },
+        { "name": "Rubber Hook", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "chords"], "energy": 0.8 },
+        { "name": "Unsettled Beauty", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.38 },
+        { "name": "Acid Swerve", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "texture", "fx"], "energy": 0.92 },
+        { "name": "Low-Key Exit", "bars": 16, "activeRoles": ["hats", "bass", "chords", "texture"], "energy": 0.3 }
+      ],
+      "reviewVocabulary": ["razor-sharp", "panoramic electro", "noisy and tripped-out", "rubbery charm", "unsettling and beautiful", "distinct machine worlds"],
+      "productionPractices": ["Pair a warm elastic bass with one memorable squeaky or laser-like motif.", "Place an ambiguous pad beneath the hook: consonant voicing, detuned or filtered surface.", "Use 808 cowbell or metallic percussion sparingly as punctuation.", "Change rhythmic language between straight techno, short breaks and bouncing acid while preserving the bass identity."]
+    },
+    {
+      "id": "montevideo-cosmic-swing", "name": "Montevideo Cosmic Swing", "description": "Bass-loaded Uruguayan electro, acid and breaks with melancholy hooks, playful swing and apocalyptic atmosphere.",
+      "aliases": ["nicolas lutz", "nicolas luts", "my own jupiter", "omar", "omar uy", "z@p", "zap", "phonotheque", "montevideo", "uruguayan", "cosmic swing"], "priority": 3,
+      "defaultRootNote": 7, "defaultMode": "Dorian", "drumPattern": "broken",
+      "profileOverride": {
+        "tempo": { "min": 126, "max": 134, "preferred": 130 },
+        "rhythm": { "density": 0.39, "syncopation": 0.9, "swing": 0.2, "microtiming": 0.27, "repetition": 0.84, "mutationRate": 0.27, "silence": 0.55, "predictability": 0.16 },
+        "drums": { "kickWeight": 0.5, "hatDensity": 0.35, "ghostDensity": 0.31, "electroInfluence": 0.82 },
+        "bass": { "density": 0.38, "chromaticism": 0.67, "tonalStability": 0.25, "rests": 0.5 },
+        "sequence": { "density": 0.29, "cycleSteps": 7, "chromaticism": 0.78, "chordProbability": 0.11, "rareEventProbability": 0.17 },
+        "timbre": { "weirdness": 0.92, "brightness": 0.37, "rawness": 0.75, "digital": 0.7 },
+        "arrangement": { "evolutionRate": 0.24, "subtraction": 0.73, "cycleBars": [2, 4, 8, 16, 32, 64] },
+        "mix": { "loudness": 0.49, "lowEnd": 0.76, "brightness": 0.32, "space": 0.74 },
+        "constraints": ["bass-loaded-not-maximal", "melancholy-simple-motif", "genre-contrast-with-coherent-groove"],
+        "negativeTraits": ["single-genre-purity", "predictable-eight-bar-drop"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Operator", "Analog", "Drift", "Simpler"], "synthesis": { "architecture": "mono acid/electro hybrid", "oscillator": "square or triangle sub plus a restrained saw edge", "filter": "resonant low-pass with accent-like envelope", "modulation": ["chromatic 7-step motif", "glide only on rare transitions"], "processing": ["analog saturation", "tight mono low end", "short room for upper harmonics"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.31, "purpose": "deep loaded low end" }, { "namePatterns": ["resonance", "res"], "normalizedValue": 0.54, "purpose": "acid contour without losing sub" }] } },
+        { "role": "lead", "instrumentQueries": ["Operator", "Drift", "Wavetable", "Instrument Rack"], "synthesis": { "architecture": "hollow electro poly/mono voice", "oscillator": "pulse or FM pair with hollow midrange", "filter": "band-pass with slow random movement", "modulation": ["off-grid accent", "one rare note outside the core mode"], "processing": ["tape-like delay", "small spring or plate", "gentle bit texture"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.45, "purpose": "hollow melodic tone" }, { "namePatterns": ["decay"], "normalizedValue": 0.27, "purpose": "concise melancholy hook" }] } }
+      ],
+      "sections": [
+        { "name": "Transmission", "bars": 16, "activeRoles": ["percussion", "texture", "fx"], "energy": 0.2 },
+        { "name": "Bass Message", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass"], "energy": 0.62 },
+        { "name": "Cosmic Breaks", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "fx"], "energy": 0.78 },
+        { "name": "Melancholy Orbit", "bars": 16, "activeRoles": ["bass", "chords", "lead", "texture"], "energy": 0.4 },
+        { "name": "Apocalyptic Funk", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"], "energy": 0.91 },
+        { "name": "Postcard Home", "bars": 16, "activeRoles": ["hats", "bass", "lead", "texture"], "energy": 0.3 }
+      ],
+      "reviewVocabulary": ["bass-loaded", "apocalyptic undertone", "eerie melody", "cosmic", "punchy and colorful", "rhythmically dynamic with restraint"],
+      "productionPractices": ["Blend electro, acid, techno and breaks instead of enforcing a single genre.", "Build trance from a simple melancholy melody and the exact texture around it.", "Use swing and rimshot placement to make the groove feel knotty but easy.", "Keep low end powerful and deep while leaving negative space above it."]
+    },
+    {
+      "id": "partout-shadow-electro", "name": "Partout Shadow Electro", "description": "Dark, crisp electro and progressive techno with regional variation, hypnotic rhythm and compact counterpoint.",
+      "aliases": ["partout", "partout records", "uhf", "nico etorena", "overthink", "la danse des ombres", "shadow electro", "dark electro"], "priority": 3,
+      "defaultRootNote": 4, "defaultMode": "Phrygian", "drumPattern": "broken",
+      "profileOverride": {
+        "tempo": { "min": 128, "max": 136, "preferred": 132 },
+        "rhythm": { "density": 0.45, "syncopation": 0.82, "swing": 0.11, "microtiming": 0.16, "repetition": 0.76, "mutationRate": 0.3, "silence": 0.46, "predictability": 0.22 },
+        "drums": { "kickWeight": 0.55, "hatDensity": 0.44, "ghostDensity": 0.26, "electroInfluence": 0.88 },
+        "bass": { "density": 0.42, "chromaticism": 0.58, "tonalStability": 0.31, "rests": 0.43 },
+        "sequence": { "density": 0.34, "cycleSteps": 8, "chromaticism": 0.66, "chordProbability": 0.18, "rareEventProbability": 0.1 },
+        "timbre": { "weirdness": 0.76, "brightness": 0.5, "rawness": 0.68, "digital": 0.75 },
+        "arrangement": { "evolutionRate": 0.29, "subtraction": 0.58, "cycleBars": [2, 4, 8, 16, 32] },
+        "mix": { "loudness": 0.57, "lowEnd": 0.73, "brightness": 0.46, "space": 0.57 },
+        "constraints": ["compact-counterpoint", "deep-texture-hypnotic-rhythm", "dark-electro-floor-function"],
+        "negativeTraits": ["washy-ambient-without-groove", "overlong-breakdown"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Wavetable", "Operator", "Drift", "Analog"], "synthesis": { "architecture": "sync or FM electro bass", "oscillator": "hard sync saw/pulse with clean sub", "filter": "fast envelope into resonant low-pass", "modulation": ["sync amount on alternate phrases", "detuned passing tones"], "processing": ["controlled drive", "short gated room", "mono low band"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.36, "purpose": "crisp but weighty bass" }, { "namePatterns": ["resonance", "res"], "normalizedValue": 0.5, "purpose": "defined electro bite" }] } },
+        { "role": "chords", "instrumentQueries": ["Wavetable", "Operator", "Drift", "Instrument Rack"], "synthesis": { "architecture": "two-line counterpoint voice", "oscillator": "crystalline digital partials over a muted analog body", "filter": "high-pass plus light low-pass movement", "modulation": ["call-and-response rhythm", "interlocking minor arpeggio"], "processing": ["short stereo delay", "subtle chorus"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.52, "purpose": "retain crystalline upper detail" }] } }
+      ],
+      "reviewVocabulary": ["dark electro", "deep textures", "hypnotic rhythms", "introspective energy", "crisp syncopation", "compact hooks"],
+      "productionPractices": ["Write two short independent lines that answer each other instead of one long melody.", "Anchor the track with robust toms or a broken 808/909 pattern.", "Use a crystalline lead against a darker bass and atmosphere.", "Keep transitions compact and floor-functional; introduce variation through counterpoint and drum fills."]
+    },
+    {
+      "id": "spacetravel-elastic-microfunk", "name": "Elastic Microfunk", "description": "Highly swung machine funk with chromatic chatter, odd sequencing, performed modulation and deliberate analog imperfection.",
+      "aliases": ["spacetravel", "melliflow", "elastic microfunk", "microfunk", "highly swung", "odd sequencing"], "priority": 3,
+      "defaultRootNote": 10, "defaultMode": "Dorian", "drumPattern": "four-on-floor",
+      "profileOverride": {
+        "tempo": { "min": 126, "max": 133, "preferred": 129 },
+        "rhythm": { "density": 0.34, "syncopation": 0.89, "swing": 0.29, "microtiming": 0.35, "repetition": 0.82, "mutationRate": 0.25, "silence": 0.63, "predictability": 0.15 },
+        "drums": { "kickWeight": 0.39, "hatDensity": 0.31, "ghostDensity": 0.27, "electroInfluence": 0.49 },
+        "bass": { "density": 0.3, "chromaticism": 0.64, "tonalStability": 0.29, "rests": 0.61 },
+        "sequence": { "density": 0.25, "cycleSteps": 7, "chromaticism": 0.82, "chordProbability": 0.09, "rareEventProbability": 0.16 },
+        "timbre": { "weirdness": 0.94, "brightness": 0.43, "rawness": 0.61, "digital": 0.67 },
+        "arrangement": { "evolutionRate": 0.28, "subtraction": 0.81, "cycleBars": [2, 4, 8, 16, 32] },
+        "mix": { "loudness": 0.42, "lowEnd": 0.6, "brightness": 0.38, "space": 0.82 },
+        "constraints": ["swing-selected-sixteenths-not-global-smear", "performed-fills-and-modulations", "recognizable-patches-used-strangely"],
+        "negativeTraits": ["hard-grid-quantization", "continuous-dense-sequence"]
+      },
+      "trackOverrides": [
+        { "role": "lead", "instrumentQueries": ["Operator", "Drift", "Wavetable", "Analog"], "synthesis": { "architecture": "familiar patch with unfamiliar sequence", "oscillator": "plain pulse, sine FM or muted saw", "filter": "LFO-modulated band/low-pass", "modulation": ["7-step chromatic cycle", "live-feeling LFO depth changes", "rare fill or octave jump"], "processing": ["short feedback delay", "subtle pitch instability"], "parameterHints": [{ "namePatterns": ["lfo amount", "lfo amt"], "normalizedValue": 0.34, "purpose": "polyrhythmic filter movement" }, { "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.47, "purpose": "chattering midrange" }] } },
+        { "role": "texture", "instrumentQueries": ["Noise", "Atmosphere", "Drift", "Simpler"], "synthesis": { "architecture": "noise/pad movement layer", "oscillator": "white noise and buoyant filtered partials", "filter": "slow random low-pass", "modulation": ["LFO at a non-synchronised rate", "manual-feeling send changes"], "processing": ["wide dark reverb", "feedback delay below self-oscillation", "high-pass"], "parameterHints": [{ "namePatterns": ["lfo amount", "lfo amt"], "normalizedValue": 0.29, "purpose": "subtle asynchronous motion" }] } }
+      ],
+      "reviewVocabulary": ["tumbling fluidity", "chattering chromatic melody", "machine-performed flaws", "polyrhythmic movement", "quirky and funky", "recognisable sounds made strange"],
+      "productionPractices": ["Delay selected off-sixteenths rather than applying maximum global swing.", "Use 7-step or other odd-length motifs against a four-beat bar.", "Record filter, LFO and send moves as if performing the machine in real time.", "Let familiar patches become strange through contrasting timbres and unusual sequencing."]
+    },
+    {
+      "id": "dojo-emotional-electro", "name": "Emotional 808 Drift", "description": "Airy, emotional electro with floaty pads, edgy synths, alien vocal color and a softer listening-to-club arc.",
+      "aliases": ["dojo zone", "in a heartbeat", "emotional electro", "floaty 808", "alien vocoder", "airy electro"], "priority": 3,
+      "defaultRootNote": 5, "defaultMode": "Dorian", "drumPattern": "broken",
+      "profileOverride": {
+        "tempo": { "min": 123, "max": 132, "preferred": 127 },
+        "rhythm": { "density": 0.36, "syncopation": 0.75, "swing": 0.16, "microtiming": 0.2, "repetition": 0.78, "mutationRate": 0.23, "silence": 0.57, "predictability": 0.31 },
+        "drums": { "kickWeight": 0.41, "hatDensity": 0.34, "ghostDensity": 0.21, "electroInfluence": 0.78 },
+        "bass": { "density": 0.32, "chromaticism": 0.46, "tonalStability": 0.43, "rests": 0.56 },
+        "sequence": { "density": 0.3, "cycleSteps": 8, "chromaticism": 0.52, "chordProbability": 0.24, "rareEventProbability": 0.1 },
+        "timbre": { "weirdness": 0.74, "brightness": 0.52, "rawness": 0.55, "digital": 0.65 },
+        "arrangement": { "evolutionRate": 0.26, "subtraction": 0.64, "cycleBars": [4, 8, 16, 32] },
+        "mix": { "loudness": 0.44, "lowEnd": 0.61, "brightness": 0.46, "space": 0.86 },
+        "constraints": ["emotional-harmony-over-electro-rhythm", "ambient-to-club-arc", "one-edgy-synth-against-soft-pad"],
+        "negativeTraits": ["aggressive-industrial-wall", "dry-monophonic-arrangement"]
+      },
+      "trackOverrides": [
+        { "role": "chords", "instrumentQueries": ["Drift", "Wavetable", "Analog", "Instrument Rack"], "synthesis": { "architecture": "wide emotional pad", "oscillator": "soft detuned saw/triangle blend", "filter": "gentle low-pass with long envelope", "modulation": ["slow pitch drift", "subtle velocity-to-filter"], "processing": ["chorus", "long dark reverb", "low-mid cleanup"], "parameterHints": [{ "namePatterns": ["attack"], "normalizedValue": 0.48, "purpose": "slow pad bloom" }, { "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.44, "purpose": "soft emotional harmonic bed" }] } },
+        { "role": "lead", "instrumentQueries": ["Vocoder", "Wavetable", "Operator", "Drift"], "synthesis": { "architecture": "edgy alien lead or vocoder-like formant voice", "oscillator": "narrow pulse or formant wavetable", "filter": "band-pass with animated center", "modulation": ["slow formant movement", "sparse call-and-response"], "processing": ["stereo delay", "small bright reverb", "gentle saturation"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.57, "purpose": "present but not harsh alien lead" }, { "namePatterns": ["decay"], "normalizedValue": 0.35, "purpose": "let phrases breathe" }] } }
+      ],
+      "sections": [
+        { "name": "Sea Air", "bars": 16, "activeRoles": ["chords", "texture", "fx"], "energy": 0.16 },
+        { "name": "808 Motion", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "chords"], "energy": 0.55 },
+        { "name": "Alien Conversation", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead"], "energy": 0.72 },
+        { "name": "Weightless", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.28 },
+        { "name": "Pulse Elevator", "bars": 32, "activeRoles": ["kick", "hats", "percussion", "bass", "chords", "lead", "texture"], "energy": 0.84 },
+        { "name": "Breeze", "bars": 16, "activeRoles": ["hats", "chords", "texture", "fx"], "energy": 0.22 }
+      ],
+      "reviewVocabulary": ["floaty 808", "ambient pads", "edgy synths", "alien vocal color", "emotional harmony", "easy-listening and club-capable"],
+      "productionPractices": ["Start with pads and electro rhythm, then reveal the stronger 909-like club pulse late.", "Contrast one edgy or formant-like lead with broad emotional harmony.", "Use robust toms or detuned bass only when the arrangement needs weight.", "Keep the mix spacious and avoid filling every gap with percussion."]
+    },
+    {
+      "id": "timeless-digger-house", "name": "Timeless Digger House", "description": "Patient, off-kilter house with forgotten garage/electro color, sparse bass and record-like oddball detail.",
+      "aliases": ["timeless", "francesco del garda", "del garda", "digger house", "off-kilter house", "forgotten garage", "record-led"], "priority": 3,
+      "defaultRootNote": 0, "defaultMode": "Dorian", "drumPattern": "four-on-floor",
+      "profileOverride": {
+        "tempo": { "min": 126, "max": 132, "preferred": 129 },
+        "rhythm": { "density": 0.33, "syncopation": 0.86, "swing": 0.21, "microtiming": 0.3, "repetition": 0.86, "mutationRate": 0.22, "silence": 0.65, "predictability": 0.2 },
+        "drums": { "kickWeight": 0.39, "hatDensity": 0.3, "ghostDensity": 0.27, "electroInfluence": 0.5 },
+        "bass": { "density": 0.28, "chromaticism": 0.53, "tonalStability": 0.34, "rests": 0.63 },
+        "sequence": { "density": 0.22, "cycleSteps": 7, "chromaticism": 0.68, "chordProbability": 0.11, "rareEventProbability": 0.13 },
+        "timbre": { "weirdness": 0.84, "brightness": 0.41, "rawness": 0.53, "digital": 0.57 },
+        "arrangement": { "evolutionRate": 0.17, "subtraction": 0.84, "cycleBars": [4, 8, 16, 32, 64] },
+        "mix": { "loudness": 0.43, "lowEnd": 0.59, "brightness": 0.37, "space": 0.81 },
+        "constraints": ["dj-functional-negative-space", "one-oddball-detail-per-cycle", "garage-inflection-without-genre-costume"],
+        "negativeTraits": ["obvious-mainstage-hook", "busy-constant-bass"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Simpler", "Operator", "Drift", "Analog"], "synthesis": { "architecture": "short sampled or subtractive bass", "oscillator": "rounded fundamental with one dry upper harmonic", "filter": "low-pass with minimal envelope movement", "modulation": ["rare chromatic pickup", "velocity-led accents"], "processing": ["light console saturation", "mono low band", "little or no reverb"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.3, "purpose": "restrained record-like low end" }] } },
+        { "role": "lead", "instrumentQueries": ["Operator", "Drift", "Electric", "Wavetable"], "synthesis": { "architecture": "small oddball pluck or bleep", "oscillator": "FM sine pair, muted pulse or sampled fragment", "filter": "narrow band-pass", "modulation": ["odd-cycle timing", "one delayed answer note"], "processing": ["quiet short delay", "room ambience", "high-pass"], "parameterHints": [{ "namePatterns": ["decay"], "normalizedValue": 0.2, "purpose": "keep detail compact" }] } }
+      ],
+      "sections": [
+        { "name": "Long Blend In", "bars": 24, "activeRoles": ["hats", "percussion", "texture"], "energy": 0.2 },
+        { "name": "Pocket", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass"], "energy": 0.54 },
+        { "name": "Odd Detail", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "chords"], "energy": 0.7 },
+        { "name": "Air", "bars": 16, "activeRoles": ["chords", "lead", "texture", "fx"], "energy": 0.26 },
+        { "name": "Second Record", "bars": 24, "activeRoles": ["kick", "hats", "percussion", "bass", "lead", "texture"], "energy": 0.78 },
+        { "name": "Mix Out", "bars": 16, "activeRoles": ["kick", "hats", "bass", "texture"], "energy": 0.3 }
+      ],
+      "reviewVocabulary": ["record-led", "off-kilter", "spacey electro", "forgotten garage inflection", "restrained", "DJ-functional"],
+      "productionPractices": ["Leave enough room for a DJ blend and make every added event justify itself.", "Use a small odd-cycle bleep or sampled fragment instead of a dominant lead.", "Let garage or electro syncopation appear as an inflection, not a genre template.", "Develop the track through long blends and tiny timbral mutations."]
+    },
+    {
+      "id": "raw-analog-juno", "name": "Raw Analog Juno House", "description": "Rugged analog house/electro built from raw drum patterns, saturated transients, hypnotic acid and timeless poly-synth harmony.",
+      "aliases": ["oshana", "innershades", "juno", "raw analog", "raw drum pattern", "electribe", "emx-1", "hypnotic acid"], "priority": 3,
+      "defaultRootNote": 9, "defaultMode": "Dorian", "drumPattern": "four-on-floor",
+      "profileOverride": {
+        "tempo": { "min": 127, "max": 133, "preferred": 129 },
+        "rhythm": { "density": 0.42, "syncopation": 0.78, "swing": 0.17, "microtiming": 0.22, "repetition": 0.82, "mutationRate": 0.25, "silence": 0.51, "predictability": 0.27 },
+        "drums": { "kickWeight": 0.55, "hatDensity": 0.4, "ghostDensity": 0.27, "electroInfluence": 0.6 },
+        "bass": { "density": 0.37, "chromaticism": 0.48, "tonalStability": 0.39, "rests": 0.48 },
+        "sequence": { "density": 0.29, "cycleSteps": 8, "chromaticism": 0.55, "chordProbability": 0.22, "rareEventProbability": 0.1 },
+        "timbre": { "weirdness": 0.7, "brightness": 0.46, "rawness": 0.84, "digital": 0.38 },
+        "arrangement": { "evolutionRate": 0.25, "subtraction": 0.62, "cycleBars": [2, 4, 8, 16, 32] },
+        "mix": { "loudness": 0.56, "lowEnd": 0.72, "brightness": 0.42, "space": 0.62 },
+        "constraints": ["raw-drums-careful-mixdown", "saturation-for-character-not-loudness", "timeless-poly-harmony"],
+        "negativeTraits": ["overcompressed-master", "plastic-clean-transients"]
+      },
+      "trackOverrides": [
+        { "role": "bass", "instrumentQueries": ["Analog", "Drift", "Operator", "Wavetable"], "synthesis": { "architecture": "accented analog acid bass", "oscillator": "saw/square with solid sub", "filter": "resonant low-pass driven before compression", "modulation": ["accent envelope", "occasional slide", "slow cutoff performance"], "processing": ["soft saturation", "gentle sidechain", "mono sub"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.35, "purpose": "hypnotic acid body" }, { "namePatterns": ["resonance", "res"], "normalizedValue": 0.6, "purpose": "analog acid character" }] } },
+        { "role": "chords", "instrumentQueries": ["Analog", "Drift", "Wavetable", "Instrument Rack"], "synthesis": { "architecture": "Juno-like poly synth", "oscillator": "single saw/pulse plus sub", "filter": "warm low-pass with medium envelope", "modulation": ["slow chorus movement", "velocity-to-envelope"], "processing": ["wide chorus", "tape saturation", "short plate"], "parameterHints": [{ "namePatterns": ["filter freq", "frequency"], "normalizedValue": 0.43, "purpose": "warm poly-synth chord" }, { "namePatterns": ["attack"], "normalizedValue": 0.26, "purpose": "soft but rhythmic chord onset" }] } }
+      ],
+      "reviewVocabulary": ["raw drum patterns", "rugged analog character", "impactful mixdown", "huge kick", "skittering percussion", "timeless melody"],
+      "productionPractices": ["Start from a raw drum-machine pattern and improve impact through sound choice before compression.", "Use saturation to reveal analog character, not to erase transient shape.", "Pair a resonant acid bass with restrained Juno-like chords or melody.", "Keep the mixdown deliberate: large kick, separated mono bass and lightly skittering upper percussion."]
+    }
+  ],
   "profileIds": ["afterhours_2019", "timeless_del_garda", "partout_city_series", "wicked_bass_noizar", "phonotheque_montevideo", "cdv_hoppetosse", "my_own_jupiter", "yoyaku_ecosystem", "slow_life_berlin", "melliflow", "pressure_traxx", "perlon", "seekers_barcelona", "cartulis_london", "limousine_dream", "half_baked_london"],
   "profile": {
     "id": "afterhours_2019", "version": "0.1", "name": "Afterhours 2019", "tempo": { "min": 126, "max": 134, "preferred": 130 },

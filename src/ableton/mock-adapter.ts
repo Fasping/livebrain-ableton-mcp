@@ -275,6 +275,9 @@ export class MockAbletonAdapter implements AbletonAdapter {
     if (name === "EQ Eight") return [
       parameter(0, "1 Filter On A", 0), parameter(1, "1 Filter Type A", 0, ["Low Cut 48", "Low Cut 12", "Bell", "High Shelf"]), parameter(2, "1 Frequency A"),
     ];
+    if (name === "Drift") return [
+      parameter(0, "Filter Freq"), parameter(1, "Resonance"), parameter(2, "Attack"), parameter(3, "Decay"), parameter(4, "LFO Amount"),
+    ];
     return [];
   }
   private summary(operation: string, changed: boolean, dryRun: boolean, target: Record<string, number | string>, details?: Record<string, unknown>): ChangeSummary {

@@ -90,7 +90,7 @@ The core is neutral. A validated JSON pack supplies genre vocabulary, track role
 | --- | --- | --- |
 | `general` | neutral songwriting fallback | backbeat |
 | `electronic` | house, techno and general club music | four-on-floor |
-| `underground-electronic` | sparse minimal, microhouse and electro | four-on-floor |
+| `underground-electronic` | eight research-informed minimal/electro variations | four-on-floor or broken |
 | `underground-breaks` | breakbeat, 2-step and UK garage | broken |
 | `hip-hop` | rap, trap, drill and boom-bap starting points | half-time |
 | `pop` | verse / pre-chorus / chorus songwriting | backbeat |
@@ -197,6 +197,7 @@ The bundled scene profiles are transparent curation hypotheses, not fake audio m
 
 - neutral vibe compiler with automatic or explicit style-pack selection;
 - nine bundled packs: general, electronic, underground minimal/electro, underground breaks/UK garage, hip-hop, pop, R&B/neo-soul, rock and ambient;
+- automatic or explicit pack variants that change groove, synthesis recipes, arrangement and mix behavior;
 - distinct four-on-floor, broken, backbeat and half-time drum topologies;
 - versioned JSON pack schema for custom genres, track roles, browser queries, arrangements and mix defaults;
 - structured 64–512 bar arrangements;
@@ -294,6 +295,7 @@ The current suite contains 52 automated tests covering the bridge contract, MIDI
 - [AI client setup](docs/CLIENTS.md)
 - [Production Engine](docs/PRODUCTION_ENGINE.md)
 - [Style Packs: install and author genres](docs/STYLE_PACKS.md)
+- [Underground Vibe Atlas: variants, production translations and sources](docs/UNDERGROUND_VIBE_ATLAS.md)
 - [Comparison with controller-focused Ableton MCPs](docs/COMPARISON.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Ableton API](docs/ABLETON_API.md)

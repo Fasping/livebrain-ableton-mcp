@@ -56,6 +56,38 @@ test("pack selection changes track roles, structure and default profile", () => 
   assert.ok(rap.brief.sections.some((section) => section.name === "Hook"));
 });
 
+test("underground prompts select explainable variants with distinct musical topology", () => {
+  const registry = new StylePackRegistry();
+  const cases = [
+    ["Binh Time Passages late-night jam", "afterhours-mutant"],
+    ["EKBOX on Cabaret, eerie but beautiful", "cabaret-eerie-machine"],
+    ["Nicolas Lutz and Z@P Montevideo swing", "montevideo-cosmic-swing"],
+    ["Partout UHF dark electro", "partout-shadow-electro"],
+    ["Spacetravel elastic microfunk", "spacetravel-elastic-microfunk"],
+    ["Dojo Zone floaty emotional electro", "dojo-emotional-electro"],
+    ["Francesco Del Garda Timeless digger house", "timeless-digger-house"],
+    ["Oshana raw analog Juno groove", "raw-analog-juno"],
+  ] as const;
+  for (const [prompt, expected] of cases) {
+    const resolution = registry.resolve(prompt);
+    assert.equal(resolution.pack.id, "underground-electronic");
+    assert.equal(resolution.variant?.id, expected);
+    assert.ok(resolution.matchedVariantAliases.length > 0);
+  }
+
+  const cabaret = planProduction(cases[1][0], { seed: 9 });
+  const spacetravel = planProduction(cases[4][0], { seed: 9 });
+  assert.equal(cabaret.brief.pack.variant?.id, "cabaret-eerie-machine");
+  assert.equal(spacetravel.brief.pack.variant?.id, "spacetravel-elastic-microfunk");
+  assert.notEqual(cabaret.brief.traits.swing, spacetravel.brief.traits.swing);
+  assert.notDeepEqual(
+    cabaret.tracks.find((track) => track.role === "kick")!.notes,
+    spacetravel.tracks.find((track) => track.role === "kick")!.notes,
+  );
+  assert.ok(cabaret.tracks.find((track) => track.role === "bass")!.synthesis?.parameterHints?.length);
+  assert.ok(spacetravel.brief.pack.variant!.productionPractices.some((practice) => practice.includes("7-step")));
+});
+
 test("a user JSON pack can be installed without changing LiveBrain source", async (context) => {
   const directory = await mkdtemp(join(tmpdir(), "livebrain-packs-"));
   context.after(() => rm(directory, { recursive: true, force: true }));

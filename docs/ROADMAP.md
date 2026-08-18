@@ -41,6 +41,7 @@
 - [x] Nine bundled packs spanning general, electronic, underground, breaks/UKG, hip-hop, pop, R&B, rock and ambient
 - [x] Four-on-floor, broken, backbeat and half-time drum topologies
 - [x] Pack-aware track roles, arrangement sections, browser queries and mix defaults
+- [x] Prompt-selectable underground variants with sourced vocabulary, synthesis recipes and compatible device parameter hints
 
 ## Mixing and routing
 
