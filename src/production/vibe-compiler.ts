@@ -2,6 +2,7 @@ import type { ProductionBrief, ProductionGenre, ProductionSection, TrackRole } f
 import type { StyleProfile } from "../music-brain/style-profile.js";
 import type { ResolvedStyleComponent } from "../style/style-resolver.js";
 import type { StylePackResolution } from "../packs/types.js";
+import { resolveVariantSections } from "../packs/variant.js";
 
 const roots = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export interface CompileVibeOptions {
@@ -23,6 +24,7 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
   const text = prompt.toLowerCase();
   if (!options.packResolution) throw new Error("compileVibe requires a resolved style pack");
   const pack = options.packResolution.pack;
+  const variant = options.packResolution.variant;
   const genre = detectGenre(text, pack.genres, pack.defaultGenre);
   const dark = has(text, "dark", "oscuro", "sinister", "amenaz", "teneb") || genre === "minimal" || genre === "techno";
   const dreamy = has(text, "dream", "soñ", "espacial", "atmos", "floating", "flotante");
@@ -31,8 +33,8 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
   const bars = normalizeBars(options.bars ?? pack.defaultBars);
   const style = options.styleProfile;
   const bpm = options.bpm ?? style?.tempo.preferred ?? pack.profile.tempo.preferred;
-  const rootNote = options.rootNote ?? (dark ? 2 : dreamy ? 7 : pack.defaultRootNote);
-  const mode = dark ? (genre === "minimal" ? "Dorian" : genre === "techno" ? "Phrygian" : "Minor") : dreamy ? "Lydian" : pack.defaultMode;
+  const rootNote = options.rootNote ?? variant?.defaultRootNote ?? (dark ? 2 : dreamy ? 7 : pack.defaultRootNote);
+  const mode = variant?.defaultMode ?? (dark ? (genre === "minimal" ? "Dorian" : genre === "techno" ? "Phrygian" : "Minor") : dreamy ? "Lydian" : pack.defaultMode);
   const traits = {
     darkness: dark ? .82 : genre === "lofi" ? .55 : .3,
     energy: energetic ? .85 : genre === "ambient" ? .2 : genre === "minimal" ? .58 : .65,
@@ -42,8 +44,17 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
   };
   return {
     title: titleFromPrompt(prompt), prompt, genre, bpm, rootNote, rootName: roots[rootNote]!, mode,
-    bars, clipBars: pack.clipBars, seed: options.seed ?? 1, traits,
-    pack: { id: pack.id, name: pack.name, version: pack.version, source: pack.source, selectionReason: options.packResolution.reason, matchedAliases: options.packResolution.matchedAliases },
+    bars, clipBars: variant?.clipBars ?? pack.clipBars, seed: options.seed ?? 1, traits,
+    pack: {
+      id: pack.id, name: pack.name, version: pack.version, source: pack.source,
+      selectionReason: options.packResolution.reason, matchedAliases: options.packResolution.matchedAliases,
+      variant: variant ? {
+        id: variant.id, name: variant.name, description: variant.description,
+        selectionReason: options.packResolution.variantReason ?? "selected pack variant",
+        matchedAliases: options.packResolution.matchedVariantAliases,
+        reviewVocabulary: [...variant.reviewVocabulary], productionPractices: [...variant.productionPractices],
+      } : undefined,
+    },
     style: {
       id: style?.id ?? "generic",
       name: style?.name ?? `Generic ${genre}`,
@@ -53,7 +64,7 @@ export function compileVibe(prompt: string, options: CompileVibeOptions = {}): P
       explanation: [...(options.styleExplanation ?? [])],
       personalization: options.stylePersonalization ?? { applied: false, evidenceCount: 0, adjustments: [] },
     },
-    sections: sectionalize(bars, pack.sections.map((section) => [section.name, section.bars, section.activeRoles, section.energy])),
+    sections: sectionalize(bars, resolveVariantSections(options.packResolution).map((section) => [section.name, section.bars, section.activeRoles, section.energy])),
     mixTargets: structuredClone(pack.mixTargets),
   };
 }

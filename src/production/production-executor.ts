@@ -45,6 +45,7 @@ export async function executeProduction(ableton: AbletonAdapter, plan: Productio
       const loaded = await loadFirstAvailable(ableton, trackIndex, track, track.instrumentQueries, ["instruments", "sounds", "drums"], browserCache, result);
       if (loaded) knownDeviceNames.add(loaded.toLowerCase());
     }
+    if (track.synthesis?.parameterHints?.length) await configureTrackSynthesis(ableton, trackIndex, track, result);
 
     for (const clip of track.clips) {
       const existingClip = existing?.clips.find((candidate) => candidate.slotIndex === clip.slotIndex);
@@ -99,6 +100,24 @@ export async function executeProduction(ableton: AbletonAdapter, plan: Productio
     result.warnings.push(`Arrangement view could not be opened: ${message(error)}`);
   }
   return result;
+}
+
+async function configureTrackSynthesis(ableton: AbletonAdapter, trackIndex: number, track: ProductionTrackPlan, result: ProductionExecutionResult) {
+  try {
+    const device = (await ableton.getDevices(trackIndex))[0];
+    if (!device) return;
+    const parameters = await ableton.getDeviceParameters({ trackIndex, deviceIndex: device.index });
+    for (const hint of track.synthesis?.parameterHints ?? []) {
+      const patterns = hint.namePatterns.map((pattern) => pattern.toLowerCase());
+      const parameter = parameters.find((candidate) => patterns.some((pattern) => candidate.name.toLowerCase().includes(pattern)));
+      if (!parameter) continue;
+      result.changes.push(await ableton.setDeviceParameter(
+        { trackIndex, deviceIndex: device.index, parameterIndex: parameter.index }, hint.normalizedValue, false,
+      ));
+    }
+  } catch (error) {
+    result.warnings.push(`Synthesis recipe could not be applied on ${track.name}: ${message(error)}`);
+  }
 }
 
 async function loadFirstAvailable(

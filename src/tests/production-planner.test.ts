@@ -14,8 +14,8 @@ test("Binh/Cabaret language compiles into a complete deterministic minimal produ
   assert.equal(first.brief.style.id, "afterhours_2019");
   assert.equal(first.brief.style.source, "curated");
   assert.equal(first.brief.style.components[0]?.id, "afterhours_2019");
-  assert.equal(first.brief.bpm, 130);
-  assert.equal(first.brief.mode, "Dorian");
+  assert.equal(first.brief.bpm, 131);
+  assert.equal(first.brief.mode, "Phrygian");
   assert.equal(first.tracks.length, 8);
   assert.deepEqual(first.tracks.map((track) => track.role), ["kick", "hats", "percussion", "bass", "chords", "lead", "texture", "fx"]);
   assert.ok(first.tracks.every((track) => track.notes.length > 0));
@@ -85,4 +85,16 @@ test("mock adapter can delete a temporary anchor track without corrupting indexe
   assert.equal(snapshot.trackCount, 1);
   assert.equal(snapshot.tracks[0]?.index, 0);
   assert.equal(snapshot.tracks[0]?.name, "LB Kick");
+});
+
+test("compatible stock instruments receive the selected variant synthesis hints", async () => {
+  const ableton = new MockAbletonAdapter();
+  const plan = planProduction("EKBOX Cabaret eerie machine funk", { bars: 64, seed: 3 });
+  assert.equal(plan.brief.pack.variant?.id, "cabaret-eerie-machine");
+  await executeProduction(ableton, plan, false);
+  const bass = plan.tracks.findIndex((track) => track.role === "bass");
+  const instrument = (await ableton.getDevices(bass))[0]!;
+  const parameters = await ableton.getDeviceParameters({ trackIndex: bass, deviceIndex: instrument.index });
+  assert.equal(parameters.find((parameter) => parameter.name === "Filter Freq")?.normalizedValue, .34);
+  assert.equal(parameters.find((parameter) => parameter.name === "Resonance")?.normalizedValue, .58);
 });

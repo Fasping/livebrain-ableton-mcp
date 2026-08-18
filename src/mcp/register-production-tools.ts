@@ -6,6 +6,7 @@ import { executeProduction } from "../production/production-executor.js";
 import { planProduction } from "../production/production-planner.js";
 import type { ReferenceService } from "../reference/reference-service.js";
 import type { StylePackRegistry } from "../packs/registry.js";
+import { applyVariantProfile } from "../packs/variant.js";
 import { getCuratedStyleContext, listCuratedStyleContexts } from "../style/curated-scenes.js";
 import { blendResolvedStyles, resolveCuratedStyleMix, type StyleResolution } from "../style/style-resolver.js";
 import { textResult } from "./helpers.js";
@@ -22,10 +23,11 @@ const productionInput = {
   profileId: profileIdSchema.optional(),
   profileMix: profileMixSchema.optional(),
   packId: profileIdSchema.optional().describe("Optional style pack id, such as pop, rnb-soul, rock, hip-hop, ambient, electronic, underground-electronic or underground-breaks."),
+  variantId: profileIdSchema.optional().describe("Optional variation inside a style pack. Omit it to select automatically from the prompt."),
 };
 
 export function registerProductionTools(server: McpServer, ableton: AbletonAdapter, references: ReferenceService, feedback: FeedbackStore, packs: StylePackRegistry) {
-  server.tool("music_list_style_packs", "List installed production packs. Packs define genres, aliases, track roles, generators, arrangement and mix defaults.", {}, async () => textResult({
+  server.tool("music_list_style_packs", "List installed production packs and their selectable variants. Packs define genres, aliases, track roles, generators, synthesis guidance, arrangement and mix defaults.", {}, async () => textResult({
     packs: packs.list().map(({ profile, sourcePath, ...pack }) => ({ ...pack, profile: { id: profile.id, name: profile.name, version: profile.version }, sourcePath: pack.source === "user" ? sourcePath : undefined })),
     diagnostics: packs.diagnostics,
   }));
@@ -43,13 +45,13 @@ export function registerProductionTools(server: McpServer, ableton: AbletonAdapt
       note: "Curated contexts are research-backed hypotheses, not measurements. Import and analyze your own references for a personal profile.",
     }));
 
-  server.tool("music_resolve_style", "Resolve one or several prompt references into an explainable weighted StyleProfile and apply locally learned preferences without changing Ableton.", {
-    prompt: z.string().min(3).max(4000), profileId: profileIdSchema.optional(), profileMix: profileMixSchema.optional(), packId: profileIdSchema.optional(),
-  }, async ({ prompt, profileId, profileMix, packId }) => {
-    const options = await resolveProfileInput(prompt, profileId, profileMix, packId, references, feedback, packs, {});
+  server.tool("music_resolve_style", "Resolve a prompt into an explainable pack, variation and weighted StyleProfile, then apply locally learned preferences without changing Ableton.", {
+    prompt: z.string().min(3).max(4000), profileId: profileIdSchema.optional(), profileMix: profileMixSchema.optional(), packId: profileIdSchema.optional(), variantId: profileIdSchema.optional(),
+  }, async ({ prompt, profileId, profileMix, packId, variantId }) => {
+    const options = await resolveProfileInput(prompt, profileId, profileMix, packId, variantId, references, feedback, packs, {});
     return textResult({
       pack: options.packResolution,
-      profile: options.styleProfile,
+      profile: applyVariantProfile(options.styleProfile!, options.packResolution!),
       source: options.styleSource,
       components: options.styleComponents,
       explanation: options.styleExplanation,
@@ -58,12 +60,12 @@ export function registerProductionTools(server: McpServer, ableton: AbletonAdapt
   });
 
   server.tool("music_plan_production", "Translate a natural-language vibe into a deterministic multi-track composition, arrangement and mix plan without changing Ableton.", productionInput,
-    async ({ prompt, profileId, profileMix, packId, ...options }) => textResult(planProduction(prompt, await resolveProfileInput(prompt, profileId, profileMix, packId, references, feedback, packs, options))));
+    async ({ prompt, profileId, profileMix, packId, variantId, ...options }) => textResult(planProduction(prompt, await resolveProfileInput(prompt, profileId, profileMix, packId, variantId, references, feedback, packs, options))));
 
   server.tool("music_create_production", "Build a pack-driven multi-track production with instruments, MIDI, role-aware mixer settings and Arrangement placement. Defaults to dry-run.", {
     ...productionInput, dryRun: z.boolean().default(true),
-  }, async ({ prompt, dryRun, profileId, profileMix, packId, ...options }) => {
-    const resolvedOptions = await resolveProfileInput(prompt, profileId, profileMix, packId, references, feedback, packs, options);
+  }, async ({ prompt, dryRun, profileId, profileMix, packId, variantId, ...options }) => {
+    const resolvedOptions = await resolveProfileInput(prompt, profileId, profileMix, packId, variantId, references, feedback, packs, options);
     const plan = planProduction(prompt, resolvedOptions);
     const execution = await executeProduction(ableton, plan, dryRun);
     if (dryRun) return textResult(execution);
@@ -94,13 +96,14 @@ async function resolveProfileInput(
   profileId: string | undefined,
   profileMix: Array<{ profileId: string; weight: number }> | undefined,
   packId: string | undefined,
+  variantId: string | undefined,
   references: ReferenceService,
   feedback: FeedbackStore,
   packs: StylePackRegistry,
   options: Omit<Parameters<typeof planProduction>[1], "styleProfile">,
 ) {
   if (profileId && profileMix) throw new Error("Use profileId or profileMix, not both");
-  const packResolution = packs.resolve(prompt, packId);
+  const packResolution = packs.resolve(prompt, packId, variantId);
   let resolution: StyleResolution;
   if (profileMix) {
     const loaded = await Promise.all(profileMix.map(async (item) => ({ ...(await loadProfile(item.profileId, references)), weight: item.weight })));

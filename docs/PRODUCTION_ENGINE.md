@@ -8,7 +8,7 @@ The Production Engine is the high-level layer that turns a musical request into 
 
 Pure planning. It resolves a style pack, then compiles the prompt into tempo, key/mode, genre, musical traits, style provenance, pack-defined track roles, MIDI material, browser queries, mixer settings and Arrangement positions. It never changes Ableton.
 
-Use optional `packId` to select instrumentation and arrangement explicitly. Use `profileId` to select either a bundled underground context or a profile built from your own local references, and `profileMix` for explicit weighted blends. Without these fields, the prompt selects a pack and any compatible named contexts are resolved automatically.
+Use optional `packId` to select instrumentation and arrangement explicitly. A pack may contain `variantId` choices that alter its groove, synthesis and section topology; without `variantId`, strong prompt aliases select a variant automatically. Use `profileId` to select either a bundled underground context or a profile built from your own local references, and `profileMix` for explicit weighted blends. Without these fields, the prompt selects a pack and any compatible named contexts are resolved automatically.
 
 `music_resolve_style` previews the normalized weights, matched aliases, provenance, final parameters and any learned personal adjustments without composing MIDI or changing Ableton.
 

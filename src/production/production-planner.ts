@@ -8,6 +8,7 @@ import { generateSequence } from "../music-brain/sequence-generator.js";
 import type { StyleProfile } from "../music-brain/style-profile.js";
 import { getDefaultStylePackRegistry } from "../packs/registry.js";
 import type { StylePackTrack } from "../packs/types.js";
+import { applyVariantProfile, resolveVariantTracks } from "../packs/variant.js";
 import { resolveCuratedStyleMix, type StyleResolution } from "../style/style-resolver.js";
 import { compileVibe, type CompileVibeOptions } from "./vibe-compiler.js";
 import type { ProductionClipPlan, ProductionPlan, ProductionTrackPlan } from "./types.js";
@@ -16,7 +17,7 @@ export function planProduction(prompt: string, options: CompileVibeOptions = {})
   const packResolution = options.packResolution ?? getDefaultStylePackRegistry().resolve(prompt, options.packId);
   const automatic = options.styleProfile ? undefined : curatedResolutionForPack(prompt, packResolution.pack.profileIds);
   const resolution = automatic ?? packStyleResolution(packResolution.pack.profile);
-  const styleProfile = options.styleProfile ?? resolution.profile;
+  const styleProfile = applyVariantProfile(options.styleProfile ?? resolution.profile, packResolution);
   const components = options.styleComponents ?? (options.styleProfile ? [{
     id: styleProfile.id, name: styleProfile.name, source: options.styleSource ?? "reference-profile" as const,
     weight: 1, matchedAliases: [], needsAudioAnalysis: options.styleNeedsAudioAnalysis ?? false, weightReason: "explicit profile",
@@ -26,10 +27,13 @@ export function planProduction(prompt: string, options: CompileVibeOptions = {})
     styleSource: options.styleSource ?? resolution.source,
     styleNeedsAudioAnalysis: options.styleNeedsAudioAnalysis ?? resolution.needsAudioAnalysis,
     styleComponents: components,
-    styleExplanation: options.styleExplanation ?? resolution.explanation,
+    styleExplanation: [
+      ...(options.styleExplanation ?? resolution.explanation),
+      ...(packResolution.variant ? [`Applied '${packResolution.variant.name}' generation variant: ${packResolution.variant.description}`] : []),
+    ],
   });
-  const drumNotes = generateDrumGroove(styleProfile, { bars: brief.clipBars, seed: brief.seed, pattern: packResolution.pack.drumPattern });
-  const tracks = packResolution.pack.tracks.map((definition, index) => {
+  const drumNotes = generateDrumGroove(styleProfile, { bars: brief.clipBars, seed: brief.seed, pattern: packResolution.variant?.drumPattern ?? packResolution.pack.drumPattern });
+  const tracks = resolveVariantTracks(packResolution).map((definition, index) => {
     const notes = generateTrackNotes(definition, index, drumNotes, brief, styleProfile);
     return trackPlan(definition, notes, brief, styleProfile, index);
   });
